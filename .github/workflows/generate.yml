@@ -35,6 +35,9 @@ jobs:
       - name: Rename file Home > index
         run: sudo mv ./docs/Home.html ./docs/index.html
 
+      - name: Replace hyphen in filename
+        run: sudo rename 'y/-/ /' *
+
       - name: Find and Replace links
         uses: jacobtomlinson/gha-find-replace@v3
         with:
@@ -48,7 +51,7 @@ jobs:
       - name: Generate the sitemap
         uses: cicirello/generate-sitemap@v1
         with:
-          path-to-root: "docs"
+          base-url-path: https://ktgram.github.io/
           include-html: true
 
       - name: Deploy
