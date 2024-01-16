@@ -23,9 +23,6 @@ jobs:
           owner: 'vendelieu'
           repository: 'telegram-bot.wiki'
 
-      - name: Replace hyphen in filename
-        run: find ./docs -type f -name '*-*' -exec bash -c 'sudo mv "$1" "${1//\-/ }"' _ {} \;
-
       - name: Convert MD > html
         uses: baileyjm02/markdown-to-pdf@v1
         with:
