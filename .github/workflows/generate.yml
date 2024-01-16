@@ -1,0 +1,58 @@
+name: Bot wiki to Pages
+# This workflow is triggered on pushes to the repository.
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Clone TelegramBot wiki repo
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          depth: 1
+          branch: 'master'
+          owner: 'vendelieu'
+          repository: 'telegram-bot.wiki'
+
+      - name: Convert MD > html
+        uses: baileyjm02/markdown-to-pdf@v1
+        with:
+          input_dir: ./telegram-bot.wiki
+          output_dir: docs
+          build_html: true
+          build_pdf: false
+          table_of_contents: true
+
+      - name: Rename file Home > index
+        run: sudo mv ./docs/Home.html ./docs/index.html
+
+      - name: Find and Replace links
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
+          replace: "$1"
+          include: "docs/**"
+
+      - name: Add robots.txt
+        run: 'echo "User-agent: *" | sudo tee ./docs/robots.txt'
+
+      - name: Generate the sitemap
+        uses: cicirello/generate-sitemap@v1
+        with:
+          path-to-root: "docs"
+          include-html: true
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v4
+        with:
+          BRANCH: gh-pages
+          FOLDER: docs
