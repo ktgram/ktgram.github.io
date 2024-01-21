@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<title>Manual-Dsl</title>
+		<title>Functional-DSL</title>
 		<style>
 			/* PDF Specific */
 
@@ -1103,13 +1103,13 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#to-infinity-manual-handling-and-beyond"> To infinity manual handling and beyond!</a><ul><li><a href="#manual-handling-dsl"> Manual handling DSL</a></li><li><a href="#commands-and-inputs"> Commands and Inputs</a><ul><li><a href="#inputs"> Inputs</a></li></ul></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
+			<ul><li><a href="#to-infinity-manual-handling-and-beyond"> To infinity manual handling and beyond!</a><ul><li><a href="#functional-handling-dsl"> Functional handling DSL</a></li><li><a href="#commands-and-inputs"> Commands and Inputs</a><ul><li><a href="#inputs"> Inputs</a></li></ul></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
 		</nav>
 		<main>
 			<h1 id="to-infinity-manual-handling-and-beyond" tabindex="-1"><a class="anchor" href="#to-infinity-manual-handling-and-beyond" aria-hidden="true"><span class="octicon octicon-link"></span></a> To <s>infinity</s> manual handling and beyond!</h1>
-<p>Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of manual update processing.</p>
+<p>Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of functional update processing.</p>
 <p>Moreover, the flexibility of the bot interface also allows you to combine the two modes.</p>
-<h2 id="manual-handling-dsl" tabindex="-1"><a class="anchor" href="#manual-handling-dsl" aria-hidden="true"><span class="octicon octicon-link"></span></a> Manual handling DSL</h2>
+<h2 id="functional-handling-dsl" tabindex="-1"><a class="anchor" href="#functional-handling-dsl" aria-hidden="true"><span class="octicon octicon-link"></span></a> Functional handling DSL</h2>
 <p>In most manual processing methods differ in the types of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types/-update/index.html"><code>Update</code></a> supported, in simple terms you can put a listener on a certain type of data.</p>
 <p>By way of example:</p>
 <pre><code class="language-kotlin"><span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
@@ -1169,7 +1169,7 @@ parsed appropriately specified in configuration.</p>
      <span class="hljs-comment">// next input point if break condition doesn't match</span>
 }
 </code></pre>
-<p>You can read more about methods in the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-manual-handling-dsl/index.html"><code>ManualHandlingDsl</code></a> class documentation.</p>
+<p>You can read more about methods in the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html"><code>FunctionalHandlingDsl</code></a> class documentation.</p>
 <h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
 <ul>
 <li><a href="Markup-dsl">Markup dsl</a></li>
