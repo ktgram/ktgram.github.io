@@ -1103,10 +1103,10 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#to-infinity-manual-handling-and-beyond"> To infinity manual handling and beyond!</a><ul><li><a href="#functional-handling-dsl"> Functional handling DSL</a></li><li><a href="#commands-and-inputs"> Commands and Inputs</a><ul><li><a href="#inputs"> Inputs</a></li></ul></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
+			<ul><li><a href="#to-infinity-functional-handling-and-beyond"> To infinity functional handling and beyond!</a><ul><li><a href="#functional-handling-dsl"> Functional handling DSL</a></li><li><a href="#commands-and-inputs"> Commands and Inputs</a><ul><li><a href="#inputs"> Inputs</a></li></ul></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
 		</nav>
 		<main>
-			<h1 id="to-infinity-manual-handling-and-beyond" tabindex="-1"><a class="anchor" href="#to-infinity-manual-handling-and-beyond" aria-hidden="true"><span class="octicon octicon-link"></span></a> To <s>infinity</s> manual handling and beyond!</h1>
+			<h1 id="to-infinity-functional-handling-and-beyond" tabindex="-1"><a class="anchor" href="#to-infinity-functional-handling-and-beyond" aria-hidden="true"><span class="octicon octicon-link"></span></a> To <s>infinity</s> functional handling and beyond!</h1>
 <p>Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of functional update processing.</p>
 <p>Moreover, the flexibility of the bot interface also allows you to combine the two modes.</p>
 <h2 id="functional-handling-dsl" tabindex="-1"><a class="anchor" href="#functional-handling-dsl" aria-hidden="true"><span class="octicon octicon-link"></span></a> Functional handling DSL</h2>
@@ -1117,7 +1117,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
     bot.handleUpdates() {
         onChosenInlineResult {
-            println(<span class="hljs-string">"got a result <span class="hljs-subst">${data.resultId}</span> from <span class="hljs-subst">${data.from}</span>"</span>)
+            println(<span class="hljs-string">"got a result <span class="hljs-subst">${update.chosenInlineResult.resultId}</span> from <span class="hljs-subst">${update.user}</span>"</span>)
         }
     }
 }
@@ -1134,7 +1134,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
             message { <span class="hljs-string">"Hello"</span> }.send(user, bot)
         }
         onCommand(<span class="hljs-string">"""(red|green|blue)"""</span>.toRegex()) {
-            message { <span class="hljs-string">"you typed <span class="hljs-subst">${update.message.text}</span> color"</span> }.send(user, bot)
+            message { <span class="hljs-string">"you typed <span class="hljs-subst">${update.text}</span> color"</span> }.send(user, bot)
         }
     }
 }
@@ -1153,16 +1153,16 @@ parsed appropriately specified in configuration.</p>
             bot.inputListener[user] = <span class="hljs-string">"testInput"</span>
         }
         onInput(<span class="hljs-string">"testInput"</span>) {
-            message { <span class="hljs-string">"Hey, nice to meet you, <span class="hljs-subst">${message.text}</span>"</span> }.send(user, bot)
+            message { <span class="hljs-string">"Hey, nice to meet you, <span class="hljs-subst">${update.text}</span>"</span> }.send(user, bot)
         }
     }
 }
 </code></pre>
 <p>Also, you can use input chaining:</p>
 <pre><code class="language-kotlin">inputChain(<span class="hljs-string">"conversation"</span>) {
-     message { <span class="hljs-string">"Nice to meet you, <span class="hljs-subst">${message.text}</span>"</span> }.send(user, bot)
+     message { <span class="hljs-string">"Nice to meet you, <span class="hljs-subst">${update.text}</span>"</span> }.send(user, bot)
      message { <span class="hljs-string">"What is your favorite food?"</span> }.send(user, bot)
-}.breakIf({ message.text == <span class="hljs-string">"peanut butter"</span> }) { <span class="hljs-comment">// chain break condition</span>
+}.breakIf({ update.text == <span class="hljs-string">"peanut butter"</span> }) { <span class="hljs-comment">// chain break condition</span>
      message { <span class="hljs-string">"Oh, too bad, I'm allergic to it."</span> }.send(user, bot)
      <span class="hljs-comment">// action that will be applied when match</span>
 }.andThen {

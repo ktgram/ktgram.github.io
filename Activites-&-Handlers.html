@@ -1137,7 +1137,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
     bot.handleUpdates {
          onMessage {
-             message { <span class="hljs-keyword">data</span>.message?.text ?: <span class="hljs-string">""</span> }.send(<span class="hljs-keyword">data</span>.message?.from!!, bot)
+             message { update.text }.send(update.user, bot)
          }
    }
 }
@@ -1164,7 +1164,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
         handle(it) <span class="hljs-comment">// Here we send the update for annotation processing.</span>
         handle(it) { <span class="hljs-comment">// Here we manually process it afterwards.</span>
             onMessage {
-                message { it.message?.text ?: <span class="hljs-string">""</span> }.send(it.message!!.from!!.id, bot)
+                message { update.text }.send(update.user, bot)
             }
         }
 }
