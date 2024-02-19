@@ -1130,8 +1130,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <p>You have two types of flow processing updates:</p>
 <h1 id="functional" tabindex="-1"><a class="anchor" href="#functional" aria-hidden="true"><span class="octicon octicon-link"></span></a> Functional</h1>
 <p>You establish the processing behavior through the lambda parameter function <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html"><code>bot.handleUpdates() {}</code></a>, or through <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html"><code>bot.update.setListener { handle(it) { // set functional handling behavior }</code></a>.</p>
-<p>You can read more about manual processing in a <a href="Manual-Dsl">related article</a>.</p>
-<p>See <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-manual-handling-dsl/index.html"><code>ManualHandlingDsl</code></a>.</p>
+<p>You can read more about  functional processing in a <a href="Functional-Dsl">related article</a>.</p>
+<p>See <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html"><code>FunctionalHandlingDsl</code></a>.</p>
 <pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
     <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>)
 
