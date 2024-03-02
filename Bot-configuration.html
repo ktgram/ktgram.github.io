@@ -1125,9 +1125,9 @@ which you can use to load settings from external sources (<code>properties</code
 <p>The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.</p>
 <pre><code class="language-kotlin"><span class="hljs-keyword">val</span> bot = TelegramBot(ConfigLoaderImpl)
 </code></pre>
-<p>By default this constructor uses <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-env-config-loader/index.html"><code>EnvConfigLoader</code></a> which gets the configuration via environment parameters.</p>
+<p>By default in jvm target <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-env-config-loader/index.html"><code>EnvConfigLoader</code></a> is provided that gets the configuration from environment parameters.</p>
 <p>i.e. you can just call a TelegramBot:</p>
-<pre><code class="language-kotlin"><span class="hljs-keyword">val</span> bot = TelegramBot()
+<pre><code class="language-kotlin"><span class="hljs-keyword">val</span> bot = TelegramBot(EnvConfigLoader)
 </code></pre>
 <p>and configuration will be picked up from the environment by such parameters:</p>
 <pre><code>TGBOT_TOKEN
