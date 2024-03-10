@@ -1114,7 +1114,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li><a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot/-telegram-bot/index.html"><code>TelegramBot</code></a> - current bot instance.</li>
 </ul>
 <p>It is also possible to add a custom type for passing.</p>
-<p>To do this, add a class that implements <a href=""><code>Autowiring&lt;T&gt;</code></a> and mark it with the <a href=""><code>@Injectable</code></a> annotation.</p>
+<p>To do this, add a class that implements <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.interfaces/-autowiring/index.html"><code>Autowiring&lt;T&gt;</code></a> and mark it with the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.annotations/-injectable/index.html"><code>@Injectable</code></a> annotation.</p>
 <p>After implementing the <code>Autowiring</code> interface - <code>T</code> will be available for passing in target functions and will be obtained through the method described in the interface.</p>
 <pre><code class="language-kotlin"><span class="hljs-meta">@Injectable</span>
 <span class="hljs-keyword">object</span> UserResolver : Autowiring&lt;UserRecord&gt; {
