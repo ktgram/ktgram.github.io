@@ -1137,7 +1137,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li><code>SSL_PORT</code>: The port number for SSL/TLS connections.</li>
 <li><code>PEM_PRIVATE_KEY_PATH</code>: The path to the PEM private key file.</li>
 <li><code>PEM_CHAIN_PATH</code>: The path to the PEM certificate chain file.</li>
-<li><code>PEM_PRIVATE_KEY</code>: The PEM private key as a character array.</li>
+<li><code>PEM_PRIVATE_KEY</code>: The PEM private key PASSWORD as a character array.</li>
 <li><code>KEYSTORE_PATH</code>: The path to the Java KeyStore file.</li>
 <li><code>KEYSTORE_PASSWORD</code>: The password for the KeyStore.</li>
 <li><code>KEY_ALIAS</code>: The alias for the key in the KeyStore.</li>
@@ -1166,8 +1166,8 @@ If pem certificates are present, the module itself will create a jks storage fro
             PORT = <span class="hljs-number">8080</span>
             SSL_PORT = <span class="hljs-number">8443</span>
 
-            PEM_PRIVATE_KEY_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/fullchain.pem"</span>
-            PEM_CHAIN_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/privkey.pem"</span>
+            PEM_PRIVATE_KEY_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/privkey.pem"</span>
+            PEM_CHAIN_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/fullchain.pem"</span>
             PEM_PRIVATE_KEY = <span class="hljs-string">"pem_changeit"</span>.toCharArray()
 
             KEYSTORE_PATH = <span class="hljs-string">"/etc/ssl/certs/java/cacerts/bot_keystore.jks"</span>
