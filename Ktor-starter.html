@@ -1103,11 +1103,20 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#overview"> Overview</a></li><li><a href="#key-components"> Key Components</a></li><li><a href="#configuration"> Configuration</a><ul><li><a href="#server-setup"> Server Setup</a></li><li><a href="#bot-configuration"> Bot Configuration:</a></li></ul></li><li><a href="#example-usage"> Example Usage</a></li></ul>
+			<ul><li><a href="#overview"> Overview</a></li><li><a href="#installation"> Installation</a></li><li><a href="#key-components"> Key Components</a></li><li><a href="#configuration"> Configuration</a><ul><li><a href="#server-setup"> Server Setup</a></li><li><a href="#bot-configuration"> Bot Configuration:</a></li></ul></li><li><a href="#example-usage"> Example Usage</a></li></ul>
 		</nav>
 		<main>
 			<h1 id="overview" tabindex="-1"><a class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a> Overview</h1>
 <p>The module is designed to facilitate the creation of a webhook server for Telegram bots. It allows developers to configure the server, including SSL/TLS settings, and declare multiple Telegram bots with custom configurations. The setup process is flexible, enabling developers to tailor the server to their specific needs.</p>
+<h1 id="installation" tabindex="-1"><a class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Installation</h1>
+<p>To install ktor starter add additional dependency to main telegram-bot library:</p>
+<pre><code class="language-gradle"><span class="hljs-keyword">dependencies</span> {
+    implementation(<span class="hljs-string">"eu.vendeli:telegram-bot:x.y.z"</span>)
+    ksp(<span class="hljs-string">"eu.vendeli:ksp:x.y.z"</span>)
+    implementation(<span class="hljs-string">"eu.vendeli:spring-ktgram-starter:x.y.z"</span>)
+    <span class="hljs-comment">// change x.y.z to current library version</span>
+}
+</code></pre>
 <h1 id="key-components" tabindex="-1"><a class="anchor" href="#key-components" aria-hidden="true"><span class="octicon octicon-link"></span></a> Key Components</h1>
 <p><code>serveWebhook</code> Function</p>
 <p>The serveWebhook function is the core of the library. It sets up and starts the webhook server for Telegram bots. It accepts two parameters:</p>
