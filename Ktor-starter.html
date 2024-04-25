@@ -1109,11 +1109,11 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 			<h1 id="overview" tabindex="-1"><a class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a> Overview</h1>
 <p>The module is designed to facilitate the creation of a webhook server for Telegram bots. It allows developers to configure the server, including SSL/TLS settings, and declare multiple Telegram bots with custom configurations. The setup process is flexible, enabling developers to tailor the server to their specific needs.</p>
 <h1 id="installation" tabindex="-1"><a class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Installation</h1>
-<p>To install ktor starter add additional dependency to main telegram-bot library:</p>
+<p>To install ktor starter add additional to main dependency:</p>
 <pre><code class="language-gradle"><span class="hljs-keyword">dependencies</span> {
     implementation(<span class="hljs-string">"eu.vendeli:telegram-bot:x.y.z"</span>)
     ksp(<span class="hljs-string">"eu.vendeli:ksp:x.y.z"</span>)
-    implementation(<span class="hljs-string">"eu.vendeli:spring-ktgram-starter:x.y.z"</span>)
+    implementation(<span class="hljs-string">"eu.vendeli:ktor-starter:x.y.z"</span>) <span class="hljs-comment">// there</span>
     <span class="hljs-comment">// change x.y.z to current library version</span>
 }
 </code></pre>

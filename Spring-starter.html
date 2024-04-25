@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<title>Home</title>
+		<title>Spring-starter</title>
 		<style>
 			/* PDF Specific */
 
@@ -1103,71 +1103,52 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#intro"> Intro</a></li><li><a href="#processing"> Processing</a></li><li><a href="#handling"> Handling</a><ul><li><a href="#global-ratelimiter"> Global RateLimiter</a></li><li><a href="#parse-text"> Parse text</a></li><li><a href="#find-activity"> Find Activity</a><ul><li><a href="#commands"> Commands</a><ul><li><a href="#scopes"> Scopes</a></li></ul></li><li><a href="#inputs"> Inputs</a></li><li><a href="#regex"> Regex</a></li><li><a href="#unprocessed"> Unprocessed</a></li></ul></li><li><a href="#activity-ratelimiter"> Activity RateLimiter</a></li></ul></li><li><a href="#activity"> Activity</a></li><li><a href="#invocation"> Invocation</a></li><li><a href="#see-also"> See also</a></li></ul>
+			<ul><li><a href="#introduction"> Introduction</a></li><li><a href="#key-features"> Key Features</a></li><li><a href="#getting-started"> Getting Started</a><ul><li><a href="#dependency"> Dependency</a></li><li><a href="#configuration"> Configuration</a></li><li><a href="#usage"> Usage</a></li></ul></li><li><a href="#advanced-configuration"> Advanced Configuration</a></li><li><a href="#conclusion"> Conclusion</a></li></ul>
 		</nav>
 		<main>
-			<h1 id="intro" tabindex="-1"><a class="anchor" href="#intro" aria-hidden="true"><span class="octicon octicon-link"></span></a> Intro</h1>
-<p>Let's get an idea of how the library handles updates in general:</p>
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/442cc5f1-0256-425a-9f25-185fdd49fe0a" alt="Handling process diagram">
-</p>
-<p>After receiving an update, the library performs three main steps, as we can see.</p>
-<h1 id="processing" tabindex="-1"><a class="anchor" href="#processing" aria-hidden="true"><span class="octicon octicon-link"></span></a> Processing</h1>
-<p>Processing is to repackage the received update into the appropriate subclass of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html"><code>ProcessedUpdate</code></a> depending on the payload being carried.</p>
-<p>This step is needed to make it easier to operate the update and to extend the processing capabilities.</p>
-<h1 id="handling" tabindex="-1"><a class="anchor" href="#handling" aria-hidden="true"><span class="octicon octicon-link"></span></a> Handling</h1>
-<p>Next comes the main step, here we get to the handling itself.</p>
-<h2 id="global-ratelimiter" tabindex="-1"><a class="anchor" href="#global-ratelimiter" aria-hidden="true"><span class="octicon octicon-link"></span></a> Global RateLimiter</h2>
-<p>If there is a user in the update, we check for exceeding the global rate limiter.</p>
-<h2 id="parse-text" tabindex="-1"><a class="anchor" href="#parse-text" aria-hidden="true"><span class="octicon octicon-link"></span></a> Parse text</h2>
-<p>Next, depending on the payload, we take a particular update component containing text and parse it according to the configuration.</p>
-<p>More detailed you can see in <a href="Update-parsing">update parsing article</a>.</p>
-<h2 id="find-activity" tabindex="-1"><a class="anchor" href="#find-activity" aria-hidden="true"><span class="octicon octicon-link"></span></a> Find Activity</h2>
-<p>Next, according to the processing priority:</p>
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/ed80628a-4160-4ea1-bad2-97b3745be10a" alt="Handling priority diagram">
-</p>
-<p>We are looking for a correspondence between the parsed data and the activities we are operating on.
-As we can see on the priority diagram, <code>Commands</code> always come first.</p>
-<p>I.e. if the text load in the update corresponds to any command, further search for <code>Inputs</code>, <code>Regexes</code> and of course execution of the <code>Unprocessed</code> action will not be performed.</p>
-<p>The only thing is that if there is a <code>UpdateHandlers</code> will be triggered in parallel regardless.</p>
-<h3 id="commands" tabindex="-1"><a class="anchor" href="#commands" aria-hidden="true"><span class="octicon octicon-link"></span></a> Commands</h3>
-<p>Let's take a closer look at the commands and their processing.</p>
-<p>As you may have noticed, although the annotation for processing commands is called <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.annotations/-command-handler/index.html"><code>CommandHandler</code></a>, it is more versatile than the classic concept in Telegram Bots.</p>
-<h4 id="scopes" tabindex="-1"><a class="anchor" href="#scopes" aria-hidden="true"><span class="octicon octicon-link"></span></a> Scopes</h4>
-<p>This is because it has a wider range of processing possibilities, i.e. the target function can be defined not only depending on the text match, but also on the type of a suitable update, this is the concept of scopes.</p>
-<p>Accordingly, each command can have different handlers for a different list of scopes, or vice versa, one command for several.</p>
-<p>Below you can see how mapping by text payload and scope is done:</p>
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="Command scope diagram">
-</p>
-<h3 id="inputs" tabindex="-1"><a class="anchor" href="#inputs" aria-hidden="true"><span class="octicon octicon-link"></span></a> Inputs</h3>
-<p>Next, if the text payload does not match any command the input points are searched.</p>
-<p>The concept is very similar to input waiting in commandline applications, you put in the bot context for a particular user a point that will handle his next input, it doesn't matter what it contains, the main thing is that the next update has a <code>User</code> to be able to relate it to the set input waiting point.</p>
-<p>Below you can see an example of processing an update when there is no match on <code>Commands</code>.</p>
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/925d3e05-0985-43d5-8d6f-b3f2786ff212" alt="Priority example diagram">
-</p>
-<h3 id="regex" tabindex="-1"><a class="anchor" href="#regex" aria-hidden="true"><span class="octicon octicon-link"></span></a> Regex</h3>
-<p>If the handler finds no <code>commands</code> or <code>inputs</code>, it checks the text load against <code>regex</code> handlers.
-We advise to use it without abuse.</p>
-<h3 id="unprocessed" tabindex="-1"><a class="anchor" href="#unprocessed" aria-hidden="true"><span class="octicon octicon-link"></span></a> Unprocessed</h3>
-<p>And the final step, if the handler doesn't find any matching activity (<a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html"><code>UpdateHandler</code></a> works completely in parallel and don't count as usual activity), then the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html"><code>UnprocessedHandler</code></a> comes into play, if it is set, it will handle this case, it may be useful to warn the user that something has gone wrong.</p>
-<h2 id="activity-ratelimiter" tabindex="-1"><a class="anchor" href="#activity-ratelimiter" aria-hidden="true"><span class="octicon octicon-link"></span></a> Activity RateLimiter</h2>
-<p>After finding an activity, it also checks the user's rate limits on it, according to the parameters specified in the activity parameters.</p>
-<h1 id="activity" tabindex="-1"><a class="anchor" href="#activity" aria-hidden="true"><span class="octicon octicon-link"></span></a> Activity</h1>
-<p>Activity refers to the different types of handlers the telegram bot library can handle, including Commands, Inputs, Regexes, and the Unprocessed handler.</p>
-<h1 id="invocation" tabindex="-1"><a class="anchor" href="#invocation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Invocation</h1>
-<p>The final processing step is the invocation of the found activity.</p>
-<p>More details can be found in the <a href="Activity-invocation">invocation article</a>.</p>
-<h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
+			<h2 id="introduction" tabindex="-1"><a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a> Introduction</h2>
+<p>The Spring Starter Library for Telegram Bots is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.</p>
+<h2 id="key-features" tabindex="-1"><a class="anchor" href="#key-features" aria-hidden="true"><span class="octicon octicon-link"></span></a> Key Features</h2>
 <ul>
-<li><a href="Update-parsing">Update parsing</a></li>
-<li><a href="Activity-invocation">Activity invocation</a></li>
-<li><a href="Bot-configuration">Bot configuration</a></li>
-<li><a href="Ktor-starter">Ktor starter</a></li>
-<li><a href="Spring-starter">Spring starter</a></li>
+<li><strong>Auto-Configuration</strong>: The library automatically configures Telegram bots based on the provided configuration properties, eliminating the need for manual setup.</li>
+<li><strong>Configuration Properties</strong>: It supports configuration properties for easy customization of bot settings, such as bot tokens, package names, and identifiers.</li>
+<li><strong>Spring Integration</strong>: Seamlessly integrates with the Spring ecosystem, utilizing Spring's dependency injection and application context for managing bot instances.</li>
+<li><strong>Coroutine Support</strong>: Leverages Kotlin coroutines for asynchronous bot operations, ensuring efficient and non-blocking execution.</li>
 </ul>
+<h2 id="getting-started" tabindex="-1"><a class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a> Getting Started</h2>
+<p>To use the Spring Starter Library for Telegram Bots, you need to include it as a dependency in your Spring Boot project. The library is designed to work with Spring Boot applications and requires the Spring Boot framework to function.</p>
+<h3 id="dependency" tabindex="-1"><a class="anchor" href="#dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a> Dependency</h3>
+<p>Add the following dependency to your <code>build.gradle</code> or <code>pom.xml</code> file:</p>
+<pre><code class="language-gradle"><span class="hljs-keyword">dependencies</span> {
+    implementation <span class="hljs-string">'eu.vendeli:spring-starter:&lt;version&gt;'</span>
+}
+</code></pre>
+<p>Replace <code>&lt;version&gt;</code> with the latest version of the library.</p>
+<h3 id="configuration" tabindex="-1"><a class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a> Configuration</h3>
+<p>The library uses Spring Boot's <code>@ConfigurationProperties</code> to bind configuration properties. You can define your bot configurations in the <code>application.properties</code> or <code>application.yml</code> file of your Spring Boot application.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">ktgram:</span>
+ <span class="hljs-attr">autoStartPolling:</span> <span class="hljs-literal">true</span>
+ <span class="hljs-attr">bot:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">token:</span> <span class="hljs-string">YOUR_BOT_TOKEN</span>
+      <span class="hljs-attr">pckg:</span> <span class="hljs-string">com.example.bot</span>
+      <span class="hljs-attr">identifier:</span> <span class="hljs-string">MyBot</span>
+</code></pre>
+<h3 id="usage" tabindex="-1"><a class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a> Usage</h3>
+<p>Once the library is included and configured, it automatically creates and configures Telegram bot instances based on the provided configuration.</p>
+<p>It also supports multiple bot instances, to initialize several ones just declare it as new entry in bot section:</p>
+<pre><code class="language-yaml"><span class="hljs-attr">ktgram:</span>
+ <span class="hljs-attr">bot:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">token:</span> <span class="hljs-string">YOUR_BOT_TOKEN</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">token:</span> <span class="hljs-string">SECOND_BOT_TOKEN</span>
+</code></pre>
+<h2 id="advanced-configuration" tabindex="-1"><a class="anchor" href="#advanced-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a> Advanced Configuration</h2>
+<p>For more advanced configurations, such as customizing bot behavior or integrating with other Spring components, you can extend the <code>BotConfiguration</code> class and change bot configuration through its <code>applyCfg</code> method, you can see example <a href="https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt">there</a>.</p>
+<blockquote>
+<p>[!TIP]
+To configure each initialized instance with a custom configuration, distinguish them by their identifier (the BotConfiguration class also has an identifier).</p>
+</blockquote>
+<h2 id="conclusion" tabindex="-1"><a class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a> Conclusion</h2>
+<p>The Spring Starter Library for Telegram Bot offers a powerful and flexible way to integrate Telegram bots into Spring Boot applications. With its auto-configuration capabilities, support for configuration properties, and seamless integration with the Spring ecosystem, it simplifies the development and management of Telegram bots. Whether you're building a simple bot or a complex application, this library provides the tools you need to get started quickly and efficiently.</p>
 
 		</main>
 	</body>
