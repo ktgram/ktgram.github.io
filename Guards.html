@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<title>First-bot</title>
+		<title>Guards</title>
 		<style>
 			/* PDF Specific */
 
@@ -1103,38 +1103,87 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#our-first-bot"> Our first bot</a><ul><li><a href="#1-telegrambot"> 1. TelegramBot</a></li><li><a href="#2-bothandleupdates"> 2. bot.handleUpdates</a></li><li><a href="#2-commandhandler"> 2. CommandHandler</a></li><li><a href="#4-message"> 4. message</a></li><li><a href="#see-also"> See also</a></li></ul></li></ul>
+			<ul><li><a href="#introduction"> Introduction</a></li><li><a href="#purpose-of-activity-guards"> Purpose of Activity Guards</a></li><li><a href="#common-use-cases"> Common Use Cases</a></li><li><a href="#implementation-strategies"> Implementation Strategies</a></li><li><a href="#integrating-guards-with-activities"> Integrating Guards with Activities</a><ul><li><a href="#implementing-example"> Implementing Example</a></li></ul></li><li><a href="#best-practices"> Best Practices</a></li><li><a href="#conclusion"> Conclusion</a></li><li><a href="#see-also"> See also</a></li></ul>
 		</nav>
 		<main>
-			<h1 id="our-first-bot" tabindex="-1"><a class="anchor" href="#our-first-bot" aria-hidden="true"><span class="octicon octicon-link"></span></a> Our first bot</h1>
-<p>Let's look at an example of the simplest echo bot:</p>
-<pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
-    <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>)
-
-    bot.handleUpdates()
-}
-
-<span class="hljs-meta">@CommandHandler([<span class="hljs-meta-string">"/start"</span>])</span>
-<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">start</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
-    message { <span class="hljs-string">"Hello!"</span> }.send(user, bot)
+			<h1 id="introduction" tabindex="-1"><a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a> Introduction</h1>
+<p>Guards are an essential feature for developers creating bots. These guards function as pre-execution checks that determine whether a particular command should be invoked. By implementing these checks, developers can enhance the functionality, security, and user experience of their bots.</p>
+<h1 id="purpose-of-activity-guards" tabindex="-1"><a class="anchor" href="#purpose-of-activity-guards" aria-hidden="true"><span class="octicon octicon-link"></span></a> Purpose of Activity Guards</h1>
+<p>The primary purpose of activity guards is to ensure that only authorized users or specific conditions trigger a activity.</p>
+<p>This can prevent misuse, maintain the bot's integrity, and streamline interactions.</p>
+<h1 id="common-use-cases" tabindex="-1"><a class="anchor" href="#common-use-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a> Common Use Cases</h1>
+<ol>
+<li>Authentication and Authorization: Ensuring only certain users can access specific commands.</li>
+<li>Pre-condition Checks: Verifying that certain conditions are met before executing a activity (e.g., ensuring a user is in a particular state or context).</li>
+<li>Contextual Guards: Making decisions based on the current chat or user state.</li>
+</ol>
+<h1 id="implementation-strategies" tabindex="-1"><a class="anchor" href="#implementation-strategies" aria-hidden="true"><span class="octicon octicon-link"></span></a> Implementation Strategies</h1>
+<p>Implementing Telegram Command Guards typically involves writing functions or methods that encapsulate the logic for each guard. Below are common strategies:</p>
+<ol>
+<li>
+<p>User Role Check:</p>
+<ul>
+<li>Ensuring the user has the required role (e.g., admin, moderator) before executing the command.<pre><code class="language-kotlin"> <span class="hljs-keyword">override</span> <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">condition</span><span class="hljs-params">(user: <span class="hljs-type">User</span>?, update: <span class="hljs-type">ProcessedUpdate</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span>: <span class="hljs-built_in">Boolean</span> {
+  <span class="hljs-comment">// Check if the user is an admin in the given chat</span>
+ }
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>State Verification:</p>
+<ul>
+<li>Checking the user's state before allowing command execution.<pre><code class="language-kotlin"><span class="hljs-keyword">override</span> <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">condition</span><span class="hljs-params">(user: <span class="hljs-type">User</span>?, update: <span class="hljs-type">ProcessedUpdate</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span>: <span class="hljs-built_in">Boolean</span> {
+   <span class="hljs-keyword">return</span> bot.userData[user.id, <span class="hljs-string">"data"</span>] == requiredState
 }
 </code></pre>
-<p>Let's go through the steps of what is what:</p>
-<h4 id="1-telegrambot" tabindex="-1"><a class="anchor" href="#1-telegrambot" aria-hidden="true"><span class="octicon octicon-link"></span></a> 1. <code>TelegramBot</code></h4>
-<p>Next comes the initialization of the bot itself, the first parameter is the <code>token</code>.</p>
-<p>You can see more parameters and possible functions in documentation <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot/-telegram-bot/index.html">there</a>.</p>
-<h4 id="2-bothandleupdates" tabindex="-1"><a class="anchor" href="#2-bothandleupdates" aria-hidden="true"><span class="octicon octicon-link"></span></a> 2. <code>bot.handleUpdates</code></h4>
-<p>Next is the shortcut for the another method <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-telegram-update-handler/set-listener.html"><code>bot.update.setListener</code></a>, which sets the behavior that will be applied to incoming updates and starts listening in <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">long-polling</a> mode.</p>
-<h4 id="2-commandhandler" tabindex="-1"><a class="anchor" href="#2-commandhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> 2. <code>CommandHandler</code></h4>
-<p>We mark function that will be triggered when given text/command will be catched.</p>
-<h4 id="4-message" tabindex="-1"><a class="anchor" href="#4-message" aria-hidden="true"><span class="octicon octicon-link"></span></a> 4. <code>message</code></h4>
-<p>Here, we send hello message to user that used <code>/start</code> command.</p>
-<h2 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h2>
+</li>
+</ul>
+</li>
+<li>
+<p>Custom Guards:</p>
 <ul>
-<li><a href="Actions">Actions</a></li>
+<li>Creating custom logic based on specific requirements.<pre><code class="language-kotlin"><span class="hljs-keyword">override</span> <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">condition</span><span class="hljs-params">(user: <span class="hljs-type">User</span>?, update: <span class="hljs-type">ProcessedUpdate</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span>: <span class="hljs-built_in">Boolean</span> {
+   <span class="hljs-comment">// Custom logic to determine if the command should be executed</span>
+}
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="integrating-guards-with-activities" tabindex="-1"><a class="anchor" href="#integrating-guards-with-activities" aria-hidden="true"><span class="octicon octicon-link"></span></a> Integrating Guards with Activities</h1>
+<p>To integrate these guards with your bot commands, you can create a guard that checks these conditions before the command handler is invoked.</p>
+<h2 id="implementing-example" tabindex="-1"><a class="anchor" href="#implementing-example" aria-hidden="true"><span class="octicon octicon-link"></span></a> Implementing Example</h2>
+<pre><code class="language-kotlin"><span class="hljs-comment">// define somewhere your guard filter class that implements Filter interface</span>
+<span class="hljs-keyword">object</span> YourGuard : Filter {
+    <span class="hljs-keyword">override</span> <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">condition</span><span class="hljs-params">(user: <span class="hljs-type">User</span>?, update: <span class="hljs-type">ProcessedUpdate</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span>: <span class="hljs-built_in">Boolean</span> {
+        <span class="hljs-comment">// write your condition here</span>
+    }
+}
+
+<span class="hljs-comment">// ...</span>
+
+<span class="hljs-meta">@CommandHandler([<span class="hljs-meta-string">"yourCommand"</span>], guard = YourGuard::class)</span> <span class="hljs-comment">// InputHandler also is supported</span>
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">stopHandling</span><span class="hljs-params">(bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    bot.update.stopListener()
+}
+</code></pre>
+<h1 id="best-practices" tabindex="-1"><a class="anchor" href="#best-practices" aria-hidden="true"><span class="octicon octicon-link"></span></a> Best Practices</h1>
+<ul>
+<li>Modularity: Keep guard logic modular and separate from activities.</li>
+<li>Reusability: Write reusable guard functions that can be easily applied across different commands/inputs.</li>
+<li>Efficiency: Optimize guard checks to minimize performance overhead.</li>
+<li>User Feedback: Provide clear feedback to users when a command is blocked by a guard.</li>
+</ul>
+<h1 id="conclusion" tabindex="-1"><a class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a> Conclusion</h1>
+<p>Activity Guards are a powerful tool for managing bot command/input execution.</p>
+<p>By implementing robust guard mechanisms, developers can ensure their bots operate securely and efficiently, providing a better user experience.</p>
+<h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
+<ul>
+<li><a href="Activites-and-Handlers">Activities and Handlers</a></li>
+<li><a href="Update-parsing">Update parsing</a></li>
 <li><a href="Features">Features</a></li>
-<li><a href="Update-parsing">Updates parsing</a></li>
-<li><a href="Functional-DSL">Functional DSL</a></li>
+<li><a href="Activity-invocation">Activity invocation</a></li>
 </ul>
 
 		</main>

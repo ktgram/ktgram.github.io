@@ -1170,6 +1170,10 @@ parsed appropriately specified in configuration.</p>
 }
 </code></pre>
 <p>You can read more about methods in the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html"><code>FunctionalHandlingDsl</code></a> class documentation.</p>
+<blockquote>
+<p>[!CAUTION]
+Be aware that if you use both handlers (functional, annotation) inputs may work not as it seems to be (each processor clears input after being processed, if you want another behavior change inputAutoRemoval configuration).</p>
+</blockquote>
 <h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
 <ul>
 <li><a href="Markup-dsl">Markup dsl</a></li>
