@@ -1135,9 +1135,7 @@ using your preferred mechanism and pass it on when initializing the bot.</p>
 }
 </code></pre>
 <h1 id="filtering-updates" tabindex="-1"><a class="anchor" href="#filtering-updates" aria-hidden="true"><span class="octicon octicon-link"></span></a> Filtering updates</h1>
-<p>The documentation mentions that you can implement update filtering yourself.</p>
-<p>Yes, this is true, it is not done in the library itself because it can be done very easily by yourself and not to complicate the internal logic for those who do not need this functionality.</p>
-<p>There's simple example how can it be done:</p>
+<p>If there's no complex conditions you can simply filter some updates for being processed:</p>
 <pre><code class="language-kotlin"><span class="hljs-comment">// function where updates filtering condition defined</span>
 <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">filteringFun</span><span class="hljs-params">(update: <span class="hljs-type">Update</span>)</span></span>: <span class="hljs-built_in">Boolean</span> = update.message?.text.isNullOrBlank()
 
@@ -1155,6 +1153,7 @@ using your preferred mechanism and pass it on when initializing the bot.</p>
   }
 }
 </code></pre>
+<p>to include filtering in your command matching or excluding process take a look at guards or <code>@CommonHandler</code>.</p>
 <h1 id="exception-handling" tabindex="-1"><a class="anchor" href="#exception-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a> Exception handling</h1>
 <p>Exceptions received during activities invocation are put into <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-tg-update-handler/caught-exceptions.html"><code>caughtExceptions</code></a> channel and handler can be attached to them.</p>
 <p>There's example of using handler:</p>

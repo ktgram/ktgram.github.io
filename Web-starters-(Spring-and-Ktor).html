@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<title>Spring-starter</title>
+		<title>Web-starters-(Spring-and-Ktor)</title>
 		<style>
 			/* PDF Specific */
 
@@ -1103,11 +1103,11 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#introduction"> Introduction</a></li><li><a href="#key-features"> Key Features</a></li><li><a href="#getting-started"> Getting Started</a><ul><li><a href="#dependency"> Dependency</a></li><li><a href="#configuration"> Configuration</a></li><li><a href="#usage"> Usage</a></li></ul></li><li><a href="#advanced-configuration"> Advanced Configuration</a></li></ul>
+			<ul><li><a href="#spring-starter"> Spring starter</a><ul><li><a href="#key-features"> Key Features</a></li><li><a href="#getting-started"> Getting Started</a><ul><li><a href="#dependency"> Dependency</a></li><li><a href="#configuration"> Configuration</a></li><li><a href="#usage"> Usage</a></li></ul></li><li><a href="#advanced-configuration"> Advanced Configuration</a></li></ul></li><li><a href="#ktor"> Ktor</a><ul><li><a href="#installation"> Installation</a></li><li><a href="#key-components"> Key Components</a></li></ul></li><li><a href="#configuration-1"> Configuration</a><ul><li><a href="#server-setup"> Server Setup</a></li><li><a href="#bot-configuration"> Bot Configuration:</a></li><li><a href="#example-usage"> Example Usage</a></li></ul></li></ul>
 		</nav>
 		<main>
-			<h2 id="introduction" tabindex="-1"><a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a> Introduction</h2>
-<p>The Spring Starter Library for Telegram Bots is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.</p>
+			<h1 id="spring-starter" tabindex="-1"><a class="anchor" href="#spring-starter" aria-hidden="true"><span class="octicon octicon-link"></span></a> Spring starter</h1>
+<p>The Spring Starter module for library is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.</p>
 <h2 id="key-features" tabindex="-1"><a class="anchor" href="#key-features" aria-hidden="true"><span class="octicon octicon-link"></span></a> Key Features</h2>
 <ul>
 <li><strong>Auto-Configuration</strong>: The library automatically configures Telegram bots based on the provided configuration properties, eliminating the need for manual setup.</li>
@@ -1147,6 +1147,96 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <p>[!TIP]
 To configure each initialized instance with a custom configuration, distinguish them by their identifier (the BotConfiguration class also has an identifier).</p>
 </blockquote>
+<h1 id="ktor" tabindex="-1"><a class="anchor" href="#ktor" aria-hidden="true"><span class="octicon octicon-link"></span></a> Ktor</h1>
+<p>The module is designed to facilitate the creation of a webhook server for Telegram bots. It allows developers to configure the server, including SSL/TLS settings, and declare multiple Telegram bots with custom configurations. The setup process is flexible, enabling developers to tailor the server to their specific needs.</p>
+<h2 id="installation" tabindex="-1"><a class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Installation</h2>
+<p>To install ktor starter add additional to main dependency:</p>
+<pre><code class="language-gradle"><span class="hljs-keyword">dependencies</span> {
+    implementation(<span class="hljs-string">"eu.vendeli:telegram-bot:x.y.z"</span>)
+    ksp(<span class="hljs-string">"eu.vendeli:ksp:x.y.z"</span>)
+    implementation(<span class="hljs-string">"eu.vendeli:ktor-starter:x.y.z"</span>) <span class="hljs-comment">// there</span>
+    <span class="hljs-comment">// change x.y.z to current library version</span>
+}
+</code></pre>
+<h2 id="key-components" tabindex="-1"><a class="anchor" href="#key-components" aria-hidden="true"><span class="octicon octicon-link"></span></a> Key Components</h2>
+<p><code>serveWebhook</code> Function</p>
+<p>The serveWebhook function is the core of the library. It sets up and starts the webhook server for Telegram bots. It accepts two parameters:</p>
+<ul>
+<li><code>wait</code>: A boolean indicating whether the server should wait for the application to stop before shutting down. Defaults to true.</li>
+<li><code>serverBuilder</code>: A lambda function that configures the server. Defaults to an empty lambda.</li>
+</ul>
+<h1 id="configuration-1" tabindex="-1"><a class="anchor" href="#configuration-1" aria-hidden="true"><span class="octicon octicon-link"></span></a> Configuration</h1>
+<ul>
+<li><code>WEBHOOK_PREFIX</code>: it's paramter that will be used for address prefix for webhook listener route. (defaults to "/")</li>
+</ul>
+<h3 id="server-setup" tabindex="-1"><a class="anchor" href="#server-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a> Server Setup</h3>
+<ul>
+<li><code>server</code>: A method to set the server configuration using either EnvConfiguration or ManualConfiguration.</li>
+<li><code>engine</code>: A method to configure the Netty application engine.</li>
+<li><code>ktorModule</code>: A method to add Ktor modules to the application.</li>
+</ul>
+<p>The library provides wide range of configurable parameters for the server, including host, port, SSL settings, and more. There are two concrete options for its configuring:</p>
+<ul>
+<li><code>EnvConfiguration</code>: Reads configuration values from environment with <code>KTGRAM_</code> prefix.</li>
+<li><code>ManualConfiguration</code>: Allows for manual setting of configuration values, set your parameters in <code>server {}</code> function.</li>
+</ul>
+<p>There's list of parameters that can be set:</p>
+<ul>
+<li><code>HOST</code>: The hostname or IP address of the server.</li>
+<li><code>PORT</code>: The port number for the server.</li>
+<li><code>SSL_PORT</code>: The port number for SSL/TLS connections.</li>
+<li><code>PEM_PRIVATE_KEY_PATH</code>: The path to the PEM private key file.</li>
+<li><code>PEM_CHAIN_PATH</code>: The path to the PEM certificate chain file.</li>
+<li><code>PEM_PRIVATE_KEY</code>: The PEM private key PASSWORD as a character array.</li>
+<li><code>KEYSTORE_PATH</code>: The path to the Java KeyStore file.</li>
+<li><code>KEYSTORE_PASSWORD</code>: The password for the KeyStore.</li>
+<li><code>KEY_ALIAS</code>: The alias for the key in the KeyStore.</li>
+<li><code>SSL_ON</code>: A boolean indicating whether SSL/TLS should be enabled. Defaults to true.</li>
+</ul>
+<blockquote>
+<p>[!TIP]
+If pem certificates are present, the module itself will create a jks storage from them at the specified path.</p>
+</blockquote>
+<h3 id="bot-configuration" tabindex="-1"><a class="anchor" href="#bot-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a> Bot Configuration:</h3>
+<p>To configure bot call <code>declareBot {}</code> which have such parameters:</p>
+<ul>
+<li><code>token</code>: The bot token.</li>
+<li><code>pckg</code>: The package name for the bot.</li>
+<li><code>identifier</code>: A unique identifier for the bot.</li>
+<li><code>configuration</code>: A lambda function for configuring the bot.</li>
+<li><code>handlingBehaviour</code>: A lambda function for setting the bot's handling behavior.</li>
+<li><code>onInit</code>: A lambda function to be executed when the bot is initialized.</li>
+</ul>
+<h2 id="example-usage" tabindex="-1"><a class="anchor" href="#example-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a> Example Usage</h2>
+<p>To use this module, call <code>serveWebhook</code> function, configure it with your desired settings, declare your bots. Here's a simplified example:</p>
+<pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
+    serveWebhook {
+        server {
+            HOST = <span class="hljs-string">"0.0.0.0"</span>
+            PORT = <span class="hljs-number">8080</span>
+            SSL_PORT = <span class="hljs-number">8443</span>
+
+            PEM_PRIVATE_KEY_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/privkey.pem"</span>
+            PEM_CHAIN_PATH = <span class="hljs-string">"/etc/letsencrypt/live/example.com/fullchain.pem"</span>
+            PEM_PRIVATE_KEY = <span class="hljs-string">"pem_changeit"</span>.toCharArray()
+
+            KEYSTORE_PATH = <span class="hljs-string">"/etc/ssl/certs/java/cacerts/bot_keystore.jks"</span>
+            KEYSTORE_PASSWORD = <span class="hljs-string">"changeit"</span>.toCharArray()
+            <span class="hljs-comment">// Set other configuration parameters as needed</span>
+        }
+        declareBot {
+            token = <span class="hljs-string">"YOUR_BOT_TOKEN"</span>
+            <span class="hljs-comment">// Configure other bot settings</span>
+        }
+        <span class="hljs-comment">// Add more bots or set other parameters if needed</span>
+    }
+}
+</code></pre>
+<blockquote>
+<p>[!CAUTION]
+Don't forget to set webhook to make everything work. 😃</p>
+</blockquote>
+<p>By default module will serve webhook listenening endpoints as <code>host/BOT_TOKEN</code></p>
 
 		</main>
 	</body>

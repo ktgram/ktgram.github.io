@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+		<title>Handlers</title>
+		<style>
+			/* PDF Specific */
+
+@media print {
+  body {
+    min-width: initial;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* General */
+
+.octicon {
+  display: inline-block;
+  fill: currentColor;
+  vertical-align: text-bottom;
+}
+
+.anchor {
+  float: left;
+  line-height: 1;
+  margin-left: -20px;
+  padding-right: 4px;
+}
+
+.anchor:focus {
+  outline: none;
+}
+
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+  color: #1b1f23;
+  vertical-align: middle;
+  visibility: hidden;
+}
+
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+  text-decoration: none;
+}
+
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+  visibility: visible;
+}
+
+h1:hover .anchor .octicon-link:before,
+h2:hover .anchor .octicon-link:before,
+h3:hover .anchor .octicon-link:before,
+h4:hover .anchor .octicon-link:before,
+h5:hover .anchor .octicon-link:before,
+h6:hover .anchor .octicon-link:before {
+  width: 16px;
+  height: 16px;
+  content: ' ';
+  display: inline-block;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' width='16' height='16' aria-hidden='true'%3E%3Cpath fill-rule='evenodd' d='M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z'%3E%3C/path%3E%3C/svg%3E");
+}
+
+body {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-print-color-adjust: exact;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #24292e;
+  word-wrap: break-word;
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 1rem auto;
+}
+
+details {
+  display: block;
+}
+
+summary {
+  display: list-item;
+}
+
+a {
+  background-color: initial;
+}
+
+a:active,
+a:hover {
+  outline-width: 0;
+}
+
+strong {
+  font-weight: inherit;
+  font-weight: bolder;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+img {
+  border-style: none;
+}
+
+code,
+kbd,
+pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+hr {
+  box-sizing: initial;
+  height: 0;
+  overflow: visible;
+}
+
+input {
+  font: inherit;
+  margin: 0;
+}
+
+input {
+  overflow: visible;
+}
+
+[type='checkbox'] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: 600;
+}
+
+hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #dfe2e5;
+}
+
+hr:after,
+hr:before {
+  display: table;
+  content: '';
+}
+
+hr:after {
+  clear: both;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  padding: 0;
+}
+
+details summary {
+  cursor: pointer;
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  line-height: 10px;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fafbfc;
+  border: 1px solid #d1d5da;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #d1d5da;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h1,
+h2 {
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+h3,
+h4 {
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h5,
+h6 {
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 12px;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+blockquote {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+ol ol,
+ul ol {
+  list-style-type: lower-roman;
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+  list-style-type: lower-alpha;
+}
+
+dd {
+  margin-left: 0;
+}
+
+code,
+pre {
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 12px;
+}
+
+pre {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+:checked + .radio-label {
+  position: relative;
+  z-index: 1;
+  border-color: #0366d6;
+}
+
+.border {
+  border: 1px solid #e1e4e8 !important;
+}
+
+.border-0 {
+  border: 0 !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #e1e4e8 !important;
+}
+
+.rounded-1 {
+  border-radius: 3px !important;
+}
+
+.bg-white {
+  background-color: #fff !important;
+}
+
+.bg-gray-light {
+  background-color: #fafbfc !important;
+}
+
+.text-gray-light {
+  color: #6a737d !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.my-2 {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.pl-0 {
+  padding-left: 0 !important;
+}
+
+.py-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.pl-1 {
+  padding-left: 4px !important;
+}
+
+.pl-2 {
+  padding-left: 8px !important;
+}
+
+.py-2 {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.pl-3,
+.px-3 {
+  padding-left: 16px !important;
+}
+
+.px-3 {
+  padding-right: 16px !important;
+}
+
+.pl-4 {
+  padding-left: 24px !important;
+}
+
+.pl-5 {
+  padding-left: 32px !important;
+}
+
+.pl-6 {
+  padding-left: 40px !important;
+}
+
+.f6 {
+  font-size: 12px !important;
+}
+
+.lh-condensed {
+  line-height: 1.25 !important;
+}
+
+.text-bold {
+  font-weight: 600 !important;
+}
+
+.pl-c {
+  color: #6a737d;
+}
+
+.pl-c1,
+.pl-s .pl-v {
+  color: #005cc5;
+}
+
+.pl-e,
+.pl-en {
+  color: #6f42c1;
+}
+
+.pl-s .pl-s1,
+.pl-smi {
+  color: #24292e;
+}
+
+.pl-ent {
+  color: #22863a;
+}
+
+.pl-k {
+  color: #d73a49;
+}
+
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+  color: #032f62;
+}
+
+.pl-smw,
+.pl-v {
+  color: #e36209;
+}
+
+.pl-bu {
+  color: #b31d28;
+}
+
+.pl-ii {
+  color: #fafbfc;
+  background-color: #b31d28;
+}
+
+.pl-c2 {
+  color: #fafbfc;
+  background-color: #d73a49;
+}
+
+.pl-c2:before {
+  content: '^M';
+}
+
+.pl-sr .pl-cce {
+  font-weight: 700;
+  color: #22863a;
+}
+
+.pl-ml {
+  color: #735c0f;
+}
+
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+  font-weight: 700;
+  color: #005cc5;
+}
+
+.pl-mi {
+  font-style: italic;
+  color: #24292e;
+}
+
+.pl-mb {
+  font-weight: 700;
+  color: #24292e;
+}
+
+.pl-md {
+  color: #b31d28;
+  background-color: #ffeef0;
+}
+
+.pl-mi1 {
+  color: #22863a;
+  background-color: #f0fff4;
+}
+
+.pl-mc {
+  color: #e36209;
+  background-color: #ffebda;
+}
+
+.pl-mi2 {
+  color: #f6f8fa;
+  background-color: #005cc5;
+}
+
+.pl-mdr {
+  font-weight: 700;
+  color: #6f42c1;
+}
+
+.pl-ba {
+  color: #586069;
+}
+
+.pl-sg {
+  color: #959da5;
+}
+
+.pl-corl {
+  text-decoration: underline;
+  color: #032f62;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.my-2 {
+  margin-bottom: 8px !important;
+}
+
+.my-2 {
+  margin-top: 8px !important;
+}
+
+.pl-0 {
+  padding-left: 0 !important;
+}
+
+.py-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.pl-1 {
+  padding-left: 4px !important;
+}
+
+.pl-2 {
+  padding-left: 8px !important;
+}
+
+.py-2 {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.pl-3 {
+  padding-left: 16px !important;
+}
+
+.pl-4 {
+  padding-left: 24px !important;
+}
+
+.pl-5 {
+  padding-left: 32px !important;
+}
+
+.pl-6 {
+  padding-left: 40px !important;
+}
+
+.pl-7 {
+  padding-left: 48px !important;
+}
+
+.pl-8 {
+  padding-left: 64px !important;
+}
+
+.pl-9 {
+  padding-left: 80px !important;
+}
+
+.pl-10 {
+  padding-left: 96px !important;
+}
+
+.pl-11 {
+  padding-left: 112px !important;
+}
+
+.pl-12 {
+  padding-left: 128px !important;
+}
+
+hr {
+  border-bottom-color: #eee;
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  line-height: 10px;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fafbfc;
+  border: 1px solid #d1d5da;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #d1d5da;
+}
+
+body:after,
+body:before {
+  display: table;
+  content: '';
+}
+
+body:after {
+  clear: both;
+}
+
+body > :first-child {
+  margin-top: 0 !important;
+}
+
+body > :last-child {
+  margin-bottom: 0 !important;
+}
+
+a:not([href]) {
+  color: inherit;
+  text-decoration: none;
+}
+
+blockquote,
+details,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e1e4e8;
+  border: 0;
+}
+
+blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+blockquote > :first-child {
+  margin-top: 0;
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h1,
+h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eaecef;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.25em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: 0.875em;
+}
+
+h6 {
+  font-size: 0.85em;
+  color: #6a737d;
+}
+
+ol,
+ul {
+  padding-left: 2em;
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+li {
+  word-wrap: break-all;
+}
+
+li > p {
+  margin-top: 16px;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: 600;
+}
+
+dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+}
+
+table th {
+  font-weight: 600;
+}
+
+table td,
+table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+img {
+  max-width: 80%;
+  box-sizing: initial;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fff;
+}
+
+code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+}
+
+pre {
+  word-wrap: normal;
+}
+
+pre > code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  -webkit-print-color-adjust: exact;
+  background: #f8f8f8;
+}
+
+.hljs pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.hljs pre,
+pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  -webkit-print-color-adjust: exact;
+
+  border-radius: 3px;
+}
+
+pre code {
+  display: inline;
+  max-width: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: initial;
+  border: 0;
+}
+
+.commit-tease-sha {
+  display: inline-block;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 90%;
+  color: #444d56;
+}
+
+.full-commit .btn-outline:not(:disabled):hover {
+  color: #005cc5;
+  border-color: #005cc5;
+}
+
+.blob-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.blob-wrapper-embedded {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.blob-num {
+  width: 1%;
+  min-width: 50px;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(27, 31, 35, 0.3);
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: top;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.blob-num:hover {
+  color: rgba(27, 31, 35, 0.6);
+}
+
+.blob-num:before {
+  content: attr(data-line-number);
+}
+
+.blob-code {
+  position: relative;
+  padding-right: 10px;
+  padding-left: 10px;
+  line-height: 20px;
+  vertical-align: top;
+}
+
+.blob-code-inner {
+  overflow: visible;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 12px;
+  color: #24292e;
+  word-wrap: normal;
+  white-space: pre;
+}
+
+.pl-token.active,
+.pl-token:hover {
+  cursor: pointer;
+  background: #ffea7f;
+}
+
+.tab-size[data-tab-size='1'] {
+  -moz-tab-size: 1;
+  tab-size: 1;
+}
+
+.tab-size[data-tab-size='2'] {
+  -moz-tab-size: 2;
+  tab-size: 2;
+}
+
+.tab-size[data-tab-size='3'] {
+  -moz-tab-size: 3;
+  tab-size: 3;
+}
+
+.tab-size[data-tab-size='4'] {
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+.tab-size[data-tab-size='5'] {
+  -moz-tab-size: 5;
+  tab-size: 5;
+}
+
+.tab-size[data-tab-size='6'] {
+  -moz-tab-size: 6;
+  tab-size: 6;
+}
+
+.tab-size[data-tab-size='7'] {
+  -moz-tab-size: 7;
+  tab-size: 7;
+}
+
+.tab-size[data-tab-size='8'] {
+  -moz-tab-size: 8;
+  tab-size: 8;
+}
+
+.tab-size[data-tab-size='9'] {
+  -moz-tab-size: 9;
+  tab-size: 9;
+}
+
+.tab-size[data-tab-size='10'] {
+  -moz-tab-size: 10;
+  tab-size: 10;
+}
+
+.tab-size[data-tab-size='11'] {
+  -moz-tab-size: 11;
+  tab-size: 11;
+}
+
+.tab-size[data-tab-size='12'] {
+  -moz-tab-size: 12;
+  tab-size: 12;
+}
+
+.task-list-item {
+  list-style-type: none;
+}
+
+.task-list-item + .task-list-item {
+  margin-top: 3px;
+}
+
+.task-list-item input {
+  margin: 0 0.2em 0.25em -1.6em;
+  vertical-align: middle;
+}
+/*
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+*/
+  
+  .hljs-comment,
+  .hljs-quote {
+    color: #998;
+    font-style: italic;
+  }
+  
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst {
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .hljs-number,
+  .hljs-literal,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-tag .hljs-attr {
+    color: #008080;
+  }
+  
+  .hljs-string,
+  .hljs-doctag {
+    color: #d14;
+  }
+  
+  .hljs-title,
+  .hljs-section,
+  .hljs-selector-id {
+    color: #900;
+    font-weight: bold;
+  }
+  
+  .hljs-subst {
+    font-weight: normal;
+  }
+  
+  .hljs-type,
+  .hljs-class .hljs-title {
+    color: #458;
+    font-weight: bold;
+  }
+  
+  .hljs-tag,
+  .hljs-name,
+  .hljs-attribute {
+    color: #000080;
+    font-weight: normal;
+  }
+  
+  .hljs-regexp,
+  .hljs-link {
+    color: #009926;
+  }
+  
+  .hljs-symbol,
+  .hljs-bullet {
+    color: #990073;
+  }
+  
+  .hljs-built_in,
+  .hljs-builtin-name {
+    color: #0086b3;
+  }
+  
+  .hljs-meta {
+    color: #999;
+    font-weight: bold;
+  }
+  
+  .hljs-deletion {
+    background: #fdd;
+  }
+  
+  .hljs-addition {
+    background: #dfd;
+  }
+  
+  .hljs-emphasis {
+    font-style: italic;
+  }
+  
+  .hljs-strong {
+    font-weight: bold;
+  }
+		</style>
+	</head>
+	<body>
+		<nav id="table-of-contents">
+			<ul><li><a href="#variety-of-handlers"> Variety of Handlers</a><ul><li><a href="#annotations-overview"> Annotations Overview</a><ul><li><a href="#commandhandler"> CommandHandler</a><ul><li><a href="#commandhandlercallbackquery"> CommandHandler.CallbackQuery</a></li></ul></li><li><a href="#commonhandler"> CommonHandler</a><ul><li><a href="#commonhandlertext"> CommonHandler.Text</a></li><li><a href="#commonhandlerregex"> CommonHandler.Regex</a></li><li><a href="#matching"> Matching</a></li></ul></li><li><a href="#inputhandler"> InputHandler</a></li><li><a href="#unprocessedhandler"> UnprocessedHandler</a></li><li><a href="#updatehandler"> UpdateHandler</a></li></ul></li><li><a href="#request-limiting"> Request limiting</a></li><li><a href="#practical-handlers-applications"> Practical Handlers Applications</a><ul><li><a href="#command-processing"> Command Processing</a></li><li><a href="#event-handling"> Event Handling</a></li><li><a href="#default-and-fallback-handling"> Default and Fallback Handling</a></li></ul></li><li><a href="#conclusion"> Conclusion</a></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
+		</nav>
+		<main>
+			<h1 id="variety-of-handlers" tabindex="-1"><a class="anchor" href="#variety-of-handlers" aria-hidden="true"><span class="octicon octicon-link"></span></a> Variety of Handlers</h1>
+<p>In bot development, particularly in systems involving user interactions, it is crucial to manage and process commands and events efficiently.</p>
+<p>These annotations mark functions designed to process specific commands, inputs, or updates and provide metadata such as command keywords, rate limits, scopes, and guards.</p>
+<h2 id="annotations-overview" tabindex="-1"><a class="anchor" href="#annotations-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a> Annotations Overview</h2>
+<h3 id="commandhandler" tabindex="-1"><a class="anchor" href="#commandhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommandHandler</h3>
+<p>The <code>CommandHandler</code> annotation is used to mark functions that process specific commands.</p>
+<p>This annotation includes properties that define the command's keywords, rate limits, scopes, and guards. It is intended for functions that should handle commands at runtime.</p>
+<ul>
+<li><strong>value</strong>: Specifies the keywords associated with the command.</li>
+<li><strong>rateLimits</strong>: Defines the query limits for this particular command.</li>
+<li><strong>scope</strong>: Determines the context or scope in which the command will be checked.</li>
+<li><strong>guard</strong>: Specifies a guard class that provides additional validation and processing control for the command.</li>
+</ul>
+<pre><code class="language-kotlin"><span class="hljs-meta">@CommandHandler([<span class="hljs-meta-string">"text"</span>], guard = isAdminGuard::class)</span>
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h4 id="commandhandlercallbackquery" tabindex="-1"><a class="anchor" href="#commandhandlercallbackquery" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommandHandler.CallbackQuery</h4>
+<p>A specialized version of the <code>CommandHandler</code> annotation designed specifically for handling callback queries.</p>
+<p>It includes similar properties as <code>CommandHandler</code>, with a focus on callback-related commands.</p>
+<pre><code class="language-kotlin"><span class="hljs-meta">@CommandHandler</span>.CallbackQuery([<span class="hljs-string">"text"</span>], rateLimits = RateLimits(period = <span class="hljs-number">10</span>, rate = <span class="hljs-number">5</span>))
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h3 id="commonhandler" tabindex="-1"><a class="anchor" href="#commonhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommonHandler</h3>
+<p>The <code>CommonHandler</code> annotation is intended for functions that process commands with lower priority compared to <code>CommandHandler</code> and <code>InputHandler</code>. It is used at the source level and provides a flexible way to define common command handlers.</p>
+<h4 id="commonhandlertext" tabindex="-1"><a class="anchor" href="#commonhandlertext" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommonHandler.Text</h4>
+<p>This annotation specifies text matching against updates. It includes properties to define the matching text, filtering conditions, priority, scope, and rate limits.</p>
+<ul>
+<li><strong>value</strong>: The text to match against incoming updates.</li>
+<li><strong>filter</strong>: A class that defines conditions used in the matching process.</li>
+<li><strong>priority</strong>: The priority level of the handler, where 0 is the highest priority.</li>
+<li><strong>scope</strong>: The context or scope in which the text matching will be checked.</li>
+<li><strong>rateLimits</strong>: The query limits for this specific text matching handler.</li>
+</ul>
+<pre><code class="language-kotlin"><span class="hljs-meta">@CommonHandler</span>.Text([<span class="hljs-string">"text"</span>], filter = isNewUserFilter::<span class="hljs-class"><span class="hljs-keyword">class</span>, <span class="hljs-type">priority = 10)</span></span>
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h4 id="commonhandlerregex" tabindex="-1"><a class="anchor" href="#commonhandlerregex" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommonHandler.Regex</h4>
+<p>Similar to <code>CommonHandler.Text</code>, this annotation is used for matching updates based on regular expressions. It includes properties for defining the regex pattern, options, filtering conditions, priority, scope, and rate limits.</p>
+<ul>
+<li><strong>value</strong>: The regex pattern used for matching.</li>
+<li><strong>options</strong>: Regex options that modify the behavior of the regex pattern.</li>
+<li><strong>filter</strong>: A class that defines conditions used in the matching process.</li>
+<li><strong>priority</strong>: The priority level of the handler, where 0 is the highest priority.</li>
+<li><strong>scope</strong>: The context or scope in which the regex matching will be checked.</li>
+<li><strong>rateLimits</strong>: The query limits for this specific regex matching handler.</li>
+</ul>
+<pre><code class="language-kotlin"><span class="hljs-meta">@CommonHandler</span>.Regex(<span class="hljs-string">"^\d+$"</span>, scope = [UpdateType.EDIT_MESSAGE])
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">EditedMessageUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h4 id="matching" tabindex="-1"><a class="anchor" href="#matching" aria-hidden="true"><span class="octicon octicon-link"></span></a> Matching</h4>
+<p>The <code>CommonHandler</code> annotation is has its own matching process. This process includes checking if updates match specified text or regex patterns, ensures is given filter passes, and ensures the command is processed in the correct scope, only when all these conditions are met handler will be match against update.</p>
+<p>So basically same text payload can be matched to different activities depending on filter and other context.</p>
+<h3 id="inputhandler" tabindex="-1"><a class="anchor" href="#inputhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> InputHandler</h3>
+<p>The <code>InputHandler</code> annotation marks functions that process specific input events. It is intended for functions that handle inputs at runtime and includes properties for defining input keywords, rate limits, and guards.</p>
+<ul>
+<li><strong>value</strong>: Specifies the keywords associated with the input event.</li>
+<li><strong>rateLimits</strong>: Defines the query limits for this particular input.</li>
+<li><strong>guard</strong>: Specifies a guard class that provides additional validation and processing control for the input.</li>
+</ul>
+<pre><code class="language-kotlin"><span class="hljs-meta">@InputHandler(<span class="hljs-meta-string">"text"</span>)</span>
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">ProcessedUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h3 id="unprocessedhandler" tabindex="-1"><a class="anchor" href="#unprocessedhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> UnprocessedHandler</h3>
+<p>The <code>UnprocessedHandler</code> annotation is used to mark functions that handle updates not processed by other handlers. It ensures that any unprocessed updates are managed appropriately, with only one processing point possible for this handler type.</p>
+<pre><code class="language-kotlin"><span class="hljs-meta">@UnprocessedHandler</span>
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">ProcessedUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h3 id="updatehandler" tabindex="-1"><a class="anchor" href="#updatehandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> UpdateHandler</h3>
+<p>The <code>UpdateHandler</code> annotation marks functions that handle specific types of incoming updates. It provides a way to categorize and process different update types systematically.</p>
+<ul>
+<li><strong>type</strong>: Specifies the types of updates the handler function will process.</li>
+</ul>
+<pre><code class="language-kotlin"><span class="hljs-meta">@UpdateHandler([UpdateType.PRE_CHECKOUT_QUERY])</span>
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">ProcessedUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<h2 id="request-limiting" tabindex="-1"><a class="anchor" href="#request-limiting" aria-hidden="true"><span class="octicon octicon-link"></span></a> Request limiting</h2>
+<p>In addition, let us also disclose the rate limiting mechanism described in the annotations.</p>
+<p>You can set general limits for each user:</p>
+<pre><code class="language-kotlin"><span class="hljs-comment">// ...</span>
+<span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>) {
+    rateLimiter { <span class="hljs-comment">// general limits</span>
+        limits = RateLimits(period = <span class="hljs-number">10000</span>, rate = <span class="hljs-number">5</span>)
+    }
+}
+
+<span class="hljs-comment">// Limits on certain actions</span>
+<span class="hljs-meta">@CommandHandler([<span class="hljs-meta-string">"/start"</span>], RateLimits(period = 1000L, rate = 1L)</span>)
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">start</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>By default after limit is exceeded bot will send message:</p>
+<pre><code class="language-kotlin">message(<span class="hljs-string">"Request limit exceeded, try again later."</span>).send(telegramId, bot)
+</code></pre>
+<p>But it can be changed in configuration</p>
+<pre><code class="language-kotlin"><span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"..."</span>) {
+    rateLimiter {
+        exceededAction = {telegramId: <span class="hljs-built_in">Long</span>, bot: TelegramBot -&gt;
+            message(<span class="hljs-string">"limit exceeded aaaaa..."</span>).send(telegramId, bot)
+            <span class="hljs-comment">// change message there or do whatever you like</span>
+        }
+    }
+}
+</code></pre>
+<h2 id="practical-handlers-applications" tabindex="-1"><a class="anchor" href="#practical-handlers-applications" aria-hidden="true"><span class="octicon octicon-link"></span></a> Practical Handlers Applications</h2>
+<h3 id="command-processing" tabindex="-1"><a class="anchor" href="#command-processing" aria-hidden="true"><span class="octicon octicon-link"></span></a> Command Processing</h3>
+<p>In chat applications, command handlers are crucial for processing user commands such as <code>/start</code>, <code>/help</code>, or custom commands specific to the application. By using <code>CommandHandler</code> annotations, developers can easily define which functions should handle specific commands, apply rate limits to prevent abuse, and use guards to ensure the command is executed under the right conditions.</p>
+<h3 id="event-handling" tabindex="-1"><a class="anchor" href="#event-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a> Event Handling</h3>
+<p>For applications that involve various types of events, such as message updates, callback queries, or other interactions, the <code>UpdateHandler</code> and <code>CommonHandler</code> annotations provide a structured way to manage these events. Developers can specify the types of updates and the conditions under which they should be handled, ensuring the application responds appropriately to different user actions.</p>
+<h3 id="default-and-fallback-handling" tabindex="-1"><a class="anchor" href="#default-and-fallback-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a> Default and Fallback Handling</h3>
+<p>The <code>UnprocessedHandler</code> annotation allows developers to define a default handler for updates that are not processed by any other handler. This ensures that no update goes unhandled, providing a fallback mechanism to manage unexpected or uncategorized updates.</p>
+<h2 id="conclusion" tabindex="-1"><a class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a> Conclusion</h2>
+<p>These annotations provide a robust and flexible tools for handling commands, inputs, and events.</p>
+<h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
+<ul>
+<li><a href="Activites-and-Processors">Activities &amp; Processors</a></li>
+<li><a href="Activity-invocation">Activity invocation</a></li>
+<li><a href="FSM-%7C-Conversation-handling">FSM and Conversation handling</a></li>
+<li><a href="Update-parsing">Update parsing</a></li>
+</ul>
+
+		</main>
+	</body>
+</html>

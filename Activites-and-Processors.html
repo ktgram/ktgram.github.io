@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<title>Markup-dsl</title>
+		<title>Activites-and-Processors</title>
 		<style>
 			/* PDF Specific */
 
@@ -1103,47 +1103,83 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</head>
 	<body>
 		<nav id="table-of-contents">
-			<ul><li><a href="#inline-keyboard-markup"> Inline Keyboard Markup</a></li><li><a href="#reply-keyboard-markup"> Reply Keyboard Markup</a><ul><li><a href="#where-they-should-be"> Where they should be?</a></li></ul></li></ul>
+			<ul><li><a href="#introduction"> Introduction</a></li><li><a href="#collecting-activities"> Collecting activities</a></li><li><a href="#processors"> Processors</a><ul><li><a href="#functional"> Functional</a></li><li><a href="#annotation"> Annotation</a><ul><li><a href="#webhooks"> Webhooks</a></li><li><a href="#long-polling"> Long polling</a></li></ul></li><li><a href="#both"> Both</a></li></ul></li><li><a href="#see-also"> See also</a></li></ul>
 		</nav>
 		<main>
-			<p>The library interface provides a convenient interface for assembling buttons in a markup.</p>
-<p>Of course, this does not prohibit you from using basic approaches.</p>
-<p>Here are examples:</p>
-<h1 id="inline-keyboard-markup" tabindex="-1"><a class="anchor" href="#inline-keyboard-markup" aria-hidden="true"><span class="octicon octicon-link"></span></a> Inline Keyboard Markup</h1>
-<p>This builder allows you to build inline buttons with any combination of parameters.</p>
-<pre><code class="language-kotlin">inlineKeyboardMarkup {
-    <span class="hljs-string">"name"</span> callback <span class="hljs-string">"callbackData"</span>         <span class="hljs-comment">//</span>
-    <span class="hljs-string">"buttonName"</span> url <span class="hljs-string">"https://google.com"</span>  <span class="hljs-comment">//--- these two buttons will be in the same row.</span>
-    newLine() <span class="hljs-comment">// or br()</span>
-    <span class="hljs-string">"otherButton"</span> webAppInfo <span class="hljs-string">"data"</span>       <span class="hljs-comment">// this will be in other row</span>
-
-    <span class="hljs-comment">// you can also use a different style within the builder:</span>
-    callbackData(<span class="hljs-string">"buttonName"</span>) { <span class="hljs-string">"callbackData"</span> }
-}
-
-</code></pre>
-<p>More details can be seen in the library <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html">documentation</a>.</p>
-<h1 id="reply-keyboard-markup" tabindex="-1"><a class="anchor" href="#reply-keyboard-markup" aria-hidden="true"><span class="octicon octicon-link"></span></a> Reply Keyboard Markup</h1>
-<p>This builder allows you to build menu buttons.</p>
-<pre><code class="language-kotlin">replyKeyboardMarkup {
-  + <span class="hljs-string">"Menu button"</span>     <span class="hljs-comment">// you can add buttons by using unary plus operator</span>
-  + <span class="hljs-string">"Menu button 2"</span>
-  br() <span class="hljs-comment">// go to second row</span>
-  <span class="hljs-string">"Send polls 👀"</span> requestPoll <span class="hljs-literal">true</span>   <span class="hljs-comment">// button with parameter</span>
-
-  options {
-    resizeKeyboard = <span class="hljs-literal">true</span>
-  }
+			<h1 id="introduction" tabindex="-1"><a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a> Introduction</h1>
+<p><code>Activity</code> in the terms of this library is the abstract entity that serves as concept that represents a generalization of entities such as <code>@CommandHandler</code>, <code>@InputHandler</code>, <code>@UnprocessedHandler</code>, and <code>@CommonHandler</code>.</p>
+<p>Also take a look at <a href="Handlers">handlers article</a>.</p>
+<h1 id="collecting-activities" tabindex="-1"><a class="anchor" href="#collecting-activities" aria-hidden="true"><span class="octicon octicon-link"></span></a> Collecting activities</h1>
+<p>Activities are collected and prepared all context in compile time.</p>
+<p>If you want to limit the area in which the package will be searched, you can pass a parameter to ksp:</p>
+<pre><code class="language-gradle">ksp {
+    arg(<span class="hljs-string">"package"</span>, <span class="hljs-string">"com.example.mybot"</span>)
 }
 </code></pre>
-<p>Additional options applicable to the keyboard can be seen in <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types.internal.options/-reply-keyboard-markup-options/index.html"><code>ReplyKeyboardMarkupOptions</code></a>.</p>
-<p>See the builder <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html">documentation</a> for more details about the methods.</p>
-<h3 id="where-they-should-be" tabindex="-1"><a class="anchor" href="#where-they-should-be" aria-hidden="true"><span class="octicon octicon-link"></span></a> Where they should be?</h3>
-<p>If you do not understand where to put the interface, the final version should look something like this:</p>
-<pre><code class="language-kotlin">message { <span class="hljs-string">"text"</span> }.replyKeyboardMarkup { <span class="hljs-comment">// or inline version</span>
-  + <span class="hljs-string">"Menu button"</span>
-}.send(to = user, via = bot)
+<p>note in such a case, in order for the collected actions to be processed correctly, you must also specify the package in the instance itself.</p>
+<pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
+    <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>, <span class="hljs-string">"com.example.mybot"</span>)
+
+    bot.handleUpdates()
+    <span class="hljs-comment">// start long-polling listener</span>
+}
 </code></pre>
+<p>this option is added to be able to run multiple bot instances, to specify different packages you need to specify them with <code>;</code> separator.</p>
+<pre><code class="language-gradle">ksp {
+    arg(<span class="hljs-string">"package"</span>, <span class="hljs-string">"com.example.mybot;com.example.mybot2"</span>)
+}
+</code></pre>
+<h1 id="processors" tabindex="-1"><a class="anchor" href="#processors" aria-hidden="true"><span class="octicon octicon-link"></span></a> Processors</h1>
+<p>You have two types of flow processing updates:</p>
+<h2 id="functional" tabindex="-1"><a class="anchor" href="#functional" aria-hidden="true"><span class="octicon octicon-link"></span></a> Functional</h2>
+<p>You establish the processing behavior through the lambda parameter function <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html"><code>bot.handleUpdates() {}</code></a>, or through <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html"><code>bot.update.setListener { handle(it) { // set functional handling behavior }</code></a>.</p>
+<p>You can read more about  functional processing in a <a href="Functional-Dsl">related article</a>.</p>
+<p>See <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html"><code>FunctionalHandlingDsl</code></a>.</p>
+<pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
+    <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>)
+
+    bot.handleUpdates {
+         onMessage {
+             message { update.text }.send(update.user, bot)
+         }
+   }
+}
+</code></pre>
+<h2 id="annotation" tabindex="-1"><a class="anchor" href="#annotation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Annotation</h2>
+<p>Annotation Depends on the selected processing mode:</p>
+<h3 id="webhooks" tabindex="-1"><a class="anchor" href="#webhooks" aria-hidden="true"><span class="octicon octicon-link"></span></a> Webhooks</h3>
+<p>In your controller (or another place where the <code>webhook</code> is processed), you call: <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646"><code>bot.update.parseAndHandle(webhookString)</code></a></p>
+<p>By default it will use processor for annotations, but if you want to have some custom behaviour it also can be set through <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-behaviour.html"><code>setBehaviour</code></a>:</p>
+<pre><code class="language-kotlin">bot.update.setBehaviour {
+    <span class="hljs-comment">// filter</span>
+   <span class="hljs-comment">// ...any other actions</span>
+   update(it) <span class="hljs-comment">// annotation processor</span>
+}
+</code></pre>
+<h3 id="long-polling" tabindex="-1"><a class="anchor" href="#long-polling" aria-hidden="true"><span class="octicon octicon-link"></span></a> Long polling</h3>
+<p>Call: <code>bot.handleUpdates()</code> or through <code>bot.update.setListener { handle(it) }</code></p>
+<h2 id="both" tabindex="-1"><a class="anchor" href="#both" aria-hidden="true"><span class="octicon octicon-link"></span></a> Both</h2>
+<p>Also, if desired, both these approaches can be combined using the same <code>setListener {}</code>, in such an approach even the same command can be processed twice, processing will be done in the order they are called.</p>
+<pre><code class="language-kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> = runBlocking {
+    <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>, <span class="hljs-string">"eu.vendeli.samples.controller"</span>)
+
+    bot.update.setListener {
+        handle(it) <span class="hljs-comment">// Here we send the update for annotation processing.</span>
+        handle(it) { <span class="hljs-comment">// Here we manually process it afterwards.</span>
+            onMessage {
+                message { update.text }.send(update.user, bot)
+            }
+        }
+}
+</code></pre>
+<p>Example of combining usage you can see in a <a href="https://github.com/vendelieu/telegram-bot_template/blob/poll/src/main/kotlin/com/example/poll/PollApplication.kt">poll sample</a>.</p>
+<p>or in webhook handling you can set through <code>setBehaviour</code> as described before.</p>
+<h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
+<ul>
+<li><a href="Update-parsing">Update parsing</a></li>
+<li><a href="Activity-invocation">Activity invocation</a></li>
+<li><a href="Actions">Actions</a></li>
+</ul>
 
 		</main>
 	</body>

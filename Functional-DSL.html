@@ -1110,7 +1110,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <p>Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of functional update processing.</p>
 <p>Moreover, the flexibility of the bot interface also allows you to combine the two modes.</p>
 <h2 id="functional-handling-dsl" tabindex="-1"><a class="anchor" href="#functional-handling-dsl" aria-hidden="true"><span class="octicon octicon-link"></span></a> Functional handling DSL</h2>
-<p>In most manual processing methods differ in the types of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types/-update/index.html"><code>Update</code></a> supported, in simple terms you can put a listener on a certain type of data.</p>
+<p>In most functional processing methods differ in the types of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types/-update/index.html"><code>Update</code></a> supported, in simple terms you can put a listener on a certain type of data.</p>
 <p>By way of example:</p>
 <pre><code class="language-kotlin"><span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
     <span class="hljs-keyword">val</span> bot = TelegramBot(<span class="hljs-string">"BOT_TOKEN"</span>)
@@ -1172,11 +1172,11 @@ parsed appropriately specified in configuration.</p>
 <p>You can read more about methods in the <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html"><code>FunctionalHandlingDsl</code></a> class documentation.</p>
 <blockquote>
 <p>[!CAUTION]
-Be aware that if you use both handlers (functional, annotation) inputs may work not as it seems to be (each processor clears input after being processed, if you want another behavior change inputAutoRemoval configuration).</p>
+Be aware that if you use both processors (functional, annotation) inputs may work not as it seems to be (each processor clears input after being processed, if you want another behavior change inputAutoRemoval configuration).</p>
 </blockquote>
 <h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
 <ul>
-<li><a href="Markup-dsl">Markup dsl</a></li>
+<li><a href="Actions">Action</a></li>
 <li><a href="Useful-utilities-and-tips">Useful utilities</a></li>
 </ul>
 

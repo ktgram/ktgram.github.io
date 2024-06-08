@@ -1154,8 +1154,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <h1 id="integrating-guards-with-activities" tabindex="-1"><a class="anchor" href="#integrating-guards-with-activities" aria-hidden="true"><span class="octicon octicon-link"></span></a> Integrating Guards with Activities</h1>
 <p>To integrate these guards with your bot commands, you can create a guard that checks these conditions before the command handler is invoked.</p>
 <h2 id="implementing-example" tabindex="-1"><a class="anchor" href="#implementing-example" aria-hidden="true"><span class="octicon octicon-link"></span></a> Implementing Example</h2>
-<pre><code class="language-kotlin"><span class="hljs-comment">// define somewhere your guard filter class that implements Filter interface</span>
-<span class="hljs-keyword">object</span> YourGuard : Filter {
+<pre><code class="language-kotlin"><span class="hljs-comment">// define somewhere your guard class that implements Guard interface</span>
+<span class="hljs-keyword">object</span> YourGuard : Guard {
     <span class="hljs-keyword">override</span> <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">condition</span><span class="hljs-params">(user: <span class="hljs-type">User</span>?, update: <span class="hljs-type">ProcessedUpdate</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span>: <span class="hljs-built_in">Boolean</span> {
         <span class="hljs-comment">// write your condition here</span>
     }
@@ -1180,9 +1180,9 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <p>By implementing robust guard mechanisms, developers can ensure their bots operate securely and efficiently, providing a better user experience.</p>
 <h1 id="see-also" tabindex="-1"><a class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a> See also</h1>
 <ul>
-<li><a href="Activites-and-Handlers">Activities and Handlers</a></li>
+<li><a href="Activites-and-Processors">Activities and Proccessors</a></li>
 <li><a href="Update-parsing">Update parsing</a></li>
-<li><a href="Features">Features</a></li>
+<li><a href="Actions">Actions</a></li>
 <li><a href="Activity-invocation">Activity invocation</a></li>
 </ul>
 
