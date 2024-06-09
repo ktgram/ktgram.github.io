@@ -1191,7 +1191,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li><strong>type</strong>: Specifies the types of updates the handler function will process.</li>
 </ul>
 <pre><code class="language-kotlin"><span class="hljs-meta">@UpdateHandler([UpdateType.PRE_CHECKOUT_QUERY])</span>
-<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">ProcessedUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+<span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(update: <span class="hljs-type">PreCheckoutQueryUpdate</span>, user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
     <span class="hljs-comment">//...</span>
 }
 </code></pre>
