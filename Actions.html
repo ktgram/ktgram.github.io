@@ -1107,8 +1107,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 		</nav>
 		<main>
 			<h1 id="all-requests-is-actions" tabindex="-1"><a class="anchor" href="#all-requests-is-actions" aria-hidden="true"><span class="octicon octicon-link"></span></a> All requests is Actions</h1>
-<p>All telegram api requests are various kinds of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.interfaces/-tg-action/index.html"><code>TgAction</code></a> interfaces that implementing different methods such as <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api/-send-message-action/index.html"><code>SendMessageAction</code></a>, <br>
-which have wrapped in the form of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api/message.html"><code>message()</code></a> - type functions for the convenience of the library interface.</p>
+<p>All telegram api requests are various kinds of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.interfaces/-tg-action/index.html"><code>TgAction</code></a> interfaces that implementing different methods such as <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html"><code>SendMessageAction</code></a>, <br>
+which have wrapped in the form of <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api.message/message.html"><code>message()</code></a> - type functions for the convenience of the library interface.</p>
 <p align="center">
     <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram">
 </p>
@@ -1123,7 +1123,7 @@ which have wrapped in the form of <a href="https://vendelieu.github.io/telegram-
 <h2 id="options" tabindex="-1"><a class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a> Options</h2>
 <p>For example, <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html"><code>OptionsFeature</code></a> is used to pass optional parameters.</p>
 <p>Each action has its own type of options, the corresponding you can see in the <code>Action</code> itself in the <code>options</code> parameter, in properties section. <br>
-For example, <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api/-send-message-action/options.html">here</a> is the parameter for <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.api/-send-message-action/index.html"><code>SendMessageAction</code></a>, which contains a <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types.internal.options/-message-options/index.html"><code>MessageOptions</code></a> data class with different parameters.</p>
+For example, <code>sendMessage</code> which contains a <a href="https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.types.internal.options/-message-options/index.html"><code>MessageOptions</code></a> data class with different parameters as options.</p>
 <p>Example usage:</p>
 <pre><code class="language-kotlin">message{ <span class="hljs-string">"*Test*"</span> }.options {
     parseMode = ParseMode.Markdown

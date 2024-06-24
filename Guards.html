@@ -1164,8 +1164,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <span class="hljs-comment">// ...</span>
 
 <span class="hljs-meta">@CommandHandler([<span class="hljs-meta-string">"yourCommand"</span>], guard = YourGuard::class)</span> <span class="hljs-comment">// InputHandler also is supported</span>
-<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">stopHandling</span><span class="hljs-params">(bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
-    bot.update.stopListener()
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">command</span><span class="hljs-params">(bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
+   <span class="hljs-comment">// command body</span>
 }
 </code></pre>
 <h1 id="best-practices" tabindex="-1"><a class="anchor" href="#best-practices" aria-hidden="true"><span class="octicon octicon-link"></span></a> Best Practices</h1>
