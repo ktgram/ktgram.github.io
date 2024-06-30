@@ -1127,6 +1127,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <h4 id="commandhandlercallbackquery" tabindex="-1"><a class="anchor" href="#commandhandlercallbackquery" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommandHandler.CallbackQuery</h4>
 <p>A specialized version of the <code>CommandHandler</code> annotation designed specifically for handling callback queries.</p>
 <p>It includes similar properties as <code>CommandHandler</code>, with a focus on callback-related commands.</p>
+<p><em>It's actually the same as just <code>@CommandHandler</code> with a preset <code>UpdateType.CALLBACK_QUERY</code> scope</em>.</p>
 <pre><code class="language-kotlin"><span class="hljs-meta">@CommandHandler</span>.CallbackQuery([<span class="hljs-string">"text"</span>], rateLimits = RateLimits(period = <span class="hljs-number">10</span>, rate = <span class="hljs-number">5</span>))
 <span class="hljs-keyword">suspend</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test</span><span class="hljs-params">(user: <span class="hljs-type">User</span>, bot: <span class="hljs-type">TelegramBot</span>)</span></span> {
     <span class="hljs-comment">//...</span>
