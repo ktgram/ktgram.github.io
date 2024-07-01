@@ -1135,6 +1135,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </code></pre>
 <h3 id="commonhandler" tabindex="-1"><a class="anchor" href="#commonhandler" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommonHandler</h3>
 <p>The <code>CommonHandler</code> annotation is intended for functions that process commands with lower priority compared to <code>CommandHandler</code> and <code>InputHandler</code>. It is used at the source level and provides a flexible way to define common command handlers.</p>
+<p><strong>Be aware, priority works within just <code>@CommonHandler</code>'s itself.</strong></p>
 <h4 id="commonhandlertext" tabindex="-1"><a class="anchor" href="#commonhandlertext" aria-hidden="true"><span class="octicon octicon-link"></span></a> CommonHandler.Text</h4>
 <p>This annotation specifies text matching against updates. It includes properties to define the matching text, filtering conditions, priority, scope, and rate limits.</p>
 <ul>
