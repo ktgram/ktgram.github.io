@@ -1,7 +1,22 @@
 import os
+import re
 
 # Define the path to your documentation folder
 docs_path = 'docs'  # Change this to your actual docs folder path
+
+def update_headings(content):
+    # Change all H1 headings to H2
+    content = re.sub(r'^(# )(.+)', r'## \2', content, flags=re.MULTILINE)
+
+    # Increment the depth of all other headings
+    def increment_headings(match):
+        level = match.group(1).count('#')  # Count the number of '#' characters
+        new_level = level + 1  # Increment the level
+        return '#' * new_level + ' ' + match.group(2)  # Return the new heading
+
+    content = re.sub(r'^(#+) (.+)', increment_headings, content, flags=re.MULTILINE)
+
+    return content
 
 # Iterate through all files in the docs directory
 for root, dirs, files in os.walk(docs_path):
@@ -33,8 +48,11 @@ for root, dirs, files in os.walk(docs_path):
             # If no front matter exists, add it
             new_content = f'---\ntitle: {title}\n---\n\n' + content
 
+        # Update headings in the content
+        new_content = update_headings(new_content)
+
         # Write the updated content back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
 
-print("Titles generated based on file names.")
+print("Titles generated based on file names and headings updated.")

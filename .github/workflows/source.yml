@@ -44,8 +44,8 @@ jobs:
           replace: "/$1"
           include: "docs/**"
 
-      - name: Add titles
-        run: python generate_titles.py
+      - name: Post process
+        run: python post_process.py
 
 #      - name: Translate Markdown files
 #        run: |
