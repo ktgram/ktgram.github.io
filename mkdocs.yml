@@ -5,6 +5,13 @@ repo_name: vendelieu/telegram-bot
 site_description: >-
   Telegram Bot API wrapper with handy Kotlin DSL.
 
+
+nav:
+  - Home: index.md
+  - Documentation:
+      - ...
+  - API Reference: https://vendelieu.github.io/telegram-bot/
+
 theme:
   name: material
   language: en
@@ -79,8 +86,7 @@ markdown_extensions:
       title: On this page
       permalink: true
 plugins:
-  - awesome-pages:
-      collapse_single_pages: true
+  - awesome-pages
   - gh-admonitions
 #  - i18n:
 #      default_language: en
