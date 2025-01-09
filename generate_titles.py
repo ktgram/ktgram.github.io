@@ -8,7 +8,7 @@ for root, dirs, files in os.walk(docs_path):
     for file in files:
         if file.endswith('.md'):
             file_path = os.path.join(root, file)
-            title = os.path.splitext(file)[0].replace('_', ' ').title()  # Convert filename to title
+            title = os.path.splitext(file)[0].replace('_', ' ').replace('-', ' ').title()  # Convert filename to title
 
             # Read the current content of the file
             with open(file_path, 'r', encoding='utf-8') as f:
