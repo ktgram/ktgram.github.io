@@ -40,6 +40,9 @@ jobs:
           replace: "/$1"
           include: "docs/**"
 
+      - name: Add titles
+        run: python generate_titles.py
+
 #      - name: Translate Markdown files
 #        run: |
 #          python translate.py [sourcefile] [outputdirectory] [languagedictionary] "FR,AR,RU,ES,ZH-HANS,KO,JA,ID,PT-BR"
