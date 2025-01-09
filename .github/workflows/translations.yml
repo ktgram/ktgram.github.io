@@ -31,7 +31,7 @@ jobs:
           repository: 'telegram-bot.wiki'
 
       - name: Rename file Home > index
-        run: sudo mv -f ./telegram-bot.wiki/* ./docs/
+        run: sudo mv -f ./telegram-bot.wiki/* ./docs/ && sudo rm -rf ./telegram-bot.wiki
 
 #      - name: Translate Markdown files
 #        run: |
