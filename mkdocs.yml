@@ -3,6 +3,10 @@ site_url: https://tgbot.vendeli.eu/
 repo_url: https://github.com/vendelieu/telegram-bot
 repo_name: vendelieu/telegram-bot
 
+nav:
+  - Home: Home.md
+#  - About: about.md
+
 theme:
   name: material
   language: en
@@ -72,6 +76,7 @@ markdown_extensions:
       title: On this page
       permalink: true
 plugins:
+  - awesome-pages
 #  - enumerate-headings:
 #      restart_increment_after:
 #        - hands_on/01_datasets.md
