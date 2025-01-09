@@ -49,7 +49,8 @@ for root, dirs, files in os.walk(docs_path):
             new_content = f'---\ntitle: {title}\n---\n\n' + content
 
         # Update headings in the content
-        new_content = update_headings(new_content).replace('\\', '<br/>')
+        new_content = update_headings(new_content).replace('\\
+        ', '<br/>')
 
         # Write the updated content back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
