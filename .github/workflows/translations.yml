@@ -38,7 +38,7 @@ jobs:
         with:
           find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
           replace: "$1"
-          include: "**"
+          include: "docs/**.md"
 
 #      - name: Translate Markdown files
 #        run: |
