@@ -2,6 +2,11 @@ site_name: Telegram bot
 site_url: https://tgbot.vendeli.eu/
 repo_url: https://github.com/vendelieu/telegram-bot
 repo_name: vendelieu/telegram-bot
+site_description: >-
+  Telegram Bot API wrapper with handy Kotlin DSL.
+
+nav:
+  - Home: Home.md
 
 theme:
   name: material
@@ -22,7 +27,8 @@ theme:
         icon: material/weather-sunny
         name: Switch to dark mode
   font:
-    text: Inter
+    text: Roboto
+    code: Roboto Mono
   features:
     - content.code.annotate
     - content.code.copy
@@ -51,6 +57,7 @@ extra:
 
 markdown_extensions:
   - admonition
+  - gh-admonitions
   - attr_list
   - md_in_html
   - pymdownx.details
@@ -67,11 +74,16 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - tables
   - toc:
       title: On this page
       permalink: true
 plugins:
+  - awesome-pages
 #  - i18n:
 #      default_language: en
 #      languages:
