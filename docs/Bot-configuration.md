@@ -22,8 +22,7 @@ val bot = TelegramBot("BOT_TOKEN") {
 
 ### ConfigLoader interface
 
-There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/>
- which you can use to load settings from external sources (`properties`, `command line args`, etc.).
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
 The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 

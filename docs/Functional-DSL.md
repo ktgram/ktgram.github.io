@@ -47,8 +47,7 @@ fun main() = runBlocking {
 }
 ```
 
-In the context of the `onCommand` function, parameters in the format `Map<String, String>` are passed, <br/>
-parsed appropriately specified in configuration. 
+In the context of the `onCommand` function, parameters in the format `Map<String, String>` are passed, <br/>parsed appropriately specified in configuration. 
 
 #### Inputs
 It is also possible to use inputs through the familiar [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html) mechanism.

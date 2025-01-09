@@ -3,8 +3,7 @@ title: Actions
 ---
 
 ### All requests is Actions
-All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>
-which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
+All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
 
 <p align="center">
     <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram" />
@@ -25,8 +24,7 @@ Let's take a closer look at them:
 ### Options
 For example, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) is used to pass optional parameters.
 
-Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>
-For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.options/-message-options/index.html) data class with different parameters as options.
+Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.options/-message-options/index.html) data class with different parameters as options.
 
 Example usage:
 
@@ -37,8 +35,7 @@ message{ "*Test*" }.options {
 ```
 ### Markup
 
-There is also a method for sending markups that supports all kind of [keyboards](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html): <br/>
-[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
+There is also a method for sending markups that supports all kind of [keyboards](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html): <br/>[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
 
 #### Inline Keyboard Markup
 
@@ -105,7 +102,7 @@ There is also a method for sending [`MessageEntity`](https://vendelieu.github.io
 Example usage:
 
 ```kotlin
-message{ "Test <br/>$hello" }.replyKeyboardMarkup {
+message{ "Test \$hello" }.replyKeyboardMarkup {
     +"Test menu button"
 }.entities {
     5 to 15 url "https://google.com" // add TextLink

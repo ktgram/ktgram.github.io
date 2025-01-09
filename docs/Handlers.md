@@ -75,7 +75,7 @@ Similar to `CommonHandler.Text`, this annotation is used for matching updates ba
 -   **scope**: The context or scope in which the regex matching will be checked.
 
 ```kotlin
-@CommonHandler.Regex("^<br/>d+$", scope = [UpdateType.EDITED_MESSAGE])
+@CommonHandler.Regex("^\d+$", scope = [UpdateType.EDITED_MESSAGE])
 suspend fun test(update: EditedMessageUpdate, user: User, bot: TelegramBot) {
     //...
 }
