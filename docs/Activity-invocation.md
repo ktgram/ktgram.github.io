@@ -43,5 +43,5 @@ Summarizing everything, below here is an example of how function parameters are 
 
 # See also
 
-* [Update parsing](./Update-parsing)
-* [Activities & Processors](./Activites-and-Processors)
+* [Update parsing](/Update-parsing)
+* [Activities & Processors](/Activites-and-Processors)

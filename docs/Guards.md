@@ -75,7 +75,7 @@ By implementing robust guard mechanisms, developers can ensure their bots operat
 
 # See also
 
-* [Activities and Proccessors](./Activites-and-Processors)
-* [Update parsing](./Update-parsing)
-* [Actions](./Actions)
-* [Activity invocation](./Activity-invocation)
+* [Activities and Proccessors](/Activites-and-Processors)
+* [Update parsing](/Update-parsing)
+* [Actions](/Actions)
+* [Activity invocation](/Activity-invocation)

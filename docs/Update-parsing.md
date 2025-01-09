@@ -78,6 +78,6 @@ In `commandParsing` configuration we have parameter [`useIdentifierInGroupComman
 
 # See also
 
-* [Activity invocation](./Activity-invocation)
-* [Activities & Processors](./Activites-and-Processors)
-* [Actions](./Actions)
+* [Activity invocation](/Activity-invocation)
+* [Activities & Processors](/Activites-and-Processors)
+* [Actions](/Actions)
