@@ -85,5 +85,5 @@ You can read more about methods in the [`FunctionalHandlingDsl`](https://vendeli
 
 # See also
 
-* [Action](https://github.com/vendelieu/telegram-bot/wiki/Actions)
-* [Useful utilities](https://github.com/vendelieu/telegram-bot/wiki/Useful-utilities-and-tips)
+* [Action](Actions)
+* [Useful utilities](Useful-utilities-and-tips)

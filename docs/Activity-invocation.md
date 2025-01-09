@@ -43,5 +43,5 @@ Summarizing everything, below here is an example of how function parameters are 
 
 # See also
 
-* [Update parsing](https://github.com/vendelieu/telegram-bot/wiki/Update-parsing)
-* [Activities & Processors](https://github.com/vendelieu/telegram-bot/wiki/Activites-and-Processors)
+* [Update parsing](Update-parsing)
+* [Activities & Processors](Activites-and-Processors)

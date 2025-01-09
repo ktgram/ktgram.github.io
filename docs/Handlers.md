@@ -180,7 +180,7 @@ These annotations provide robust and flexible tools for handling commands, input
 
 ## See also
 
-* [Activities & Processors](https://github.com/vendelieu/telegram-bot/wiki/Activites-and-Processors)
-* [Activity invocation](https://github.com/vendelieu/telegram-bot/wiki/Activity-invocation)
-* [FSM and Conversation handling](https://github.com/vendelieu/telegram-bot/wiki/FSM-and-Conversation-handling)
-* [Update parsing](https://github.com/vendelieu/telegram-bot/wiki/Update-parsing)
+* [Activities & Processors](Activites-and-Processors)
+* [Activity invocation](Activity-invocation)
+* [FSM and Conversation handling](FSM-and-Conversation-handling)
+* [Update parsing](Update-parsing)

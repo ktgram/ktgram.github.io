@@ -75,7 +75,7 @@ By implementing robust guard mechanisms, developers can ensure their bots operat
 
 # See also
 
-* [Activities and Proccessors](https://github.com/vendelieu/telegram-bot/wiki/Activites-and-Processors)
-* [Update parsing](https://github.com/vendelieu/telegram-bot/wiki/Update-parsing)
-* [Actions](https://github.com/vendelieu/telegram-bot/wiki/Actions)
-* [Activity invocation](https://github.com/vendelieu/telegram-bot/wiki/Activity-invocation)
+* [Activities and Proccessors](Activites-and-Processors)
+* [Update parsing](Update-parsing)
+* [Actions](Actions)
+* [Activity invocation](Activity-invocation)

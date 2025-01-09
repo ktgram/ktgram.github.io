@@ -134,5 +134,5 @@ photo { "FILE_ID" }.caption { "Test caption" }.send(user, bot)
 
 # See also
 
-* [Bot context](https://github.com/vendelieu/telegram-bot/wiki/Bot-Context)
-* [FSM | Conversation handling](https://github.com/vendelieu/telegram-bot/wiki/FSM-and-Conversation-handling)
+* [Bot context](Bot-Context)
+* [FSM | Conversation handling](FSM-and-Conversation-handling)

@@ -78,6 +78,6 @@ In `commandParsing` configuration we have parameter [`useIdentifierInGroupComman
 
 # See also
 
-* [Activity invocation](https://github.com/vendelieu/telegram-bot/wiki/Activity-invocation)
-* [Activities & Processors](https://github.com/vendelieu/telegram-bot/wiki/Activites-and-Processors)
-* [Actions](https://github.com/vendelieu/telegram-bot/wiki/Actions)
+* [Activity invocation](Activity-invocation)
+* [Activities & Processors](Activites-and-Processors)
+* [Actions](Actions)
