@@ -1,5 +1,5 @@
 ---
-title: Functional Dsl
+title: <Br/>F<Br/>U<Br/>N<Br/>C<Br/>T<Br/>I<Br/>O<Br/>N<Br/>A<Br/>L<Br/> <Br/>D<Br/>S<Br/>L<Br/>
 ---
 
 ### To ~~infinity~~ functional handling and beyond!

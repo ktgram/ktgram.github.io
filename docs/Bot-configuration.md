@@ -1,5 +1,5 @@
 ---
-title: Bot Configuration
+title: <Br/>B<Br/>O<Br/>T<Br/> <Br/>C<Br/>O<Br/>N<Br/>F<Br/>I<Br/>G<Br/>U<Br/>R<Br/>A<Br/>T<Br/>I<Br/>O<Br/>N<Br/>
 ---
 
 Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-bot-configuration/index.html) class description.
