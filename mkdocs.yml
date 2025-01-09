@@ -101,6 +101,12 @@ plugins:
         - locale: zh
           name: 中文
           build: true
+          site_name: Telegram bot 中文文档
+          site_description: 带有便捷 Kotlin DSL 的 Telegram Bot API 封装程序。
+          nav_translations:
+            Home: 首页
+            Documentation: 文件
+            API Reference: API 参考
 #        - locale: ko
 #          name: Korean
 #          build: true
