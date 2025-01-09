@@ -27,12 +27,8 @@ for root, dirs, files in os.walk(docs_path):
         if file == 'index.md':
             title = 'Home'  # Set title to Home for index.md
         elif file.endswith('.md'):
-            title = os.path.splitext(file)[0]
-            .replace('_', ' ')
-            .replace('-', ' ')
-            .replace('\
-', '<br/>')
-            .title()  # Convert filename to title
+            title = os.path.splitext(file)[0].replace('_', ' ').replace('-', ' ').replace('\
+', '<br/>').title()  # Convert filename to title
         else:
             continue  # Skip non-md files
 
