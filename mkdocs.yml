@@ -5,10 +5,9 @@ repo_name: vendelieu/telegram-bot
 
 theme:
   name: material
-  custom_dir: docs/assets/overrides
   language: en
   logo: assets/img/lib_logo.png
-  favicon: assets/img/nf-square.png
+  favicon: assets/img/lib_logo.png
   palette:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
