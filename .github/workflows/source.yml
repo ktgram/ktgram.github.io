@@ -37,7 +37,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
-          replace: "./$1"
+          replace: "/$1"
           include: "docs/**"
 
 #      - name: Translate Markdown files
