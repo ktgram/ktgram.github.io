@@ -31,7 +31,11 @@ jobs:
           repository: 'telegram-bot.wiki'
 
       - name: Reorganize files
-        run: sudo mv -f ./telegram-bot.wiki/* ./docs/ && sudo rm -rf ./telegram-bot.wiki && sudo rm -rf ./docs/_Footer.md
+        run: |
+          sudo mv -f ./telegram-bot.wiki/* ./docs/ 
+          sudo mv ./docs/Home.md ./docs/index.md
+          sudo rm -rf ./telegram-bot.wiki 
+          sudo rm -rf ./docs/_Footer.md
 
       - name: Find and Replace links
         uses: jacobtomlinson/gha-find-replace@v3
