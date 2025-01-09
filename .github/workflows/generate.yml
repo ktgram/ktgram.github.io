@@ -15,17 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone TelegramBot wiki repo
-        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
-        with:
-          depth: 1
-          branch: 'master'
-          owner: 'vendelieu'
-          repository: 'telegram-bot.wiki'
-
-      - name: Rename file Home > index
-        run: sudo mv -f ./telegram-bot.wiki/* ./docs/
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

@@ -20,6 +20,17 @@ jobs:
         run: |
           pip install --upgrade deepl
 
+      - name: Clone TelegramBot wiki repo
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          depth: 1
+          branch: 'master'
+          owner: 'vendelieu'
+          repository: 'telegram-bot.wiki'
+
+      - name: Rename file Home > index
+        run: sudo mv -f ./telegram-bot.wiki/* ./docs/
+
       - name: Translate Markdown files
         run: |
           python ./translate.py ./docs ./docs "FR,AR,RU,ES,ZH-HANS,KO,JA,ID,PT-BR"
@@ -31,6 +42,3 @@ jobs:
         with:
           commit_message: Commit translations.
           branch: master
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
