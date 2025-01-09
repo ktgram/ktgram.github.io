@@ -91,34 +91,34 @@ plugins:
   - i18n:
       default_language: en
       languages:
-        - en:
+        - locale: en
           name: English
           build: true
-#        - ar:
+#        - locale: ar
 #          name: عربى
 #          build: true
-        - zh:
+        - locale: zh
           name: 中文
           build: true
-#        - ko:
+#        - locale: ko
 #          name: Korean
 #          build: true
-#        - ja:
+#        - locale: ja
 #          name: 日本語
 #          build: true
-#        - id:
+#        - locale: id
 #          name: Bahasa Indonesia
 #          build: true
-#        - pt:
+#        - locale: pt
 #          name: Português
 #          build: true
-#        - es:
+#        - locale: es
 #          name: Español
 #          build: true
-#        - fr:
+#        - locale: fr
 #          name: Français
 #          build: true
-#        - ru:
+#        - locale: ru
 #          name: Русский
 #          build: true
   - search
