@@ -25,7 +25,7 @@ If there is a user in the update, we check for exceeding the global rate limiter
 
 Next, depending on the payload, we take a particular update component containing text and parse it according to the configuration.
 
-More detailed you can see in [update parsing article](Update-parsing).
+More detailed you can see in [update parsing article](./Update-parsing).
 
 ## Find Activity
 
@@ -82,7 +82,7 @@ We advise to use it without abuse, since it checks doing iteration over all entr
 
 And the final step, if the handler doesn't find any matching activity ([`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) works completely in parallel and don't count as usual activity), then the [`UnprocessedHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html) comes into play, if it is set, it will handle this case, it may be useful to warn the user that something has gone wrong.
 
-More detailed read in [Handlers article](Handlers).
+More detailed read in [Handlers article](./Handlers).
 
 ## Activity RateLimiter
 
@@ -96,12 +96,12 @@ Activity refers to the different types of handlers the telegram bot library can 
 
 The final processing step is the invocation of the found activity.
 
-More details can be found in the [invocation article](Activity-invocation).
+More details can be found in the [invocation article](./Activity-invocation).
 
 # See also
 
-* [Update parsing](Update-parsing)
-* [Activity invocation](Activity-invocation)
-* [Handlers](Handlers)
-* [Bot configuration](Bot-configuration)
-* [Web starters (Spring, Ktor)](Web-starters-(Spring-and-Ktor))
+* [Update parsing](./Update-parsing)
+* [Activity invocation](./Activity-invocation)
+* [Handlers](./Handlers)
+* [Bot configuration](./Bot-configuration)
+* [Web starters (Spring, Ktor)](./Web-starters-(Spring-and-Ktor))
