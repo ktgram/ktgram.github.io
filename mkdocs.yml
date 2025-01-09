@@ -81,37 +81,37 @@ plugins:
         - basic_training/index.md
         - hands_on/index.md
         - hands_on/solutions/*md
-  - i18n:
-      default_language: en
-      languages:
-        en:
-          name: English
-          build: true
-        ar:
-          name: عربى
-          build: true
-        zh-hans:
-          name: 中文
-          build: true
-        ko:
-          name: Korean
-          build: true
-        ja:
-          name: 日本語
-          build: true
-        id:
-          name: Bahasa Indonesia
-          build: true
-        pt:
-          name: Português
-          build: true
-        es:
-          name: Español
-          build: true
-        fr:
-          name: Français
-          build: true
-        ru:
-          name: Русский
-          build: true
+#  - i18n:
+#      default_language: en
+#      languages:
+#        - en:
+#          name: English
+#          build: true
+#        - ar:
+#          name: عربى
+#          build: true
+#        - zh:
+#          name: 中文
+#          build: true
+#        - ko:
+#          name: Korean
+#          build: true
+#        - ja:
+#          name: 日本語
+#          build: true
+#        - id:
+#          name: Bahasa Indonesia
+#          build: true
+#        - pt:
+#          name: Português
+#          build: true
+#        - es:
+#          name: Español
+#          build: true
+#        - fr:
+#          name: Français
+#          build: true
+#        - ru:
+#          name: Русский
+#          build: true
   - search
