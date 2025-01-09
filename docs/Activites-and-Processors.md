@@ -1,5 +1,5 @@
 ---
-title: Activites-And-Processors
+title: Activites And Processors
 ---
 
 # Introduction

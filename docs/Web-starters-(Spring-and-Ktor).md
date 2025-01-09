@@ -1,5 +1,5 @@
 ---
-title: Web-Starters-(Spring-And-Ktor)
+title: Web Starters (Spring And Ktor)
 ---
 
 # Spring starter

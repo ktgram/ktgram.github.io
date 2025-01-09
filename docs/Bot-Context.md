@@ -1,5 +1,5 @@
 ---
-title: Bot-Context
+title: Bot Context
 ---
 
 <p align="center">

@@ -1,5 +1,5 @@
 ---
-title: Bot-Configuration
+title: Bot Configuration
 ---
 
 Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-bot-configuration/index.html) class description.

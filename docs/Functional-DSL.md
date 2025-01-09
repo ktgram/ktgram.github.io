@@ -1,5 +1,5 @@
 ---
-title: Functional-Dsl
+title: Functional Dsl
 ---
 
 # To ~~infinity~~ functional handling and beyond!
