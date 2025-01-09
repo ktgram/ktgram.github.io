@@ -1,3 +1,7 @@
+---
+title: Update-Parsing
+---
+
 # Text payload
 
 Certain updates may have text payload that can be parsed for further processing. Let's take a look at them:

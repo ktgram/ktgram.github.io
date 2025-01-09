@@ -1,3 +1,7 @@
+---
+title: Web-Starters-(Spring-And-Ktor)
+---
+
 # Spring starter
 
 The Spring Starter module for library is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.

@@ -1,3 +1,7 @@
+---
+title: Activity-Invocation
+---
+
 During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions. 
 
 The parameters that can be passed are: 

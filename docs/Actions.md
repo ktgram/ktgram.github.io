@@ -1,3 +1,7 @@
+---
+title: Actions
+---
+
 # All requests is Actions
 All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), \
 which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.

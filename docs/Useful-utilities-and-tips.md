@@ -1,3 +1,7 @@
+---
+title: Useful-Utilities-And-Tips
+---
+
 # Operating with ProcessedUpdate
 
 The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-callback-query-update/index.html), etc.)

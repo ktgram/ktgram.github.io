@@ -1,3 +1,7 @@
+---
+title: Bot-Context
+---
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Bot context diagram" />
 </p>

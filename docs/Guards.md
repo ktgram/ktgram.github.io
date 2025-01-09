@@ -1,3 +1,7 @@
+---
+title: Guards
+---
+
 # Introduction
 Guards are an essential feature for developers creating bots. These guards function as pre-execution checks that determine whether a particular command should be invoked. By implementing these checks, developers can enhance the functionality, security, and user experience of their bots.
 

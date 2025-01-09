@@ -1,3 +1,7 @@
+---
+title: Activites-And-Processors
+---
+
 # Introduction
 
 `Activity` in the terms of this library is the abstract entity that serves as concept that represents a generalization of entities such as `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, and `@CommonHandler`.

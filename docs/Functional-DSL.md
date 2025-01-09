@@ -1,3 +1,7 @@
+---
+title: Functional-Dsl
+---
+
 # To ~~infinity~~ functional handling and beyond!
 Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of functional update processing.
 

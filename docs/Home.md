@@ -1,3 +1,7 @@
+---
+title: Home
+---
+
 # Intro
 Let's get an idea of how the library handles updates in general:
 

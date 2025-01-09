@@ -1,3 +1,7 @@
+---
+title: F.A.Q
+---
+
 ## How do I get the method's response?
 
 To get a response and be able to operate over, you need to use `sendReturning` at the end of the method instead of `send`.
