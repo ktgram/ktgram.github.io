@@ -33,6 +33,13 @@ jobs:
       - name: Rename file Home > index
         run: sudo mv -f ./telegram-bot.wiki/* ./docs/ && sudo rm -rf ./telegram-bot.wiki && sudo rm -rf ./docs/_Footer.md
 
+      - name: Find and Replace links
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
+          replace: "$1"
+          include: "**"
+
 #      - name: Translate Markdown files
 #        run: |
 #          python translate.py [sourcefile] [outputdirectory] [languagedictionary] "FR,AR,RU,ES,ZH-HANS,KO,JA,ID,PT-BR"
