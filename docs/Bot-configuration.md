@@ -1,5 +1,5 @@
 ---
-title: <Br/>B<Br/>O<Br/>T<Br/> <Br/>C<Br/>O<Br/>N<Br/>F<Br/>I<Br/>G<Br/>U<Br/>R<Br/>A<Br/>T<Br/>I<Br/>O<Br/>N<Br/>
+title: Bot Configuration
 ---
 
 Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-bot-configuration/index.html) class description.
@@ -22,7 +22,7 @@ val bot = TelegramBot("BOT_TOKEN") {
 
 ### ConfigLoader interface
 
-There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,\
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/>
  which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
 The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.

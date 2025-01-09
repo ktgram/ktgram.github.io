@@ -1,5 +1,5 @@
 ---
-title: <Br/>U<Br/>S<Br/>E<Br/>F<Br/>U<Br/>L<Br/> <Br/>U<Br/>T<Br/>I<Br/>L<Br/>I<Br/>T<Br/>I<Br/>E<Br/>S<Br/> <Br/>A<Br/>N<Br/>D<Br/> <Br/>T<Br/>I<Br/>P<Br/>S<Br/>
+title: Useful Utilities And Tips
 ---
 
 ### Operating with ProcessedUpdate
@@ -33,7 +33,7 @@ The library uses simple mechanism to initialize classes where your update proces
 
 [`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) is used by default to invoke annotated methods.
 
-But if you want to use some other libraries for that you can redefine the [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) interface, \
+But if you want to use some other libraries for that you can redefine the [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) interface, <br/>
 using your preferred mechanism and pass it on when initializing the bot.
 
 ```kotlin

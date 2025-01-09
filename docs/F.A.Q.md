@@ -1,5 +1,5 @@
 ---
-title: <Br/>F<Br/>.<Br/>A<Br/>.<Br/>Q<Br/>
+title: F.A.Q
 ---
 
 ### How do I get the method's response?

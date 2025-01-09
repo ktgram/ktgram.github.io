@@ -1,5 +1,5 @@
 ---
-title: <Br/>A<Br/>C<Br/>T<Br/>I<Br/>V<Br/>I<Br/>T<Br/>E<Br/>S<Br/> <Br/>A<Br/>N<Br/>D<Br/> <Br/>P<Br/>R<Br/>O<Br/>C<Br/>E<Br/>S<Br/>S<Br/>O<Br/>R<Br/>S<Br/>
+title: Activites And Processors
 ---
 
 ### Introduction

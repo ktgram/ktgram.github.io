@@ -1,5 +1,5 @@
 ---
-title: <Br/>G<Br/>U<Br/>A<Br/>R<Br/>D<Br/>S<Br/>
+title: Guards
 ---
 
 ### Introduction

@@ -1,5 +1,5 @@
 ---
-title: <Br/>F<Br/>U<Br/>N<Br/>C<Br/>T<Br/>I<Br/>O<Br/>N<Br/>A<Br/>L<Br/> <Br/>D<Br/>S<Br/>L<Br/>
+title: Functional Dsl
 ---
 
 ### To ~~infinity~~ functional handling and beyond!
@@ -47,7 +47,7 @@ fun main() = runBlocking {
 }
 ```
 
-In the context of the `onCommand` function, parameters in the format `Map<String, String>` are passed, \
+In the context of the `onCommand` function, parameters in the format `Map<String, String>` are passed, <br/>
 parsed appropriately specified in configuration. 
 
 #### Inputs
