@@ -2,22 +2,22 @@
 title: Web Starters (Spring And Ktor)
 ---
 
-# Spring starter
+### Spring starter
 
 The Spring Starter module for library is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.
 
-## Key Features
+### Key Features
 
 - **Auto-Configuration**: The library automatically configures Telegram bots based on the provided configuration properties, eliminating the need for manual setup.
 - **Configuration Properties**: It supports configuration properties for easy customization of bot settings, such as bot tokens, package names, and identifiers.
 - **Spring Integration**: Seamlessly integrates with the Spring ecosystem, utilizing Spring's dependency injection and application context for managing bot instances.
 - **Coroutine Support**: Leverages Kotlin coroutines for asynchronous bot operations, ensuring efficient and non-blocking execution.
 
-## Getting Started
+### Getting Started
 
 To use the Spring Starter Library for Telegram Bots, you need to include it as a dependency in your Spring Boot project. The library is designed to work with Spring Boot applications and requires the Spring Boot framework to function.
 
-### Dependency
+#### Dependency
 
 Add the following dependency to your `build.gradle` or `pom.xml` file:
 
@@ -29,7 +29,7 @@ dependencies {
 
 Replace `<version>` with the latest version of the library.
 
-### Configuration
+#### Configuration
 
 The library uses Spring Boot's `@ConfigurationProperties` to bind configuration properties. You can define your bot configurations in the `application.properties` or `application.yml` file of your Spring Boot application.
 
@@ -43,7 +43,7 @@ ktgram:
       identifier: MyBot
 ```
 
-### Usage
+#### Usage
 
 Once the library is included and configured, it automatically creates and configures Telegram bot instances based on the provided configuration.
 
@@ -56,18 +56,18 @@ ktgram:
     - token: SECOND_BOT_TOKEN
 ```
 
-## Advanced Configuration
+### Advanced Configuration
 
 For more advanced configurations, such as customizing bot behavior or integrating with other Spring components, you can extend the `BotConfiguration` class and change bot configuration through its `applyCfg` method, you can see example [there](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
 
 > [!TIP]
 > To configure each initialized instance with a custom configuration, distinguish them by their identifier (the BotConfiguration class also has an identifier).
 
-# Ktor
+### Ktor
 
 The module is designed to facilitate the creation of a webhook server for Telegram bots. It allows developers to configure the server, including SSL/TLS settings, and declare multiple Telegram bots with custom configurations. The setup process is flexible, enabling developers to tailor the server to their specific needs.
 
-## Installation
+### Installation
 
 To install ktor starter add additional to main dependency:
 
@@ -78,7 +78,7 @@ dependencies {
 }
 ```
 
-## Key Components
+### Key Components
 
 `serveWebhook` Function
 
@@ -87,11 +87,11 @@ The serveWebhook function is the core of the library. It sets up and starts the 
 - `wait`: A boolean indicating whether the server should wait for the application to stop before shutting down. Defaults to true.
 - `serverBuilder`: A lambda function that configures the server. Defaults to an empty lambda.
 
-# Configuration
+### Configuration
 
 * `WEBHOOK_PREFIX`: it's paramter that will be used for address prefix for webhook listener route. (defaults to "/")
 
-### Server Setup
+#### Server Setup
 
 - `server`: A method to set the server configuration using either EnvConfiguration or ManualConfiguration.
 - `engine`: A method to configure the Netty application engine.
@@ -118,7 +118,7 @@ There's list of parameters that can be set:
 > [!TIP]
 > If pem certificates are present, the module itself will create a jks storage from them at the specified path.
 
-### Bot Configuration:
+#### Bot Configuration:
 
 To configure bot call `declareBot {}` which have such parameters:
 
@@ -128,7 +128,7 @@ To configure bot call `declareBot {}` which have such parameters:
 - `handlingBehaviour`: A lambda function for setting the bot's handling behavior.
 - `onInit`: A lambda function to be executed when the bot is initialized.
 
-## Example Usage
+### Example Usage
 
 To use this module, call `serveWebhook` function, configure it with your desired settings, declare your bots. Here's a simplified example:
 

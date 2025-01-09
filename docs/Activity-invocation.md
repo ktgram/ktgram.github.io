@@ -45,7 +45,7 @@ Summarizing everything, below here is an example of how function parameters are 
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
 </p>
 
-# See also
+### See also
 
 * [Update parsing](/Update-parsing)
 * [Activities & Processors](/Activites-and-Processors)

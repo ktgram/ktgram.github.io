@@ -6,7 +6,7 @@ Library provides plenty of configuration options, you can see api reference in t
 
 There are also two approaches to configuring the bot:
 
-# Configurator lambda
+### Configurator lambda
 
 ```kotlin
 // ...
@@ -20,7 +20,7 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-# ConfigLoader interface
+### ConfigLoader interface
 
 There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,\
  which you can use to load settings from external sources (`properties`, `command line args`, etc.).
@@ -33,13 +33,13 @@ val bot = TelegramBot(ConfigLoaderImpl)
 
 Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
-# BotConfiguration Overview
+### BotConfiguration Overview
 
-### BotConfiguration
+#### BotConfiguration
 
 The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
-#### Properties
+##### Properties
 
 - `identifier`: Identifies different bot instances during multi-bot processing.
 - `apiHost`: Host of the Telegram API.
@@ -54,7 +54,7 @@ The `BotConfiguration` class is the central hub for configuring a bot. It includ
     * `Handle` - Set custom handler.
 - `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
-#### Configuration Blocks
+##### Configuration Blocks
 
 `BotConfiguration` also offers functions to configure its internal components:
 
@@ -64,9 +64,9 @@ The `BotConfiguration` class is the central hub for configuring a bot. It includ
 - `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
 - `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
 
-## Associated Configuration Classes
+### Associated Configuration Classes
 
-### RateLimiterConfiguration
+#### RateLimiterConfiguration
 
 Configures global rate limiting.
 
@@ -74,7 +74,7 @@ Configures global rate limiting.
 - `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
 - `exceededAction`: Action applied when the limit is exceeded.
 
-### HttpConfiguration
+#### HttpConfiguration
 
 Contains configuration for the bot's HTTP client.
 
@@ -87,14 +87,14 @@ Contains configuration for the bot's HTTP client.
 - `proxy`: Proxy settings for HTTP calls.
 - `additionalHeaders`: Headers applied to every request.
 
-### LoggingConfiguration
+#### LoggingConfiguration
 
 Manages logging levels for bot actions and HTTP requests.
 
 - `botLogLevel`: Level of logs for bot actions.
 - `httpLogLevel`: Level of logs for HTTP requests.
 
-### UpdatesListenerConfiguration
+#### UpdatesListenerConfiguration
 
 Configures parameters related to pulling updates.
 
@@ -103,7 +103,7 @@ Configures parameters related to pulling updates.
 - `pullingDelay`: Delay after each pulling request.
 - `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
-### CommandParsingConfiguration
+#### CommandParsingConfiguration
 
 Specifies parameters for command parsing.
 
@@ -113,7 +113,7 @@ Specifies parameters for command parsing.
 - `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
 - `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-## Example Configuration
+### Example Configuration
 
 Here's an example of how to configure a bot using these classes:
 

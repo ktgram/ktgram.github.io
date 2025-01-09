@@ -2,13 +2,13 @@
 title: Activites And Processors
 ---
 
-# Introduction
+### Introduction
 
 `Activity` in the terms of this library is the abstract entity that serves as concept that represents a generalization of entities such as `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, and `@CommonHandler`.
 
 Also take a look at [handlers article](/Handlers).
 
-# Collecting activities
+### Collecting activities
 
 Activities are collected and prepared all context in compile time.
 
@@ -56,11 +56,11 @@ ksp {
 }
 ```
 
-# Processors
+### Processors
 
 You have two types of flow processing updates:
 
-## Functional 
+### Functional 
 
 You establish the processing behavior through the lambda parameter function [`bot.handleUpdates() {}`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html), or through [`bot.update.setListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html).
 
@@ -80,11 +80,11 @@ fun main() = runBlocking {
 }
 ```
 
-## Annotation
+### Annotation
 
 Annotation depends on the selected processing mode: 
 
-### Webhooks
+#### Webhooks
 
 In your controller (or another place where the `webhook` is processed), you call: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
@@ -97,11 +97,11 @@ bot.update.setBehaviour {
 }
 ```
 
-### Long polling
+#### Long polling
 
 Call: `bot.handleUpdates()` or through `bot.update.setListener { handle(it) }`
 
-## Both
+### Both
 
 Also, if desired, both these approaches can be combined using the same `setListener {}`, in such an approach even the same command can be processed twice, processing will be done in the order they are called.
 
@@ -123,7 +123,7 @@ Example of combining usage you can see in a [poll sample](https://github.com/ven
 or in webhook handling you can set through `setBehaviour` as described before.
 
 
-# See also
+### See also
 
 * [Update parsing](/Update-parsing)
 * [Activity invocation](/Activity-invocation)

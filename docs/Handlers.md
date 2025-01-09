@@ -3,15 +3,15 @@ title: Handlers
 ---
 
 
-# Variety of Handlers
+### Variety of Handlers
 
 In bot development, particularly in systems involving user interactions, it is crucial to manage and process commands and events efficiently.
 
 These annotations mark functions designed to process specific commands, inputs, or updates and provide metadata such as command keywords, scopes, and guards.
 
-## Annotations Overview
+### Annotations Overview
 
-### CommandHandler
+#### CommandHandler
 
 The `CommandHandler` annotation is used to mark functions that process specific commands. This annotation includes properties that define the command's keywords and scopes.
 
@@ -25,7 +25,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-#### CommandHandler.CallbackQuery
+##### CommandHandler.CallbackQuery
 
 A specialized version of the `CommandHandler` annotation designed specifically for handling callback queries. It includes similar properties as `CommandHandler`, with a focus on callback-related commands.
 
@@ -42,13 +42,13 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-### CommonHandler
+#### CommonHandler
 
 The `CommonHandler` annotation is intended for functions that process commands with lower priority compared to `CommandHandler` and `InputHandler`. It is used at the source level and provides a flexible way to define common command handlers.
 
 **Be aware, priority works within just `@CommonHandler`'s itself  (ie. not affects other handlers).**
 
-#### CommonHandler.Text
+##### CommonHandler.Text
 
 This annotation specifies text matching against updates. It includes properties to define the matching text, filtering conditions, priority, and scope.
 
@@ -64,7 +64,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-#### CommonHandler.Regex
+##### CommonHandler.Regex
 
 Similar to `CommonHandler.Text`, this annotation is used for matching updates based on regular expressions. It includes properties for defining the regex pattern, options, filtering conditions, priority, and scope.
 
@@ -81,7 +81,7 @@ suspend fun test(update: EditedMessageUpdate, user: User, bot: TelegramBot) {
 }
 ```
 
-### InputHandler
+#### InputHandler
 
 The `InputHandler` annotation marks functions that process specific input events. It is intended for functions that handle inputs at runtime and includes properties for defining input keywords and scopes.
 
@@ -94,7 +94,7 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 }
 ```
 
-### UnprocessedHandler
+#### UnprocessedHandler
 
 The `UnprocessedHandler` annotation is used to mark functions that handle updates not processed by other handlers. It ensures that any unprocessed updates are managed appropriately, with only one processing point possible for this handler type.
 
@@ -105,7 +105,7 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 }
 ```
 
-### UpdateHandler
+#### UpdateHandler
 
 The `UpdateHandler` annotation marks functions that handle specific types of incoming updates. It provides a way to categorize and process different update types systematically.
 
@@ -117,7 +117,7 @@ suspend fun test(update: PreCheckoutQueryUpdate, user: User, bot: TelegramBot) {
     //...
 }
 ```
-# Handler Companion Annotations
+### Handler Companion Annotations
 
 There are also additional annotations that are optional to the handlers, complementing the optional behavior of the handlers itself.
 
@@ -125,7 +125,7 @@ They can be placed both on functions to which a handler is applied and on classe
 
 I.e. the applying has such a priority, `Function` > `Class`, where function have higher priority.
 
-### Rate Limiting
+#### Rate Limiting
 
 In addition, let us also disclose the rate limiting mechanism described in the annotations.
 
@@ -140,7 +140,7 @@ val bot = TelegramBot("BOT_TOKEN") {
 }
 ```
 
-##### Handler specific
+###### Handler specific
 
 Limits on certain actions can be defined using the `RateLimits` annotation, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`, `@CommonHandler`.
 
@@ -152,7 +152,7 @@ suspend fun start(user: User, bot: TelegramBot) {
 }
 ```
 
-### Guard
+#### Guard
 
 You can define guards separately to control access to handlers, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler` :
 
@@ -164,7 +164,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-### ArgParser
+#### ArgParser
 
 You can define custom argument parser separately to change parameters parsing behaviour for handlers, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@CommonHandler`:
 
@@ -178,11 +178,11 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 **see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils/default-arg-parser.html)**
 
-# Conclusion
+### Conclusion
 
 These annotations provide robust and flexible tools for handling commands, inputs, and events, while allowing for separate configurations of rate limits and guards, enhancing the overall structure and maintainability of bot development.
 
-## See also
+### See also
 
 * [Activities & Processors](/Activites-and-Processors)
 * [Activity invocation](/Activity-invocation)

@@ -2,7 +2,7 @@
 title: F.A.Q
 ---
 
-## How do I get the method's response?
+### How do I get the method's response?
 
 To get a response and be able to operate over, you need to use `sendReturning` at the end of the method instead of `send`.
 
@@ -10,7 +10,7 @@ In this case the `Response` class is returned, which contains the response, succ
 
 There's section about: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-## I'm getting error while using `spring-boot-devtools`
+### I'm getting error while using `spring-boot-devtools`
 
 This happens because `spring-boot-devtools` has its own `classloader` and it does not find methods.
 
@@ -20,17 +20,17 @@ You need to add to `resources/META-INF/spring-devtools.properties`:
 restart.include.generated=/eu.vendeli
 ```
 
-## How to change ktor engine
+### How to change ktor engine
 
 If you want to change the engine used by the client you can simply change the [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) in the [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-## How to use my favorite logging provider
+### How to use my favorite logging provider
 
 The library uses `slf4j-api` and to use the provider you need you just need to add it to the dependencies.
 
 The library plugin automatically detects the use of the provider, if it is missing, `logback` will be used by default.
 
-## Catch network exceptions within long-polling handler
+### Catch network exceptions within long-polling handler
 
 For example if you have an unstable connection and need to catch an error because of this, perhaps this approach will help you:
 

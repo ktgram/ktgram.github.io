@@ -2,7 +2,7 @@
 title: Update Parsing
 ---
 
-# Text payload
+### Text payload
 
 Certain updates may have text payload that can be parsed for further processing. Let's take a look at them:
 
@@ -20,7 +20,7 @@ Certain updates may have text payload that can be parsed for further processing.
 
 From the listed updates, a certain parameter is selected and taken as [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-text-reference/index.html), for further parsing.
 
-# Parsing
+### Parsing
 
 The selected parameters are parsed with the appropriate configured delimiters into the command and parameters to it.
 
@@ -32,7 +32,7 @@ You can see in the diagram below which components are mapped to which parts of t
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/7489099a-cca8-4049-a374-efaf6ce52128" alt="Text parsing diagram" />
 </p>
 
-## @ParamMapping
+### @ParamMapping
 
 There is also an annotation called [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) for convenience or for any special case. 
 
@@ -65,7 +65,7 @@ As you can see since second parameter don't have declared name it represented as
 
 So you can abbreviate the variable names in the callback itself and use clear readable names in the code.
 
-# Deeplink
+### Deeplink
 
 Considering the information from above if you expect deeplink in your start command you can catch it with:
 
@@ -76,11 +76,11 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 }
 ```
 
-# Group commands
+### Group commands
 
 In `commandParsing` configuration we have parameter [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) when it turned on, we can use `TelegramBot.identifier` (don't forget to change it if you are using described parameter) in the command matching process, it helps to separate similar commands between several bots, otherwise the `@MyBot` part will just be skipped. 
 
-# See also
+### See also
 
 * [Activity invocation](/Activity-invocation)
 * [Activities & Processors](/Activites-and-Processors)

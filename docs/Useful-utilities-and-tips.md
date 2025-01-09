@@ -2,7 +2,7 @@
 title: Useful Utilities And Tips
 ---
 
-# Operating with ProcessedUpdate
+### Operating with ProcessedUpdate
 
 The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-callback-query-update/index.html), etc.)
 
@@ -27,7 +27,7 @@ val user = if(update is UserReference) update.user else null
 If needed inside there is always the original [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) in the update parameter.
 
 
-# Dependency injection
+### Dependency injection
 
 The library uses simple mechanism to initialize classes where your update processing methods are annotated with the provided annotations.
 
@@ -46,7 +46,7 @@ fun main() = runBlocking {
 }
 ```
 
-# Filtering updates
+### Filtering updates
 
 If there's no complex conditions you can simply filter some updates for being processed:
 
@@ -71,7 +71,7 @@ fun main() = runBlocking {
 
 to include filtering in your command matching or excluding process take a look at guards or `@CommonHandler`.
 
-# Generalize options for different methods
+### Generalize options for different methods
 
 If you have to apply the same optional parameters often, you can write a similar function that suits you and lighten the boilerplate code :)
 

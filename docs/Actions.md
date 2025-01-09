@@ -2,7 +2,7 @@
 title: Actions
 ---
 
-# All requests is Actions
+### All requests is Actions
 All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), \
 which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
 
@@ -12,7 +12,7 @@ which have wrapped in the form of [`message()`](https://vendelieu.github.io/tele
 
 Each `Action` may be able of having its own possible methods, depending on the available [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html).
 
-# Features
+### Features
 
 Different actions may have different [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) depending on the Telegram Bot Api, such as:
 [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html),
@@ -22,7 +22,7 @@ Different actions may have different [`Features`](https://vendelieu.github.io/te
 
 Let's take a closer look at them:
 
-## Options
+### Options
 For example, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) is used to pass optional parameters.
 
 Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. \
@@ -35,12 +35,12 @@ message{ "*Test*" }.options {
     parseMode = ParseMode.Markdown
 }.send(user, bot)
 ```
-## Markup
+### Markup
 
 There is also a method for sending markups that supports all kind of [keyboards](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html): \
 [`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
 
-### Inline Keyboard Markup
+#### Inline Keyboard Markup
 
 This builder allows you to construct inline buttons with any combination of parameters.
 
@@ -59,7 +59,7 @@ message{ "Test" }.inlineKeyboardMarkup {
 
 More details can be seen in the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html).
 
-### Reply Keyboard Markup
+#### Reply Keyboard Markup
 
 This builder allows you to construct menu buttons.
 
@@ -99,7 +99,7 @@ message{ "*Test*" }.markup {
 }.send(user, bot)
 ```
 
-## Entities
+### Entities
 There is also a method for sending [`MessageEntity`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-message-entity/index.html).
 
 Example usage:
@@ -114,7 +114,7 @@ message{ "Test \$hello" }.replyKeyboardMarkup {
 }.send(user, bot)
 ```
 
-### Contextual entities.
+#### Contextual entities.
 
 Entities can also be added through the context of some constructs, they are labeled with a specific [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) interface, it is also present in the caption feature.
 
@@ -126,7 +126,7 @@ message { "usual text " - bold { "this is bold text" } - " continue usual" }.sen
 
 All kinds of [entity types](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-entity-type/index.html) are supported.
 
-## Caption
+### Caption
 Also, the `caption` method can be used to add captions to media files.
 
 Example usage:
@@ -136,7 +136,7 @@ photo { "FILE_ID" }.caption { "Test caption" }.send(user, bot)
 ```
 
 
-# See also
+### See also
 
 * [Bot context](/Bot-Context)
 * [FSM | Conversation handling](/FSM-and-Conversation-handling)

@@ -2,12 +2,12 @@
 title: Functional Dsl
 ---
 
-# To ~~infinity~~ functional handling and beyond!
+### To ~~infinity~~ functional handling and beyond!
 Although the basic mechanism of working with the bot involves working with annotations, but nevertheless it does not prevent the use of functional update processing.
 
 Moreover, the flexibility of the bot interface also allows you to combine the two modes.
 
-## Functional handling DSL
+### Functional handling DSL
 
 In most functional processing methods differ in the types of [`Update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) supported, in simple terms you can put a listener on a certain type of data.
 
@@ -25,7 +25,7 @@ suspend fun main() {
 }
 ```
 
-## Commands and Inputs
+### Commands and Inputs
 
 It is also possible to process both `commands` and `inputs`.
 
@@ -50,7 +50,7 @@ fun main() = runBlocking {
 In the context of the `onCommand` function, parameters in the format `Map<String, String>` are passed, \
 parsed appropriately specified in configuration. 
 
-### Inputs
+#### Inputs
 It is also possible to use inputs through the familiar [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html) mechanism.
 
 ```kotlin
@@ -87,7 +87,7 @@ You can read more about methods in the [`FunctionalHandlingDsl`](https://vendeli
 > [!CAUTION]
 > Be aware that if you use both processors (functional, annotation) inputs may work not as it seems to be (each processor clears input after being processed, if you want another behavior change inputAutoRemoval configuration).
 
-# See also
+### See also
 
 * [Action](/Actions)
 * [Useful utilities](/Useful-utilities-and-tips)
