@@ -26,10 +26,10 @@ for root, dirs, files in os.walk(docs_path):
         # Check if the file is index.md
         if file == 'index.md':
             title = 'Home'  # Set title to Home for index.md
-        elif file.endswith('.md'):
+        elif file.endswith('.md') and not re.search(r'\.\w{2}\.md$', file):  # Exclude language-specific .md files
             title = os.path.splitext(file)[0].replace('_', ' ').replace('-', ' ').title()  # Convert filename to title
         else:
-            continue  # Skip non-md files
+            continue  # Skip non-md files or language-specific files
 
         # Read the current content of the file
         with open(file_path, 'r', encoding='utf-8') as f:

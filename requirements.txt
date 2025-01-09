@@ -6,3 +6,4 @@ pillow
 cairosvg
 mkdocs-awesome-pages-plugin
 mkdocs-github-admonitions-plugin
+mkdocs-minify-html-plugin

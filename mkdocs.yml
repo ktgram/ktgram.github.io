@@ -88,18 +88,18 @@ markdown_extensions:
 plugins:
   - awesome-pages
   - gh-admonitions
-#  - i18n:
-#      default_language: en
-#      languages:
-#        - en:
-#          name: English
-#          build: true
+  - i18n:
+      default_language: en
+      languages:
+        - en:
+          name: English
+          build: true
 #        - ar:
 #          name: عربى
 #          build: true
-#        - zh:
-#          name: 中文
-#          build: true
+        - zh:
+          name: 中文
+          build: true
 #        - ko:
 #          name: Korean
 #          build: true
@@ -122,3 +122,4 @@ plugins:
 #          name: Русский
 #          build: true
   - search
+  - minify_html
