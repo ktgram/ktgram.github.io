@@ -76,7 +76,6 @@ markdown_extensions:
       title: On this page
       permalink: true
 plugins:
-  - awesome-pages
 #  - enumerate-headings:
 #      restart_increment_after:
 #        - hands_on/01_datasets.md
