@@ -1,4 +1,4 @@
-site_name: tgbot.vendeli.eu
+site_name: Telegram bot
 site_url: https://tgbot.vendeli.eu/
 repo_url: https://github.com/vendelieu/telegram-bot
 repo_name: vendelieu/telegram-bot
@@ -72,15 +72,6 @@ markdown_extensions:
       title: On this page
       permalink: true
 plugins:
-#  - enumerate-headings:
-#      restart_increment_after:
-#        - hands_on/01_datasets.md
-#      exclude:
-#        - index.md
-#        - help.md
-#        - basic_training/index.md
-#        - hands_on/index.md
-#        - hands_on/solutions/*md
 #  - i18n:
 #      default_language: en
 #      languages:
