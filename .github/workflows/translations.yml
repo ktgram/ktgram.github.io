@@ -30,7 +30,7 @@ jobs:
           owner: 'vendelieu'
           repository: 'telegram-bot.wiki'
 
-      - name: Rename file Home > index
+      - name: Reorganize files
         run: sudo mv -f ./telegram-bot.wiki/* ./docs/ && sudo rm -rf ./telegram-bot.wiki && sudo rm -rf ./docs/_Footer.md
 
       - name: Find and Replace links
@@ -38,7 +38,7 @@ jobs:
         with:
           find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
           replace: "$1"
-          include: "./docs/**.md"
+          include: "docs/**"
 
 #      - name: Translate Markdown files
 #        run: |
