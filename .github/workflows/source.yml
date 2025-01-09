@@ -1,4 +1,4 @@
-name: Organize documents
+name: Process documents
 on:
   workflow_dispatch:
   schedule:
