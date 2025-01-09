@@ -27,8 +27,7 @@ for root, dirs, files in os.walk(docs_path):
         if file == 'index.md':
             title = 'Home'  # Set title to Home for index.md
         elif file.endswith('.md'):
-            title = os.path.splitext(file)[0].replace('_', ' ').replace('-', ' ').replace('\
-', '<br/>').title()  # Convert filename to title
+            title = os.path.splitext(file)[0].replace('_', ' ').replace('-', ' ').title()  # Convert filename to title
         else:
             continue  # Skip non-md files
 
@@ -50,7 +49,8 @@ for root, dirs, files in os.walk(docs_path):
             new_content = f'---\ntitle: {title}\n---\n\n' + content
 
         # Update headings in the content
-        new_content = update_headings(new_content)
+        new_content = update_headings(new_content).replace('\
+                                                  ', '<br/>')
 
         # Write the updated content back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
