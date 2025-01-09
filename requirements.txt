@@ -7,4 +7,3 @@ cairosvg
 mkdocs-enumerate-headings-plugin>=0.6.0
 mkdocs-awesome-pages-plugin
 mkdocs-github-admonitions-plugin
-mkdocs-nav-weight

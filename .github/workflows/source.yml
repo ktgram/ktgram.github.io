@@ -5,7 +5,7 @@ on:
     - cron: "0 0 1 * *"
 
 jobs:
-  translate:
+  source:
     runs-on: ubuntu-latest
     permissions:
       contents: write

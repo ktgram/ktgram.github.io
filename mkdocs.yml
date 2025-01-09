@@ -8,8 +8,8 @@ site_description: >-
 theme:
   name: material
   language: en
-  logo: assets/img/lib_logo.png
-  favicon: assets/img/lib_logo.png
+  logo: assets/img/lib-logo.png
+  favicon: assets/img/lib-logo.png
   palette:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
@@ -81,7 +81,6 @@ markdown_extensions:
 plugins:
   - awesome-pages
   - gh-admonitions
-  - mkdocs-nav-weight
 #  - i18n:
 #      default_language: en
 #      languages:
