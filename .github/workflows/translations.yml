@@ -1,0 +1,36 @@
+name: Translate documents from docs/simple folder
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade deepl
+
+      - name: Translate Markdown files
+        run: |
+          python ./translate.py ./docs ./docs "FR,AR,RU,ES,ZH-HANS,KO,JA,ID,PT-BR"
+        env:
+          DEEPL_AUTH_KEY: ${{ secrets.DL_API_KEY }}
+
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit translations.
+          branch: master
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

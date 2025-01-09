@@ -1,9 +1,9 @@
 name: Bot wiki to Pages
-# This workflow is triggered on pushes to the repository.
+
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 1 * * *"
-  workflow_dispatch:
 
 jobs:
   deploy:
@@ -23,37 +23,16 @@ jobs:
           owner: 'vendelieu'
           repository: 'telegram-bot.wiki'
 
-      - name: Convert MD > html
-        uses: baileyjm02/markdown-to-pdf@v1
-        with:
-          input_dir: ./telegram-bot.wiki
-          output_dir: docs
-          build_html: true
-          build_pdf: false
-          table_of_contents: true
-
       - name: Rename file Home > index
-        run: sudo mv ./docs/Home.html ./docs/index.html
+        run: sudo mv -f ./telegram-bot.wiki/* ./docs/
 
-      - name: Find and Replace links
-        uses: jacobtomlinson/gha-find-replace@v3
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
-          replace: "$1"
-          include: "docs/**"
+          python-version: '3.8'
 
-      - name: Add robots.txt
-        run: 'echo "User-agent: *" | sudo tee ./docs/robots.txt'
-
-      - name: Generate the sitemap
-        uses: cicirello/generate-sitemap@v1
-        with:
-          path-to-root: "docs"
-          base-url-path: https://ktgram.github.io/
-          include-html: true
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v4
-        with:
-          BRANCH: gh-pages
-          FOLDER: docs
+        run: mkdocs gh-deploy --force

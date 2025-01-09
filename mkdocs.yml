@@ -1,0 +1,118 @@
+site_name: tgbot.vendeli.eu
+site_url: https://tgbot.vendeli.eu/
+repo_url: https://github.com/vendelieu/telegram-bot
+repo_name: vendelieu/telegram-bot
+
+theme:
+  name: material
+  custom_dir: docs/assets/overrides
+  language: en
+  logo: assets/img/lib_logo.png
+  favicon: assets/img/nf-square.png
+  palette:
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+  font:
+    text: Inter
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - navigation.footer
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.share
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra:
+  analytics:
+    provider: google
+    property: G-NV2HD45F9G
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.snippets:
+      base_path: ["."]
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      title: On this page
+      permalink: true
+plugins:
+  - enumerate-headings:
+      restart_increment_after:
+        - hands_on/01_datasets.md
+      exclude:
+        - index.md
+        - help.md
+        - basic_training/index.md
+        - hands_on/index.md
+        - hands_on/solutions/*md
+  - i18n:
+      default_language: en
+      languages:
+        en:
+          name: English
+          build: true
+        ar:
+          name: عربى
+          build: true
+        zh-hans:
+          name: 中文
+          build: true
+        ko:
+          name: Korean
+          build: true
+        ja:
+          name: 日本語
+          build: true
+        id:
+          name: Bahasa Indonesia
+          build: true
+        pt:
+          name: Português
+          build: true
+        es:
+          name: Español
+          build: true
+        fr:
+          name: Français
+          build: true
+        ru:
+          name: Русский
+          build: true
+  - search
