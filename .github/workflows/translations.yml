@@ -1,4 +1,4 @@
-name: Translate documents
+name: Organize documents
 on:
   workflow_dispatch:
   schedule:
