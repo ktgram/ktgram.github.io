@@ -56,5 +56,5 @@ jobs:
       - name: Push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Commit translations.
+          commit_message: Commit sources.
           branch: master

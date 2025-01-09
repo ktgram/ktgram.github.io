@@ -79,7 +79,8 @@ markdown_extensions:
       title: On this page
       permalink: true
 plugins:
-  - awesome-pages
+  - awesome-pages:
+      collapse: true
   - gh-admonitions
 #  - i18n:
 #      default_language: en
