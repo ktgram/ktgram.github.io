@@ -3,7 +3,7 @@ name: Bot wiki to Pages
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 5 1 * *"
+    - cron: "0 0 1 * *"
 
 jobs:
   deploy:
@@ -22,6 +22,37 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Clone TelegramBot wiki repo
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          depth: 1
+          branch: 'master'
+          owner: 'vendelieu'
+          repository: 'telegram-bot.wiki'
+
+      - name: Reorganize files
+        run: |
+          sudo mv -f ./telegram-bot.wiki/* ./docs/ 
+          sudo mv ./docs/Home.md ./docs/index.md
+          sudo rm -rf ./telegram-bot.wiki 
+          sudo rm -rf ./docs/_Footer.md
+
+      - name: Find and Replace links
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
+          replace: "/$1"
+          include: "docs/**"
+
+      - name: Post process
+        run: python post_process.py
+
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit sources.
+          branch: master
 
       - name: Deploy
         run: mkdocs gh-deploy --force
