@@ -6,7 +6,7 @@ title: Activites And Processors
 
 `Activity` in the terms of this library is the abstract entity that serves as concept that represents a generalization of entities such as `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, and `@CommonHandler`.
 
-Also take a look at [handlers article](Handlers)..md
+Also take a look at [handlers article](./Handlers)..md
 
 ### Collecting activities
 
@@ -64,7 +64,7 @@ You have two types of flow processing updates:
 
 You establish the processing behavior through the lambda parameter function [`bot.handleUpdates() {}`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html), or through [`bot.update.setListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html).
 
-You can read more about  functional processing in a [related article](Functional-Dsl)..md
+You can read more about  functional processing in a [related article](./Functional-Dsl)..md
 
 See [`FunctionalHandlingDsl`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html).
 
@@ -125,6 +125,6 @@ or in webhook handling you can set through `setBehaviour` as described before.
 
 ### See also
 
-* [Update parsing](Update-parsing).md
-* [Activity invocation](Activity-invocation).md
-* [Actions](Actions).md
+* [Update parsing](./Update-parsing).md
+* [Activity invocation](./Activity-invocation).md
+* [Actions](./Actions).md

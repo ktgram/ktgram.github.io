@@ -135,5 +135,5 @@ photo { "FILE_ID" }.caption { "Test caption" }.send(user, bot)
 
 ### See also
 
-* [Bot context](Bot-Context).md
-* [FSM | Conversation handling](FSM-and-Conversation-handling).md
+* [Bot context](./Bot-Context).md
+* [FSM | Conversation handling](./FSM-and-Conversation-handling).md

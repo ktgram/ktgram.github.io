@@ -184,7 +184,7 @@ These annotations provide robust and flexible tools for handling commands, input
 
 ### See also
 
-* [Activities & Processors](Activites-and-Processors).md
-* [Activity invocation](Activity-invocation).md
-* [FSM and Conversation handling](FSM-and-Conversation-handling).md
-* [Update parsing](Update-parsing).md
+* [Activities & Processors](./Activites-and-Processors).md
+* [Activity invocation](./Activity-invocation).md
+* [FSM and Conversation handling](./FSM-and-Conversation-handling).md
+* [Update parsing](./Update-parsing).md
