@@ -19,9 +19,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+          cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Clone TelegramBot wiki repo
         uses: GuillaumeFalourd/clone-github-repo-action@v2.3
