@@ -4,6 +4,10 @@ import re
 # Define the path to your documentation folder
 docs_path = 'docs'  # Change this to your actual docs folder path
 
+def on_post_build(config):
+    with open(os.path.join(config['site_dir'], 'CNAME'), 'w') as f:
+        f.write('tgbot.vendeli.eu')
+
 def update_headings(content):
     # Change all H1 headings to H2
     content = re.sub(r'^(# )(.+)', r'## \2', content, flags=re.MULTILINE)
