@@ -88,5 +88,5 @@ You can read more about methods in the [`FunctionalHandlingDsl`](https://vendeli
 
 ### See also
 
-* [Action](/Actions)
-* [Useful utilities](/Useful-utilities-and-tips)
+* [Action](Actions).md
+* [Useful utilities](Useful-utilities-and-tips).md
