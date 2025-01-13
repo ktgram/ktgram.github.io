@@ -42,7 +42,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "https://github.com/vendelieu/telegram-bot/wiki/(.*)"
-          replace: "${1}.md"
+          replace: "./$1.md"
           include: "docs/**"
 
       - name: Post process
