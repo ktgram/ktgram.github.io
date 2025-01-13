@@ -46,5 +46,5 @@ object UserResolver : Autowiring<UserRecord> {
 
 ### 另请参见
 
-* [更新解析](/Update-parsing)
-* [活动与处理器](/Activites-and-Processors)
+* [更新解析](Update-parsing.md)
+* [活动与处理器](Activites-and-Processors.md)

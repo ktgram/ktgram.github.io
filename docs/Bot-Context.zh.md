@@ -29,4 +29,4 @@ class MyRedis : UserData<String> {
 ### 另请参见
 
 * [首页](https://github.com/vendelieu/telegram-bot/wiki)
-* [更新解析](/Update-parsing)
+* [更新解析](Update-parsing.md)

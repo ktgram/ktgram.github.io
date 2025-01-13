@@ -183,7 +183,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 ### 另请参见
 
-* [活动与处理器](/Activites-and-Processors)
+* [活动与处理器](Activites-and-Processors.md)
 * [活动调用](/Activity-invocation)
 * [有限状态机和对话处理](/FSM-and-Conversation-handling)
 * [更新解析](/Update-parsing)

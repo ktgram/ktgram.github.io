@@ -79,7 +79,7 @@ fun command(bot: TelegramBot) {
 
 ### 另请参见
 
-* [活动与处理器](/Activites-and-Processors)
-* [更新解析](/Update-parsing)
-* [动作](/Actions)
-* [活动调用](/Activity-invocation)
+* [活动与处理器](Activites-and-Processors.md)
+* [更新解析](Update-parsing.md)
+* [动作](Actions.md)
+* [活动调用](Activity-invocation.md)

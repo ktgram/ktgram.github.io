@@ -89,5 +89,5 @@ inputChain("conversation") {
 
 ### 另请参见
 
-* [动作](/Actions)
-* [有用的工具和提示](/Useful-utilities-and-tips)
+* [动作](Actions.md)
+* [有用的工具和提示](Useful-utilities-and-tips.md)

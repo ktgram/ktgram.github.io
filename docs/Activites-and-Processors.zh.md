@@ -6,7 +6,7 @@ title: 活动与处理器
 
 在本库的术语中，`Activity` 是一个抽象实体，作为一个概念，代表了 `@CommandHandler`、`@InputHandler`、`@UnprocessedHandler` 和 `@CommonHandler` 等实体的概括。
 
-还可以查看 [处理器文章](/Handlers)。
+还可以查看 [处理器文章](Handlers.md)。
 
 ### 收集活动
 
@@ -64,7 +64,7 @@ ksp {
 
 您通过 lambda 参数函数 [`bot.handleUpdates() {}`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html) 或通过 [`bot.update.setListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html) 建立处理行为。
 
-您可以在 [相关文章](/Functional-Dsl) 中阅读更多关于功能性处理的信息。
+您可以在 [相关文章](Functional-Dsl.md) 中阅读更多关于功能性处理的信息。
 
 请参见 [`FunctionalHandlingDsl`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html)。
 
@@ -125,6 +125,6 @@ fun main() = runBlocking {
 
 ###  另请参见
 
-* [更新解析](/Update-parsing)
-* [活动调用](/Activity-invocation)
-* [动作](/Actions)
+* [更新解析](Update-parsing.md)
+* [活动调用](Activity-invocation.md)
+* [动作](Actions.md)

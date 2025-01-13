@@ -29,7 +29,7 @@ title: 首页
 
 接下来，根据有效负载，我们获取包含文本的特定更新组件，并根据配置进行解析。
 
-更详细的信息可以在 [更新解析文章](/Update-parsing) 中查看。
+更详细的信息可以在 [更新解析文章](Update-parsing.md) 中查看。
 
 ### 查找活动
 
@@ -87,7 +87,7 @@ title: 首页
 最后一步，如果处理器未找到任何匹配的活动（[`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) 完全并行工作，不算作常规活动），则会调用 [`UnprocessedHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html)，如果设置了它，将处理此情况，这可能有助于警告用户某些事情出错了 ```markdown
 。
 
-更详细的信息可以在 [处理器文章](/Handlers) 中查看。
+更详细的信息可以在 [处理器文章](Handlers.md) 中查看。
 
 ### 活动速率限制器
 
@@ -101,12 +101,12 @@ title: 首页
 
 最后的处理步骤是调用找到的活动。
 
-更多详细信息可以在 [调用文章](/Activity-invocation) 中找到。
+更多详细信息可以在 [调用文章](Activity-invocation.md) 中找到。
 
 ### 另请参见
 
-* [更新解析](/Update-parsing)
-* [活动调用](/Activity-invocation)
-* [处理器](/Handlers)
-* [机器人配置](/Bot-configuration)
-* [Web 启动器（Spring、Ktor）](/Web-starters-(Spring-and-Ktor))
+* [更新解析](Update-parsing.md)
+* [活动调用](Activity-invocation.md)
+* [处理器](Handlers.md)
+* [机器人配置](Bot-configuration.md)
+* [Web 启动器（Spring、Ktor）](Web-starters-(Spring-and-Ktor).md)

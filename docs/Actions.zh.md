@@ -138,5 +138,5 @@ photo { "FILE_ID" }.caption { "测试标题" }.send(user, bot)
 
 ### 另请参见
 
-* [Bot 上下文](/Bot-Context)
-* [FSM | 对话处理](/FSM-and-Conversation-handling)
+* [Bot 上下文](Bot-Context.md)
+* [FSM | 对话处理](FSM-and-Conversation-handling.md)
