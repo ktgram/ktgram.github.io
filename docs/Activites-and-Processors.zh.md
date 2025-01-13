@@ -64,7 +64,7 @@ ksp {
 
 您通过 lambda 参数函数 [`bot.handleUpdates() {}`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html) 或通过 [`bot.update.setListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html) 建立处理行为。
 
-您可以在 [相关文章](Functional-Dsl.md) 中阅读更多关于功能性处理的信息。
+您可以在 [相关文章](Functional-DSL.md) 中阅读更多关于功能性处理的信息。
 
 请参见 [`FunctionalHandlingDsl`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html)。
 

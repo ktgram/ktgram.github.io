@@ -64,7 +64,7 @@ You have two types of flow processing updates:
 
 You establish the processing behavior through the lambda parameter function [`bot.handleUpdates() {}`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/handle-updates.html), or through [`bot.update.setListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/set-listener.html).
 
-You can read more about  functional processing in a [related article](Functional-Dsl.md).
+You can read more about  functional processing in a [related article](Functional-DSL.md).
 
 See [`FunctionalHandlingDsl`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-functional-handling-dsl/index.html).
 
