@@ -82,6 +82,6 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 
 ### 另请参见
 
-* [活动调用](/Activity-invocation)
-* [活动与处理器](/Activites-and-Processors)
-* [动作](/Actions)
+* [活动调用](Activity-invocation.md)
+* [活动与处理器](Activites-and-Processors.md)
+* [动作](Actions.md)

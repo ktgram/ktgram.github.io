@@ -184,6 +184,6 @@ suspend fun test(user: User, bot: TelegramBot) {
 ### 另请参见
 
 * [活动与处理器](Activites-and-Processors.md)
-* [活动调用](/Activity-invocation)
-* [有限状态机和对话处理](/FSM-and-Conversation-handling)
-* [更新解析](/Update-parsing)
+* [活动调用](Activity-invocation.md)
+* [有限状态机和对话处理](FSM-and-Conversation-handling.md)
+* [更新解析](Update-parsing.md)
