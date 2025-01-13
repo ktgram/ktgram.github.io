@@ -56,14 +56,3 @@ jobs:
 
       - name: Deploy
         run: mkdocs gh-deploy --force
-
-      - name: Preserve CNAME
-        run: |
-          git checkout gh-pages
-          echo "tgbot.vendeli.eu" > CNAME
-
-      - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Set domain.
-          branch: gh-pages
