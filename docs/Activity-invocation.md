@@ -47,5 +47,5 @@ Summarizing everything, below here is an example of how function parameters are 
 
 ### See also
 
-* [Update parsing](./Update-parsing).md
-* [Activities & Processors](./Activites-and-Processors).md
+* [Update parsing](Update-parsing.md)
+* [Activities & Processors](Activites-and-Processors.md)
