@@ -116,6 +116,7 @@ fun main() = runBlocking {
                 message { update.text }.send(update.user, bot)
             }
         }
+   }
 }
 ```
 Example of combining usage you can see in a [poll sample](https://github.com/vendelieu/telegram-bot_template/blob/poll/src/main/kotlin/com/example/poll/PollApplication.kt).
