@@ -13,7 +13,7 @@ After receiving an update, the library performs three main steps, as we can see.
 
 ### Processing
 
-Processing is to repackage the received update into the appropriate subclass of [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html) depending on the payload being carried.
+Processing is to repackage the received update into the appropriate subclass of [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) depending on the payload being carried.
 
 This step is needed to make it easier to operate the update and to extend the processing capabilities.
 

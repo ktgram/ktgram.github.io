@@ -76,7 +76,7 @@ bot.inputListener.setChain(user, Conversation.Name)
 
 ### Links details
 
-All links have the same foundation and implementing [`Link<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.chain/-link/index.html) interface, which have such properties:
+All links have the same foundation and implementing [`Link<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chain/-link/index.html) interface, which have such properties:
 
 Key Properties:
 
@@ -96,7 +96,7 @@ There are two types of links they are differentiated by state, stateless and sta
 
 ### Stateless Links
 
-Stateless links are represented by the abstract class [`ChainLink`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-chain-link/index.html). This class serves as the foundation for creating links that do not maintain any state information between user interactions.
+Stateless links are represented by the abstract class [`ChainLink`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chain/-chain-link/index.html). This class serves as the foundation for creating links that do not maintain any state information between user interactions.
 
 ### Stateful Links
 

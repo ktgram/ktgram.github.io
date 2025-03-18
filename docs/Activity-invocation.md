@@ -6,7 +6,7 @@ During activity invocation, it is possible to pass the bot context, as it is dec
 
 The parameters that can be passed are: 
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html) (and all its subclasses) - current processing update.
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses) - current processing update.
 * [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
 * [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance. 
 
@@ -49,3 +49,4 @@ Summarizing everything, below here is an example of how function parameters are 
 
 * [Update parsing](Update-parsing.md)
 * [Activities & Processors](Activites-and-Processors.md)
+* [Aide](Aide.md)

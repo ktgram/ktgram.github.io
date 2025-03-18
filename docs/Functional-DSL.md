@@ -9,7 +9,7 @@ Moreover, the flexibility of the bot interface also allows you to combine the tw
 
 ### Functional handling DSL
 
-In most functional processing methods differ in the types of [`Update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) supported, in simple terms you can put a listener on a certain type of data.
+In most functional processing methods differ in the types of [`Update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.common/-update/index.html) supported, in simple terms you can put a listener on a certain type of data.
 
 By way of example:
 

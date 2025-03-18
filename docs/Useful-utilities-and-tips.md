@@ -4,7 +4,7 @@ title: Useful Utilities And Tips
 
 ### Operating with ProcessedUpdate
 
-The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-callback-query-update/index.html), etc.)
+The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html), etc.)
 
 So you can check the type of incoming data and further manipulate certain data with smartcasts, for example:
 
@@ -17,7 +17,7 @@ if (update !is MessageUpdate) {
 // Further on, ProcessedUpdate will be perceived as MessageUpdate.
 ```
 
-There's also an [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-user-reference/index.html) interface inside that lets you determine if there's a user reference inside, example use case:
+There's also an [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) interface inside that lets you determine if there's a user reference inside, example use case:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
@@ -74,7 +74,7 @@ to include filtering in your command matching or excluding process take a look a
 
 If you have to apply the same optional parameters often, you can write a similar function that suits you and lighten the boilerplate code :)
 
-Some common properties are separated to [different interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.options/-options/index.html).
+Some common properties are separated to [different interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")

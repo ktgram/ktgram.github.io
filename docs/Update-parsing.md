@@ -18,13 +18,13 @@ Certain updates may have text payload that can be parsed for further processing.
 * `PollUpdate` -> `poll.question`
 * `PurchasedPaidMediaUpdate` -> `purchasedPaidMedia.paidMediaPayload`
 
-From the listed updates, a certain parameter is selected and taken as [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal/-text-reference/index.html), for further parsing.
+From the listed updates, a certain parameter is selected and taken as [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html), for further parsing.
 
 ### Parsing
 
 The selected parameters are parsed with the appropriate configured delimiters into the command and parameters to it.
 
-See configuration [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-command-parsing-configuration/index.html) block.
+See configuration [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/command-parsing.html) block.
 
 You can see in the diagram below which components are mapped to which parts of the target function.
 
@@ -78,7 +78,7 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 
 ### Group commands
 
-In `commandParsing` configuration we have parameter [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) when it turned on, we can use `TelegramBot.identifier` (don't forget to change it if you are using described parameter) in the command matching process, it helps to separate similar commands between several bots, otherwise the `@MyBot` part will just be skipped. 
+In `commandParsing` configuration we have parameter [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) when it turned on, we can use `TelegramBot.identifier` (don't forget to change it if you are using described parameter) in the command matching process, it helps to separate similar commands between several bots, otherwise the `@MyBot` part will just be skipped. 
 
 ### See also
 

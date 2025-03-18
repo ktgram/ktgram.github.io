@@ -2,7 +2,7 @@
 title: Bot Configuration
 ---
 
-Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.configuration/-bot-configuration/index.html) class description.
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
 There are also two approaches to configuring the bot:
 

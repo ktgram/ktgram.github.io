@@ -24,7 +24,7 @@ Let's take a closer look at them:
 ### Options
 For example, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) is used to pass optional parameters.
 
-Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.options/-message-options/index.html) data class with different parameters as options.
+Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-message-options/index.html) data class with different parameters as options.
 
 Example usage:
 
@@ -73,7 +73,7 @@ message{ "Test" }.replyKeyboardMarkup {
 }.send(user, bot)
 ```
 
-Additional options applicable to the keyboard can be seen in [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.internal.options/-reply-keyboard-markup-options/index.html).
+Additional options applicable to the keyboard can be seen in [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html).
 
 See the builder [documentation](https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) for more details about the methods.
 

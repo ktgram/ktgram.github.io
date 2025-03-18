@@ -176,7 +176,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-**see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils/default-arg-parser.html)**
+**see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
 
 ### Conclusion
 
@@ -188,3 +188,4 @@ These annotations provide robust and flexible tools for handling commands, input
 * [Activity invocation](Activity-invocation.md)
 * [FSM and Conversation handling](FSM-and-Conversation-handling.md)
 * [Update parsing](Update-parsing.md)
+* [Aide](Aide.md)
