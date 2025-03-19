@@ -66,7 +66,7 @@ fun handleInput(user: User, bot: TelegramBot) {
 
     * Action is directly returned from handler
     * No intermediate variable assignment
-    * No existing .send() call
+    * No existing `.send()` call
 
 
 2. Warnings Generated For:
@@ -87,7 +87,7 @@ fun handleInput(user: User, bot: TelegramBot) {
 graph TD
     A[Detect Action] --> B{Simple Call?}
     B -->|Yes| C{Has Send?}
-    B -->|No| D[No Change]
+    B -->|No| D[No send]
     C -->|No| E[Add Send]
     C -->|Yes| F[Keep]
     D --> G[Show Warning]

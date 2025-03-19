@@ -75,7 +75,7 @@ message{ "Test" }.replyKeyboardMarkup {
 
 Additional options applicable to the keyboard can be seen in [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html).
 
-See the builder [documentation](https://vendelieu.github.io/telegram-bot/-telegram%20-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) for more details about the methods.
+See the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) for more details about the methods.
 
 It's mostly convenient to use dsl for collecting keyboard markup, but if needed, you can also add markup manually.
 
