@@ -2,25 +2,20 @@
 title: Aide
 ---
 
-### Aide Compiler Plugin
+### Aide Compiler Plugin [🔬]
+
+_feature disabled by default, to use it enable in plugin parameters_
 
 ### Configuration  
 Configure Aide in your `build.gradle.kts`:
 
 ```kotlin
 ktGram {
-    // Enable AIDE compiler extensions
+    // Enable AIDE compiler extensions (Automatic .send() chaining)
     aideEnabled = true
     
-    // Automatic .send() chaining (requires aideEnabled=true)
-    aideAutoSend = true 
 }
 ```
-
-| Property | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `aideEnabled` | Enables AIDE compiler features | `true` | Yes for `Aide` to work |
-| `aideAutoSend` | Auto-appends `.send()` to action returns | `true` | No |
 
 ---
 
@@ -50,7 +45,7 @@ suspend fun handler(user: User, bot: TelegramBot) {
 ```kotlin
 @InputHandler
 fun handleInput(user: User, bot: TelegramBot) {
-    // Requires manual .send() - will trigger warning
+    // Requires manual .send()
     val savedAction = message {
         "Stored action"
     }
@@ -62,26 +57,17 @@ fun handleInput(user: User, bot: TelegramBot) {
 
 ###### Validation Rules
 
-1. Auto-Send Applies When:
+* Auto-Send Applies When:
 
     * Action is directly returned from handler
     * No intermediate variable assignment
     * No existing `.send()` call
 
-
-2. Warnings Generated For:
-
-```mermaid
-    graph LR
-        A[Action Assignment] --> B[Missing Send]
-        C[Nested Actions] --> B
-        D[Lambda Returns] --> B
-```
 ---
 
 ### Feature Behavior
 
-#### When `aideAutoSend=true`
+#### When `aideEnabled=true`
 
 ```mermaid
 graph TD
@@ -90,7 +76,7 @@ graph TD
     B -->|No| D[No send]
     C -->|No| E[Add Send]
     C -->|Yes| F[Keep]
-    D --> G[Show Warning]
+    D --> G[Skip]
 ```
 
 #### Requirements
