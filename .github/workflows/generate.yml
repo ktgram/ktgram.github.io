@@ -52,7 +52,7 @@ jobs:
         run: python post_process.py
 
       - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Commit sources.
           branch: master
