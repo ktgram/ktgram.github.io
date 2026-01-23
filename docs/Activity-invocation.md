@@ -51,4 +51,3 @@ Summarizing everything, below here is an example of how function parameters are 
 
 * [Update parsing](Update-parsing.md)
 * [Activities & Processors](Activites-and-Processors.md)
-* [Aide](Aide.md)

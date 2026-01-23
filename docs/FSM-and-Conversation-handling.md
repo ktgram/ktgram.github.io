@@ -4,6 +4,9 @@ title: Fsm And Conversation Handling
 
 The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
+> [!NOTE]
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
+
 ### In theory
 
 Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
