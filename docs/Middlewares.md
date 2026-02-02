@@ -8,7 +8,7 @@ Here’s how middleware works in *telegram‑bot*, and how you can use it in you
 
 ---
 
-######################### “What is Middleware?” (in simple terms)
+########################## “What is Middleware?” (in simple terms)
 
 Think of middleware like a security guard + reporter + helper that stands in three places along the path of each update:
 
@@ -20,7 +20,7 @@ You can attach code to each of those moments to do things like check if someone 
 
 ---
 
-######################### The Three Hook Points & Why They’re Useful
+########################## The Three Hook Points & Why They’re Useful
 
 Here are the three hooks (*points you can attach middleware*) in *telegram‑bot*, and what they let you do:
 
@@ -32,7 +32,7 @@ Here are the three hooks (*points you can attach middleware*) in *telegram‑bot
 
 ---
 
-######################### Real‑Life Example
+########################## Real‑Life Example
 
 Here’s a short imaginary example showing how middleware could help:
 
@@ -48,7 +48,7 @@ This keeps your handler code very simple: “Here’s what I’m supposed to do 
 
 ---
 
-######################### Some Tips & Best Practices
+########################## Some Tips & Best Practices
 
 * Only do what needs to happen at *each* stage: don’t overload `preHandle` or `postInvoke` with everything. It helps keep things predictable.
 
