@@ -2,238 +2,238 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://tgbot.vendeli.eu/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Actions/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Actions/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Actions/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Activites-and-Processors/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Activites-and-Processors/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Activites-and-Processors/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Activity-invocation/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Activity-invocation/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Activity-invocation/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Aide/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Aide/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Aide/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Bot-Context/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Bot-Context/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Bot-Context/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Bot-configuration/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Bot-configuration/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Bot-configuration/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/F.A.Q/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/F.A.Q/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/F.A.Q/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/FSM-and-Conversation-handling/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/FSM-and-Conversation-handling/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/FSM-and-Conversation-handling/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Functional-DSL/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Functional-DSL/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Functional-DSL/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Guards/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Guards/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Guards/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Handlers/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Handlers/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Handlers/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Interceptors-%28middleware%29/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Interceptors-%28middleware%29/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Interceptors-%28middleware%29/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Middlewares/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Middlewares/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Middlewares/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Update-parsing/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Update-parsing/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Update-parsing/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Useful-utilities-and-tips/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Useful-utilities-and-tips/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Useful-utilities-and-tips/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/Web-starters-%28Spring-and-Ktor%29/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Web-starters-%28Spring-and-Ktor%29/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Web-starters-%28Spring-and-Ktor%29/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Actions/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Actions/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Actions/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Activites-and-Processors/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Activites-and-Processors/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Activites-and-Processors/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Activity-invocation/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Activity-invocation/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Activity-invocation/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Aide/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Aide/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Aide/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Bot-Context/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Bot-Context/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Bot-Context/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Bot-configuration/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Bot-configuration/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Bot-configuration/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/F.A.Q/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/F.A.Q/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/F.A.Q/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/FSM-and-Conversation-handling/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/FSM-and-Conversation-handling/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/FSM-and-Conversation-handling/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Functional-DSL/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Functional-DSL/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Functional-DSL/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Guards/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Guards/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Guards/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Handlers/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Handlers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Handlers/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Interceptors-%28middleware%29/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Interceptors-%28middleware%29/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Interceptors-%28middleware%29/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Middlewares/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Middlewares/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Middlewares/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Update-parsing/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Update-parsing/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Update-parsing/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Useful-utilities-and-tips/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Useful-utilities-and-tips/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Useful-utilities-and-tips/"/>
     </url>
     <url>
         <loc>https://tgbot.vendeli.eu/zh/Web-starters-%28Spring-and-Ktor%29/</loc>
-        <lastmod>2026-02-07</lastmod>
+        <lastmod>2026-02-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://tgbot.vendeli.eu/zh/Web-starters-%28Spring-and-Ktor%29/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://tgbot.vendeli.eu/Web-starters-%28Spring-and-Ktor%29/"/>
