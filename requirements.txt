@@ -1,5 +1,7 @@
 mkdocs
 mkdocs-material
+requests
+pyyaml
 mkdocs-static-i18n
 pymdown-extensions
 pillow

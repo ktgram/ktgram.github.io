@@ -1,0 +1,19 @@
+# Target languages for documentation translation.
+# Add or remove locales to control which languages are generated.
+languages:
+  - locale: hi
+    name: Hindi
+  - locale: ru
+    name: Russian
+  - locale: zh
+    name: Chinese
+  - locale: ko
+    name: Korean
+  - locale: fa
+    name: Persian
+  - locale: pt
+    name: Portuguese (Brazilian)
+  - locale: id
+    name: Indonesian
+  - locale: vi
+    name: Vietnamese

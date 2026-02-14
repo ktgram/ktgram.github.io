@@ -15,17 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
       - name: Clone TelegramBot wiki repo
         uses: GuillaumeFalourd/clone-github-repo-action@v2.3
         with:
@@ -34,14 +23,70 @@ jobs:
           owner: 'vendelieu'
           repository: 'telegram-bot.wiki'
 
-      - name: Reorganize files
+      - name: Check if wiki changed
+        id: check
         run: |
-          sudo mv -f ./telegram-bot.wiki/* ./docs/ 
+          WIKI_REV=$(cd telegram-bot.wiki && git rev-parse HEAD)
+          STORED=$(cat .wiki_rev 2>/dev/null || echo "")
+          echo "rev=$WIKI_REV" >> $GITHUB_OUTPUT
+          if [ "$WIKI_REV" = "$STORED" ] && [ -n "$STORED" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Wiki unchanged (rev=$WIKI_REV), skipping regeneration and translation"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Wiki changed (rev=$WIKI_REV), proceeding with regeneration"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install dependencies
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Reorganize files
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          # Build valid base doc stems from wiki (before we delete it)
+          # index = from Home.md, plus all other .md files except _Footer
+          VALID_STEMS=" index "
+          for f in telegram-bot.wiki/*.md; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f" .md)
+            [ "$base" = "Home" ] && VALID_STEMS="${VALID_STEMS} index " && continue
+            [ "$base" = "_Footer" ] && continue
+            VALID_STEMS="${VALID_STEMS} ${base} "
+          done
+
+          # Move wiki content to docs
+          sudo mv -f ./telegram-bot.wiki/* ./docs/
           sudo mv ./docs/Home.md ./docs/index.md
-          sudo rm -rf ./telegram-bot.wiki 
+          sudo rm -rf ./telegram-bot.wiki
           sudo rm -rf ./docs/_Footer.md
 
+          # Remove obsolete base docs and translations (deleted from wiki)
+          cd docs
+          for f in *.md; do
+            [ -e "$f" ] || continue
+            if echo "$f" | grep -qE '\.[a-z]{2}\.md$'; then
+              stem=$(echo "$f" | sed -E 's/\.[a-z]{2}\.md$//')
+            else
+              stem=$(basename "$f" .md)
+            fi
+            if ! echo "$VALID_STEMS" | grep -q " $stem "; then
+              echo "Removing obsolete (deleted from wiki): $f"
+              sudo rm -f "$f"
+            fi
+          done
+
       - name: Find and Replace links
+        if: steps.check.outputs.changed == 'true'
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "https://github.com/vendelieu/telegram-bot/wiki/([^)]*)"
@@ -49,13 +94,26 @@ jobs:
           include: "docs/**"
 
       - name: Post process
+        if: steps.check.outputs.changed == 'true'
         run: python post_process.py
 
+      - name: Translate docs
+        if: steps.check.outputs.changed == 'true'
+        env:
+          OR_TOKEN: ${{ secrets.OR_TOKEN }}
+        run: python scripts/translate_docs.py
+
+      - name: Save wiki revision
+        if: steps.check.outputs.changed == 'true'
+        run: echo "${{ steps.check.outputs.rev }}" > .wiki_rev
+
       - name: Push changes
+        if: steps.check.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Commit sources.
           branch: master
 
       - name: Deploy
+        if: steps.check.outputs.changed == 'true'
         run: mkdocs gh-deploy --force

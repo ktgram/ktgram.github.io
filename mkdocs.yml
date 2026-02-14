@@ -97,27 +97,27 @@ plugins:
             Home: 首页
             Documentation: 文件
             API Reference: API 参考
-#        - locale: ko
-#          name: Korean
-#          build: true
-#        - locale: ja
-#          name: 日本語
-#          build: true
-#        - locale: id
-#          name: Bahasa Indonesia
-#          build: true
-#        - locale: pt
-#          name: Português
-#          build: true
-#        - locale: es
-#          name: Español
-#          build: true
-#        - locale: fr
-#          name: Français
-#          build: true
-#        - locale: ru
-#          name: Русский
-#          build: true
+        - locale: hi
+          name: हिन्दी
+          build: true
+        - locale: ru
+          name: Русский
+          build: true
+        - locale: ko
+          name: 한국어
+          build: true
+        - locale: fa
+          name: فارسی
+          build: true
+        - locale: pt
+          name: Português
+          build: true
+        - locale: id
+          name: Bahasa Indonesia
+          build: true
+        - locale: vi
+          name: Tiếng Việt
+          build: true
   - search:
       { separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;' }
   - minify_html
