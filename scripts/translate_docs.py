@@ -7,6 +7,7 @@ Reads base docs (without language suffix) and translates them to configured targ
 import os
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import requests
@@ -25,6 +26,8 @@ MODELS = [
 # Config
 DOCS_DIR = Path(__file__).resolve().parent.parent / "docs"
 CONFIG_PATH = Path(__file__).resolve().parent / "translation_config.yaml"
+# Parallel workers (env TRANSLATE_PARALLEL_JOBS, default 8)
+MAX_WORKERS = int(os.environ.get("TRANSLATE_PARALLEL_JOBS", "8"))
 
 # System prompt for translations (from user spec)
 SYSTEM_PROMPT = """You are a senior technical documentation localization engineer.
@@ -146,15 +149,15 @@ def translate_content(
                 timeout=120,
             )
             if resp.status_code == 401:
-                print(f"Error: Invalid OR_TOKEN (401). Check your API key.")
+                print("Error: Invalid OR_TOKEN (401). Check your API key.", flush=True)
                 sys.exit(1)
             if resp.status_code == 429:
                 last_error = resp
-                print(f"Rate limited on {model}, trying next model...")
+                print(f"Rate limited on {model}, trying next model...", flush=True)
                 continue
             if resp.status_code >= 500:
                 last_error = resp
-                print(f"Server error on {model} ({resp.status_code}), trying next model...")
+                print(f"Server error on {model} ({resp.status_code}), trying next model...", flush=True)
                 continue
             resp.raise_for_status()
             data = resp.json()
@@ -162,47 +165,73 @@ def translate_content(
             return text.strip()
         except requests.RequestException as e:
             last_error = e
-            print(f"Request failed on {model}: {e}, trying next model...")
+            print(f"Request failed on {model}: {e}, trying next model...", flush=True)
             continue
     raise RuntimeError(f"All models failed. Last error: {last_error}")
+
+
+def _translate_one(
+    doc_name: str,
+    stem: str,
+    content: str,
+    lang: dict,
+    token: str,
+) -> tuple[Path, str]:
+    """Translate one (doc, language) pair. Returns (out_path, translated_content)."""
+    locale = lang["locale"]
+    name = lang["name"]
+    out_path = DOCS_DIR / f"{stem}.{locale}.md"
+    translated = translate_content(content, name, token)
+    return (out_path, translated)
 
 
 def main() -> None:
     token = os.environ.get("OR_TOKEN")
     if not token:
-        print("Error: OR_TOKEN environment variable is not set.")
+        print("Error: OR_TOKEN environment variable is not set.", flush=True)
         sys.exit(1)
 
     languages = load_config()
     base_docs = get_base_docs()
 
     if not base_docs:
-        print("No base docs found.")
+        print("No base docs found.", flush=True)
         return
 
-    total = len(base_docs) * len(languages)
-    done = 0
+    # Build list of (doc_name, stem, content, lang) for parallel execution
+    tasks = []
     for doc_path in base_docs:
-        stem = doc_path.stem
         with open(doc_path, encoding="utf-8") as f:
             content = f.read()
-
         for lang in languages:
-            locale = lang["locale"]
-            name = lang["name"]
-            out_path = DOCS_DIR / f"{stem}.{locale}.md"
-            done += 1
-            print(f"[{done}/{total}] Translating {doc_path.name} -> {name} ({locale})...")
+            tasks.append((doc_path.name, doc_path.stem, content, lang))
 
+    total = len(tasks)
+    doc_names = [d.name for d in base_docs]
+    lang_names = [f"{l['locale']} ({l['name']})" for l in languages]
+    print(f"Base docs: {', '.join(doc_names)}", flush=True)
+    print(f"Target languages: {', '.join(lang_names)}", flush=True)
+    print(f"Translating {total} docs with {MAX_WORKERS} parallel workers...", flush=True)
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {
+            executor.submit(_translate_one, name, stem, content, lang, token): (name, lang)
+            for name, stem, content, lang in tasks
+        }
+        done = 0
+        for future in as_completed(futures):
+            doc_name, lang = futures[future]
+            done += 1
             try:
-                translated = translate_content(content, name, token)
+                out_path, translated = future.result()
                 with open(out_path, "w", encoding="utf-8") as f:
                     f.write(translated)
+                print(f"[{done}/{total}] {doc_name} -> {lang['name']} ({lang['locale']})", flush=True)
             except Exception as e:
-                print(f"  Failed: {e}")
+                print(f"[{done}/{total}] {doc_name} -> {lang['name']}: FAILED - {e}", flush=True)
                 raise
 
-    print(f"Done. Translated {total} docs.")
+    print(f"Done. Translated {total} docs.", flush=True)
 
 
 if __name__ == "__main__":

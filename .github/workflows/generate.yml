@@ -101,6 +101,8 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         env:
           OR_TOKEN: ${{ secrets.OR_TOKEN }}
+          TRANSLATE_PARALLEL_JOBS: 8
+          PYTHONUNBUFFERED: 1
         run: python scripts/translate_docs.py
 
       - name: Save wiki revision
