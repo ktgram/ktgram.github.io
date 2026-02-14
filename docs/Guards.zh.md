@@ -1,57 +1,58 @@
 ---
-title: 保护机制
+---
+title: Guards
 ---
 
 ### 介绍
-保护机制是为开发者创建机器人时的重要功能。这些保护机制作为执行前检查，决定是否应调用特定命令。通过实现这些检查，开发者可以增强机器人功能、安全性和用户体验。
+Guards 是开发者创建机器人时的一项重要功能。这些 guards 作为执行前检查，用于确定是否应该调用特定命令。通过实施这些检查，开发者可以增强机器人的功能性、安全性和用户体验。
 
-### 活动保护的目的
-活动保护的主要目的是确保只有授权用户或特定条件触发活动。
+### Activity Guards 的目的
+Activity Guards 的主要目的是确保只有授权用户或特定条件才能触发活动。
 
 这可以防止滥用，维护机器人的完整性，并简化交互。
 
 ### 常见用例
-1. 身份验证和授权：确保只有特定用户可以访问特定命令。
-2. 前置条件检查：在执行活动之前验证某些条件是否满足（例如，确保用户处于特定状态或上下文中）。
-3. 上下文保护：根据当前聊天或用户状态做出决策。
+1. 认证和授权：确保只有特定用户可以访问特定命令。
+2. 前置条件检查：在执行活动之前验证是否满足某些条件（例如，确保用户处于特定状态或上下文中）。
+3. 上下文 Guards：根据当前聊天或用户状态进行决策。
 
 ### 实现策略
-实现 Telegram 命令保护通常涉及编写封装每个保护逻辑的函数或方法。以下是常见策略：
+实现 Telegram Command Guards 通常涉及编写封装每个 guard 逻辑的函数或方法。以下是常见策略：
 
 1. 用户角色检查：
-   - 确保用户在执行命令之前具有所需角色（例如，管理员、版主）。
+   - 确保用户具有执行命令所需的角色（例如，管理员、版主）之前执行命令。
       ```kotlin
        override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 检查用户是否是给定聊天中的管理员
+        // 检查用户是否为给定聊天中的管理员
        }
       ```
-   
+
 2. 状态验证：
-   - 在允许执行命令之前检查用户的状态。
+   - 在允许命令执行之前检查用户状态。
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         return bot.userData[user.id, "data"] == requiredState
      }
      ```
-   
-3. 自定义保护：
-   - 根据特定要求创建自定义逻辑。
+
+3. 自定义 Guards：
+   - 根据特定需求创建自定义逻辑。
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 自定义逻辑以确定是否应执行命令
+        // 自定义逻辑来确定是否应该执行命令
      }
      ```
-   
-### 将保护与活动集成
-要将这些保护与您的机器人命令集成，您可以创建一个在命令处理程序被调用之前检查这些条件的保护。
+
+### 将 Guards 与 Activities 集成
+要将这些 Guards 与机器人命令集成，您可以创建一个 guard 来检查这些条件，然后再调用命令处理程序。
 
 ### 实现示例
 
 ```kotlin
-// 在某处定义您的保护类，实现 Guard 接口
+// 在某个地方定义实现 Guard 接口的 guard 类
 object YourGuard : Guard {
     override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 在此编写您的条件
+        // 在此处编写条件
     }
 }
 
@@ -66,20 +67,20 @@ fun command(bot: TelegramBot) {
 
 ### 最佳实践
 
-- 模块化：保持保护逻辑模块化，并与活动分开。
-- 可重用性：编写可重用的保护函数，可以轻松应用于不同的命令/输入。
-- 效率：优化保护检查以最小化性能开销。
-- 用户反馈：当命令被保护阻止时，向用户提供清晰的反馈。
+- 模块化：保持 guard 逻辑模块化并与 activities 分离。
+- 可重用性：编写可重用的 guard 函数，可以轻松应用于不同的命令/输入。
+- 效率：优化 guard 检查以最小化性能开销。
+- 用户反馈：当命令被 guard 阻止时，向用户提供清晰的反馈。
 
 ### 结论
 
-活动保护是管理机器人命令/输入执行的强大工具。
+Activity Guards 是管理机器人命令/输入执行的强大工具。
 
-通过实现强大的保护机制，开发者可以确保他们的机器人安全高效地运行，提供更好的用户体验。
+通过实施强大的 guard 机制，开发者可以确保他们的机器人安全高效地运行，提供更好的用户体验。
 
-### 另请参见
+### 另请参阅
 
-* [活动与处理器](Activites-and-Processors.md)
-* [更新解析](Update-parsing.md)
-* [动作](Actions.md)
-* [活动调用](Activity-invocation.md)
+* [Activities and Proccessors](Activites-and-Processors.md)
+* [Update parsing](Update-parsing.md)
+* [Actions](Actions.md)
+* [Activity invocation](Activity-invocation.md)
