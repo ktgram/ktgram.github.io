@@ -3,9 +3,9 @@
 title: Activites And Processors
 ---
 
-### Pengantar
+### Introduction
 
-`Activity` dalam hal ini adalah entitas abstrak yang merupakan generalisasi dari entitas seperti `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, dan `@CommonHandler`.
+`Activity` dalam konteks library ini adalah entitas abstrak yang merupakan generalisasi dari entitas seperti `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, dan `@CommonHandler`.
 
 Juga lihat [artikel handlers](Handlers.md).
 
@@ -13,7 +13,7 @@ Juga lihat [artikel handlers](Handlers.md).
 
 Activities dikumpulkan dan dipersiapkan semua konteks pada waktu kompilasi (kecuali yang didefinisikan melalui functional dsl).
 
-Jika Anda ingin membatasi area di mana paket akan dicari, Anda dapat memberikan parameter ke plugin:
+Jika Anda ingin membatasi area di mana package akan dicari, Anda dapat memberikan parameter ke plugin:
 
 ```gradle
 ktGram {
@@ -29,14 +29,14 @@ ksp {
 }
 ```
 
-catatan dalam kasus seperti itu, agar actions yang dikumpulkan dapat diproses dengan benar, Anda juga harus menentukan paket dalam instans itu sendiri.
+catatan dalam kasus seperti itu, agar actions yang dikumpulkan dapat diproses dengan benar, Anda juga harus menentukan package pada instansinya sendiri.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // mulai long-polling listener
+    // start long-polling listener
 }
 ```
 
@@ -49,7 +49,7 @@ ktGram {
 ```
 
 
-atau jika Anda tidak menggunakan plugin untuk menentukan paket yang berbeda, Anda perlu menentukannya dengan pemisah `;`:
+atau jika Anda tidak menggunakan plugin untuk menentukan package yang berbeda, Anda perlu menentukannya dengan pemisah `;`:
 
 ```gradle
 ksp {
@@ -57,7 +57,7 @@ ksp {
 }
 ```
 
-### Pemrosesan
+### Processing
 
 #### Webhooks
 
@@ -73,3 +73,5 @@ Panggil: `bot.handleUpdates()` atau melalui `bot.update.setListener { handle(it)
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)
 * [Actions](Actions.md)
+
+---

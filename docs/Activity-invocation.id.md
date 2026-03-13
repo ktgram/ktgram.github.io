@@ -3,21 +3,21 @@
 title: Activity Invocation
 ---
 
-Selama invocation activity, adalah mungkin untuk melewatkan konteks bot, karena dinyatakan sebagai parameter dalam fungsi target.
+Selama aktivasi aktivitas, dimungkinkan untuk melewatkan konteks bot, karena dideklarasikan sebagai parameter dalam fungsi target.
 
 Parameter yang dapat dilewatkan adalah:
 
 * [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (dan semua subclass-nya) - update pemrosesan saat ini.
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - konteks level rendah dari penanganan activity.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - konteks tingkat rendah dari penanganan aktivitas.
 * [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - jika ada.
 * [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - jika ada.
 * [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - instance bot saat ini.
 
 Juga dimungkinkan untuk menambahkan tipe kustom untuk dilewatkan.
 
-Untuk melakukannya, tambahkan kelas yang mengimplementasikan [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) dan tandai dengan anotasi [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html).
+Untuk melakukan ini, tambahkan kelas yang mengimplementasikan [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) dan tandai dengan anotasi [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html).
 
-Setelah mengimplementasikan interface `Autowiring` - `T` akan tersedia untuk dilewatkan dalam fungsi target dan akan diperoleh melalui metode yang dijelaskan dalam interface.
+Setelah mengimplementasikan antarmuka `Autowiring` - `T` akan tersedia untuk dilewatkan dalam fungsi target dan akan diperoleh melalui metode yang dijelaskan dalam antarmuka.
 
 ```kotlin
 @Injectable
@@ -29,9 +29,9 @@ object UserResolver : Autowiring<UserRecord> {
 ```
 
 
-Parameter lain yang dinyatakan dalam fungsi akan **dicari** dalam parameter yang diparse.
+Parameter lain yang dideklarasikan dalam fungsi akan **dicari** dalam parameter yang diparsing.
 
-Selain itu, parameter yang diparse selama dilewatkan dapat di-cast ke tipe tertentu, berikut daftarnya:
+Selain itu, parameter yang diparsing selama dilewatkan dapat di-cast ke tipe tertentu, berikut daftarnya:
 
 - `String`
 - `Integer`
@@ -40,7 +40,7 @@ Selain itu, parameter yang diparse selama dilewatkan dapat di-cast ke tipe terte
 - `Float`
 - `Double`
 
-Selain itu, perhatikan bahwa jika parameter dinyatakan dan hilang (atau dalam parameter yang diparse atau misalnya `User` hilang dalam `Update`) atau tipe yang dinyatakan tidak sesuai dengan parameter yang diterima dalam fungsi, **`null`** akan dilewatkan jadi berhati-hatilah.
+Selain itu, perhatikan bahwa jika parameter dideklarasikan dan tidak ada (atau dalam parameter yang diparsing atau misalnya `User` tidak ada dalam `Update`) atau tipe yang dideklarasikan tidak sesuai dengan parameter yang diterima dalam fungsi, **`null`** akan dilewatkan jadi berhati-hatilah.
 
 Meringkas semuanya, di bawah ini adalah contoh bagaimana parameter fungsi biasanya dibentuk:
 

@@ -3,18 +3,18 @@
 title: Actions
 ---
 
-### Semua Permintaan adalah Actions
+### Semua permintaan adalah Actions
 Semua permintaan api telegram adalah berbagai jenis antarmuka [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) yang mengimplementasikan metode berbeda seperti [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>yang dibungkus dalam bentuk fungsi bertipe [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) untuk kenyamanan antarmuka library.
 
 <p align="center">
     <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram" />
 </p>
 
-Setiap `Action` mungkin memiliki metode yang berbeda-beda, tergantung pada [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) yang tersedia.
+Setiap `Action` mungkin memiliki metode sendiri yang mungkin, tergantung pada [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) yang tersedia.
 
 ### Features
 
-Action yang berbeda mungkin memiliki [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) yang berbeda tergantung pada Telegram Bot Api, seperti:
+Actions berbeda mungkin memiliki [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) yang berbeda tergantung pada Telegram Bot Api, seperti:
 [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html),
 [`MarkupFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-markup-feature/index.html)
 [`EntitiesFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-entities-feature/index.html)
@@ -55,7 +55,7 @@ message{ "Test" }.inlineKeyboardMarkup {
 
 ```
 
-Detail lebih lanjut dapat dilihat di dokumentasi builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html).
+Detail lebih lanjut dapat dilihat di dokumentasi builder [ini](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html).
 
 #### Reply Keyboard Markup
 
@@ -76,9 +76,9 @@ message{ "Test" }.replyKeyboardMarkup {
 
 Opsi tambahan yang berlaku untuk keyboard dapat dilihat di [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html).
 
-Lihat dokumentasi builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) untuk detail lebih lanjut tentang metode-metode.
+Lihat dokumentasi builder [ini](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) untuk detail lebih lanjut tentang metode-metode tersebut.
 
-Biasanya nyaman menggunakan dsl untuk mengumpulkan keyboard markup, tetapi jika diperlukan, Anda juga dapat menambahkan markup secara manual.
+Sebagian besar nyaman menggunakan dsl untuk mengumpulkan keyboard markup, tetapi jika diperlukan, Anda juga dapat menambahkan markup secara manual.
 
 ```kotlin
 message{ "*Test*" }.markup {
@@ -106,7 +106,7 @@ Contoh penggunaan:
 message{ "Test \$hello" }.replyKeyboardMarkup {
     +"Test menu button"
 }.entities {
-    5 to 15 url "https://google.com" // tambahkan TextLink
+    5 to 15 url "https://google.com" // tambah TextLink
     entity(EntityType.Bold, 0, 4)
     entity(EntityType.Cashtag, 5, 5) // backslash tidak dihitung (karena digunakan untuk compiler)
 }.send(user, bot)
@@ -114,7 +114,7 @@ message{ "Test \$hello" }.replyKeyboardMarkup {
 
 #### Contextual entities.
 
-Entities juga dapat ditambahkan melalui konteks beberapa konstruksi, mereka diberi label dengan antarmuka [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) tertentu, yang juga hadir dalam fitur caption.
+Entities juga dapat ditambahkan melalui konteks beberapa konstruksi, mereka ditandai dengan antarmuka [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) tertentu, juga hadir dalam fitur caption.
 
 Contoh penggunaan:
 

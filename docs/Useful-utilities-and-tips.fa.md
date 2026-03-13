@@ -1,14 +1,14 @@
 ---
 ---
-title: ابزارهای مفید و نکات
+title: ابزارهای و ترفندهای مفید
 ---
 
 
-### کار با ProcessedUpdate
+### عمل با ProcessedUpdate
 
-[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) یک کلاس جنریک برای آپدیت‌ها است که بسته به داده اصلی، می‌تواند در انواع مختلفی ارائه شود ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html)، [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) و غیره.)
+کلاس [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) یک کلاس عمومی برای آپدیت‌ها است که بسته به داده اصلی، می‌تواند در انواع مختلفی ارائه شود ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html)، [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) و غیره)
 
-بنابراین می‌توانید نوع داده دریافتی را بررسی کنید و با smartcasts داده‌های خاصی را بیشتر دستکاری کنید، به عنوان مثال:
+بنابراین می‌توانید نوع داده ورودی را بررسی کنید و داده‌های خاص را با smartcasts اداره کنید، به عنوان مثال:
 
 ```kotlin
 // ...
@@ -16,26 +16,26 @@ if (update !is MessageUpdate) {
     message { "Only messages are allowed" }.send(user, bot)
     return
 }
-// در ادامه، ProcessedUpdate به عنوان MessageUpdate درک می‌شود.
+// در ادامه، ProcessedUpdate به عنوان MessageUpdate در نظر گرفته می‌شود.
 ```
 
-همچنین یک اینترفیس [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) درون آن وجود دارد که به شما امکان می‌دهد تعیین کنید آیا یک مرجع کاربری درون آن وجود دارد، مورد استفاده:
+همچنین یک اینترفیس [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) درونی وجود دارد که به شما اجازه می‌دهد مشخص کنید آیا یک مرجع کاربری درونی وجود دارد یا خیر، مورد استفاده مثال:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
 
 ```
 
-اگر لازم باشد، همیشه آپدیت اصلی [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) در پارامتر update وجود دارد.
+در صورت نیاز، همیشه آپدیت اصلی [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) در پارامتر آپدیت وجود دارد.
 
 
 ### تزریق وابستگی‌ها
 
-کتابخانه از یک مکانیسم ساده برای مقداردهی کلاس‌ها استفاده می‌کند که روش‌های پردازش آپدیت شما با annotation‌های ارائه شده برچسب‌گذاری شده‌اند.
+کتابخانه از یک مکانیزم ساده برای مقداردهی کلاس‌ها استفاده می‌کند که در آن متدهای پردازش آپدیت شما با annotation‌های ارائه شده برچسب‌گذاری می‌شوند.
 
-[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) به طور پیش‌فرض برای فراخوانی روش‌های برچسب‌گذاری شده استفاده می‌شود.
+[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) به طور پیش‌فرض برای فراخوانی متدهای annotatd استفاده می‌شود.
 
-اما اگر می‌خواهید از کتابخانه‌های دیگری برای این منظور استفاده کنید، می‌توانید اینترفیس [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) را مجدداً تعریف کنید، <br/>با استفاده از مکانیسم مورد نظر خود و هنگام مقداردهی ربات آن را ارسال کنید.
+اما اگر می‌خواهید از کتابخانه‌های دیگری برای این منظور استفاده کنید، می‌توانید اینترفیس [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) را دوباره تعریف کنید، <br/>با استفاده از مکانیزم مورد نظر خود و آن را هنگام مقداردهی اولیه ربات ارسال کنید.
 
 ```kotlin
 fun main() = runBlocking {
@@ -49,34 +49,34 @@ fun main() = runBlocking {
 
 ### فیلتر کردن آپدیت‌ها
 
-اگر شرایط پیچیده‌ای ندارید، می‌توانید به سادگی برخی آپدیت‌ها را برای پردازش فیلتر کنید:
+اگر شرایط پیچیده‌ای ندارید، می‌توانید ساده‌ترین روش فیلتر کردن برخی آپدیت‌ها برای پردازش باشد:
 
 ```kotlin
-// تابعی که شرط فیلتر کردن آپدیت‌ها در آن تعریف شده است
+// تابعی که شرط فیلتر کردن آپدیت‌ها تعریف شده است
 fun filteringFun(update: Update): Boolean = update.message?.text.isNullOrBlank()
 
 fun main() = runBlocking {
   val bot = TelegramBot("BOT_TOKEN")
 
-  // تنظیم جریان پردازشی خاص‌تر برای آپدیت‌ها
+  // تنظیم جریان پردازش دقیق‌تر برای آپدیت‌ها
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // پس از اینکه لیسنر از حوزه خارج شده و قبل از رسیدن به تابع handler، فیلتر کرده است.
-    // در واقع می‌توانید حتی شرط if را مستقیماً در آنجا با return@setListener بنویسید یا فیلتر کردن را به کلاس جداگانه گسترش دهید.
+    // بنابراین ساده، اگر listener قبل از رسیدن به متد handler از حدود خارج شود، این فیلتر کردن است.
+    // در واقع می‌توانید حتی یک if-condition مستقیم در آنجا با return@setListener بنویسید یا فیلتر کردن را به یک کلاس جداگانه توسعه دهید.
 
-    handle(it) // یا روش دستی مدیریت با بلوک
+    handle(it) // یا روش دستی پردازش با بلوک
   }
 }
 ```
 
-برای شامل کردن فیلتر کردن در فرآیند تطبیق یا حذف دستورات، به guardها یا `@CommonHandler` نگاه کنید.
+برای شامل کردن فیلتر کردن در فرآیند تطبیق یا استثنا دستورات، به guardها یا `@CommonHandler` نگاه کنید.
 
-### گزینه‌هایی برای تعمیم دادن روش‌های مختلف
+### گسترش گزینه‌ها برای متدهای مختلف
 
-اگر باید پارامترهای اختیاری یکسان را اغلب اعمال کنید، می‌توانید یک تابع مشابه بنویسید که برای شما مناسب است و کد boilerplate را سبک کنید :)
+اگر باید پارامترهای اختیاری یکسان را اغلب اعمال کنید، می‌توانید یک تابع مشابه که برای شما مناسب است بنویسید و کد boilerplate را سبک‌تر کنید :)
 
-برخی خواص رایج به [اینترفیس‌های مختلف](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html) جدا شده‌اند.
+بعضی خصوصیات رایج به [اینترفیس‌های مختلف](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html) تفکیک شده‌اند.
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")

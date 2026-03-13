@@ -3,51 +3,53 @@
 title: Interceptors (Middleware)
 ---
 
-### Interceptors: Logic Cross-Cutting cho Bot của bạn
+### Interceptors: Cross-Cutting Logic for Your Bot
 
-Khi xây dựng một bot Telegram, bạn thường lặp lại việc thiết lập, kiểm tra, hoặc dọn dẹp trên các handler. Interceptors cho phép bạn chèn logic chia sẻ xung quanh các handler, giữ cho các handler tập trung và dễ bảo trì.
+When building a Telegram bot, you often repeat setup, checks, or cleanup across handlers. Interceptors let you plug in shared logic around handlers, keeping handlers focused and maintainable.
 
-Đây là cách interceptors hoạt động trong *telegram-bot* và cách sử dụng chúng.
+Here’s how interceptors work in *telegram-bot* and how to use them.
 
-### Interceptors là gì? (Giải thích đơn giản)
+### What Are Interceptors? (Simple Explanation)
 
-Interceptors là các hàm chạy tại các điểm cụ thể trong pipeline xử lý cập nhật. Chúng cho phép bạn:
-- Kiểm tra và sửa đổi context xử lý
-- Thêm logic cross-cutting (logging, auth, metrics)
-- Dừng xử lý sớm nếu cần
-- Dọn dẹp tài nguyên sau khi xử lý
+Interceptors are functions that run at specific points in the update processing pipeline. They let you:
+- Inspect and modify the processing context
+- Add cross-cutting logic (logging, auth, metrics)
+- Stop processing early if needed
+- Clean up resources after processing
 
-Hãy nghĩ về interceptors như các checkpoint mà mọi cập nhật đều đi qua trước, trong và sau khi thực thi handler.
+Think of interceptors as checkpoints that every update passes through before, during, and after handler execution.
 
-### Pipeline Xử lý
 
-Bot xử lý cập nhật thông qua một pipeline với bảy giai đoạn:
+### The Processing Pipeline
 
-| Giai đoạn | Khi nào chạy | Bạn có thể dùng để làm gì |
-|-----------|--------------|--------------------------|
-| **Setup** | Ngay khi cập nhật đến, trước mọi xử lý | ✔ Giới hạn tốc độ toàn cục<br>✔ Lọc spam hoặc cập nhật bị lỗi<br>✔ Logging ban đầu<br>✔ Thiết lập context chia sẻ |
-| **Parsing** | Sau Setup, trích xuất lệnh và tham số | ✔ Custom command parsing<br>✔ Bổ sung context với dữ liệu đã parsed<br>✔ Validate cấu trúc cập nhật |
-| **Match** | Tìm handler phù hợp (Command/Input/Common) | ✔ Ghi đè selection handler<br>✔ Custom input handling logic<br>✔ Log matched handlers |
-| **Validation** | Sau khi tìm thấy handler, trước khi gọi | ✔ Permissions riêng cho handler<br>✔ Giới hạn tốc độ theo handler<br>✔ Guard checks<br>✔ Cancel processing nếu điều kiện không được đáp ứng |
-| **PreInvoke** | Ngay trước khi handler chạy | ✔ Checks phút cuối<br>✔ Start timers/metrics<br>✔ Bổ sung context cho handler<br>✔ Sửa đổi hành vi handler |
-| **Invoke** | Handler được thực thi ở đây | ✔ Wrap handler execution<br>✔ Error handling<br>✔ Logging handler results |
-| **PostInvoke** | Sau khi handler hoàn thành (thành công hoặc thất bại) | ✔ Dọn dẹp tài nguyên<br>✔ Log results<br>✔ Send fallback messages khi lỗi<br>✔ Sửa đổi kết quả trước khi trả về |
+The bot processes updates through a pipeline with seven phases:
 
-### Tạo một Interceptor
+| Phase | When It Runs | What You Can Use It For |
+|-------|--------------|-------------------------|
+| **Setup** | As soon as the update arrives, before any processing | ✔ Global rate limiting<br>✔ Filter out spam or malformed updates<br>✔ Initial logging<br>✔ Setup shared context |
+| **Parsing** | After setup, extracts command and parameters | ✔ Custom command parsing<br>✔ Enrich context with parsed data<br>✔ Validate update structure |
+| **Match** | Finds the appropriate handler (Command/Input/Common) | ✔ Override handler selection<br>✔ Custom input handling logic<br>✔ Log matched handlers |
+| **Validation** | After handler is found, before invocation | ✔ Handler-specific permissions<br>✔ Rate limiting per handler<br>✔ Guard checks<br>✔ Cancel processing if conditions aren't met |
+| **PreInvoke** | Immediately before the handler runs | ✔ Last-minute checks<br>✔ Start timers/metrics<br>✔ Enrich context for handler<br>✔ Modify handler behavior |
+| **Invoke** | The handler is executed here | ✔ Wrap handler execution<br>✔ Error handling<br>✔ Logging handler results |
+| **PostInvoke** | After handler completes (success or failure) | ✔ Cleanup resources<br>✔ Log results<br>✔ Send fallback messages on errors<br>✔ Modify results before returning |
 
-Một interceptor là một hàm đơn giản nhận một `ProcessingContext`:
+
+### Creating an Interceptor
+
+An interceptor is a simple function that receives a `ProcessingContext`:
 
 ```kotlin
 import eu.vendeli.tgbot.core.PipelineInterceptor
 import eu.vendeli.tgbot.types.component.ProcessingContext
 
 val myInterceptor: PipelineInterceptor = { context ->
-    // Logic của bạn ở đây
+    // Your logic here
     println("Processing update: ${context.update.updateId}")
 }
 ```
 
-Hoặc sử dụng lambda:
+Or using a lambda:
 
 ```kotlin
 val loggingInterceptor = PipelineInterceptor { context ->
@@ -56,31 +58,32 @@ val loggingInterceptor = PipelineInterceptor { context ->
 }
 ```
 
-### Đăng ký Interceptors
 
-Đăng ký interceptors trên pipeline xử lý:
+### Registering Interceptors
+
+Register interceptors on the processing pipeline:
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
 
-    // Đăng ký interceptor cho giai đoạn Setup
+    // Register an interceptor for the Setup phase
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-        // Kiểm tra nếu user bị banned
+        // Check if user is banned
         val user = context.update.userOrNull
         if (user != null && isBanned(user.id)) {
-            context.finish() // Dừng xử lý
+            context.finish() // Stop processing
             return@intercept
         }
     }
 
-    // Đăng ký interceptor cho giai đoạn PreInvoke
+    // Register an interceptor for the PreInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
         // store start time
     }
 
-    // Đăng ký interceptor cho giai đoạn PostInvoke
+    // Register an interceptor for the PostInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val startTime = // get start time
         if (startTime != null) {
@@ -93,15 +96,15 @@ suspend fun main() {
 }
 ```
 
-### Ví dụ thực tế: Authentication & Metrics
+### Real-World Example: Authentication & Metrics
 
-Ví dụ: một bot yêu cầu authentication cho một số lệnh, đo thời gian thực thi handler, và log tất cả các lệnh.
+Example: a bot that requires authentication for certain commands, measures handler execution time, and logs all commands.
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
 
-    // Giai đoạn Setup: Kiểm tra nếu user đã được authenticated
+    // Setup phase: Check if user is authenticated
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
         val user = context.update.userOrNull ?: return@intercept
 
@@ -112,12 +115,12 @@ suspend fun main() {
         }
     }
 
-    // Giai đoạn PreInvoke: Start timer và check permissions
+    // PreInvoke phase: Start timer and check permissions
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
 
-        // Kiểm tra nếu user có permission cho handler cụ thể này
+        // Check if user has permission for this specific handler
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
@@ -129,7 +132,7 @@ suspend fun main() {
         // store start time
     }
 
-    // Giai đoạn PostInvoke: Log và cleanup
+    // PostInvoke phase: Log and cleanup
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val startTime = // get start time
@@ -148,47 +151,49 @@ suspend fun main() {
 }
 ```
 
+
 ### ProcessingContext
 
-`ProcessingContext` cung cấp truy cập đến:
+The `ProcessingContext` provides access to:
 
-- **`update: ProcessedUpdate`** - Cập nhật hiện tại đang được xử lý
-- **`bot: TelegramBot`** - Bot instance
-- **`registry: ActivityRegistry`** - Activity registry
-- **`parsedInput: String`** - Command/input text đã parsed
-- **`parameters: Map<String, String>`** - Command parameters đã parsed
-- **`activity: Activity?`** - Handler đã resolved (null cho đến giai đoạn Match)
-- **`shouldProceed: Boolean`** - Liệu xử lý có nên tiếp tục
-- **`additionalContext: AdditionalContext`** - Dữ liệu context bổ sung
-- **`finish()`** - Dừng xử lý sớm
+- **`update: ProcessedUpdate`** - The current update being processed
+- **`bot: TelegramBot`** - The bot instance
+- **`registry: ActivityRegistry`** - The activity registry
+- **`parsedInput: String`** - The parsed command/input text
+- **`parameters: Map<String, String>`** - Parsed command parameters
+- **`activity: Activity?`** - The resolved handler (null until Match phase)
+- **`shouldProceed: Boolean`** - Whether processing should continue
+- **`additionalContext: AdditionalContext`** - Additional context data
+- **`finish()`** - Stop processing early
 
-#### Dừng Xử lý Sớm
+#### Stopping Processing Early
 
-Gọi `context.finish()` để dừng xử lý:
+Call `context.finish()` to stop processing:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
     if (someCondition) {
-        context.finish() // Không có giai đoạn tiếp theo nào sẽ thực thi
+        context.finish() // No further phases will execute
     }
 }
 ```
 
-#### Lưu trữ Dữ liệu Tùy chỉnh
+#### Storing Custom Data
 
-Sử dụng `additionalContext` để truyền dữ liệu giữa các interceptors:
+Use `additionalContext` to pass data between interceptors:
 
 ```kotlin
-// Trong PreInvoke
+// In PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// Trong PostInvoke
+// In PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
+
 ### Multiple Interceptors
 
-Bạn có thể đăng ký multiple interceptors cho cùng một giai đoạn. Chúng thực thi theo thứ tự đăng ký:
+You can register multiple interceptors for the same phase. They execute in registration order:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
@@ -199,66 +204,67 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     println("Second interceptor")
 }
 
-// Khi một cập nhật được xử lý:
+// When an update is processed:
 // Output: "First interceptor"
 // Output: "Second interceptor"
 ```
 
-Nếu một interceptor gọi `context.finish()`, các interceptors tiếp theo trong giai đoạn đó sẽ bị bỏ qua, và các giai đoạn sau sẽ không thực thi.
+If an interceptor calls `context.finish()`, subsequent interceptors in that phase are skipped, and later phases won't execute.
+
 
 ### Best Practices
 
-#### 1. Dùng đúng Giai đoạn
+#### 1. Use the Right Phase
 
 - Setup: Global checks, filtering, initial setup
 - Parsing: Custom parsing logic
 - Match: Handler selection logic
 - Validation: Permissions, rate limits, guards
 - PreInvoke: Handler-specific preparation
-- Invoke: Thường được xử lý bởi interceptor mặc định
+- Invoke: Usually handled by the default interceptor
 - PostInvoke: Cleanup, logging, error handling
 
-#### 2. Giữ Interceptors Tập trung
+#### 2. Keep Interceptors Focused
 
-Mỗi interceptor nên làm một việc:
+Each interceptor should do one thing:
 
 ```kotlin
-// ✅ Good - interceptor tập trung
+// ✅ Good - focused interceptor
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     if (isBanned(context.update.userOrNull?.id)) {
         context.finish()
     }
 }
 
-// ❌ Avoid - làm quá nhiều
+// ❌ Avoid - doing too much
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     // Authentication
     // Logging
     // Metrics
     // Rate limiting
-    // ... quá nhiều!
+    // ... too much!
 }
 ```
 
-#### 3. Xử lý Errors Gracefully
+#### 3. Handle Errors Gracefully
 
-Interceptors không nên crash bot:
+Interceptors should not crash the bot:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     try {
-        // Logic của bạn
+        // Your logic
     } catch (e: Exception) {
         val logger = context.bot.config.loggerFactory.get("Interceptor")
         logger.error("Interceptor error", e)
-        // Đừng gọi context.finish() trừ khi bạn muốn dừng xử lý
+        // Don't call context.finish() unless you want to stop processing
     }
 }
 ```
 
-#### 4. Dọn dẹp Tài nguyên
+#### 4. Clean Up Resources
 
-Nếu bạn mở tài nguyên trong `PreInvoke`, dọn dẹp chúng trong `PostInvoke`:
+If you open resources in `PreInvoke`, clean them up in `PostInvoke`:
 
 ```kotlin
 var timer: Timer? = null
@@ -274,25 +280,25 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 }
 ```
 
-#### 5. Thứ tự Quan trọng
+#### 5. Order Matters
 
-Đăng ký interceptors theo thứ tự bạn muốn chúng chạy:
+Register interceptors in the order you want them to run:
 
 ```kotlin
-// Checks chung trước
+// More general checks first
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) {
     // Global ban check
 }
 
-// Checks cụ thể sau
+// More specific checks later
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) {
     // Handler-specific permission check
 }
 ```
 
-#### 6. Dùng Interceptors cho Cross-Cutting Concerns
+#### 6. Use Interceptors for Cross-Cutting Concerns
 
-Interceptors lý tưởng cho:
+Interceptors are ideal for:
 - ✅ Authentication/authorization
 - ✅ Logging
 - ✅ Metrics/performance monitoring
@@ -300,31 +306,32 @@ Interceptors lý tưởng cho:
 - ✅ Error handling
 - ✅ Request/response transformation
 
-Với handler-specific logic, giữ nó trong handler.
+For handler-specific logic, keep it in the handler.
+
 
 ### Default Interceptors
 
-Framework bao gồm default interceptors cho core functionality:
+The framework includes default interceptors for core functionality:
 
 - **DefaultSetupInterceptor**: Global rate limiting
 - **DefaultParsingInterceptor**: Command parsing
 - **DefaultMatchInterceptor**: Handler matching (commands, inputs, common matchers)
-- **DefaultValidationInterceptor**: Guard checks và per-handler rate limiting
-- **DefaultInvokeInterceptor**: Handler execution và error handling
+- **DefaultValidationInterceptor**: Guard checks and per-handler rate limiting
+- **DefaultInvokeInterceptor**: Handler execution and error handling
 
-Custom interceptors của bạn chạy cùng với defaults. Bạn có thể thêm logic trước hoặc sau defaults, nhưng bạn không thể xóa default interceptors.
+Your custom interceptors run alongside these defaults. You can add logic before or after the defaults, but you cannot remove the default interceptors.
 
 ---
 
 ### Advanced: Conditional Interceptors
 
-Bạn có thể làm interceptors conditional:
+You can make interceptors conditional:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
 
-    // Chỉ áp dụng cho các handler cụ thể
+    // Only apply to specific handlers
     if (activity::class.simpleName?.contains("Admin") == true) {
         // Admin-specific logic
         checkAdminPermissions(context)
@@ -332,17 +339,18 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
 }
 ```
 
+
 ### Summary
 
-Interceptors cung cấp cách sạch sẽ để thêm cross-cutting logic cho bot của bạn:
+Interceptors provide a clean way to add cross-cutting logic to your bot:
 
-- ✅ **Bảy giai đoạn** cho các stages khác nhau của xử lý
-- ✅ **API đơn giản**: Chỉ implement `PipelineInterceptor`
-- ✅ **Flexible**: Đăng ký multiple interceptors mỗi giai đoạn
-- ✅ **Powerful**: Truy cập đầy đủ processing context
-- ✅ **Safe**: Có thể dừng xử lý sớm với `context.finish()`
+- ✅ **Seven phases** for different stages of processing
+- ✅ **Simple API**: Just implement `PipelineInterceptor`
+- ✅ **Flexible**: Register multiple interceptors per phase
+- ✅ **Powerful**: Access to full processing context
+- ✅ **Safe**: Can stop processing early with `context.finish()`
 
-Dùng interceptors để giữ handlers tập trung vào business logic trong khi xử lý shared concerns như authentication, logging, và metrics một cách centralized.
+Use interceptors to keep your handlers focused on business logic while handling shared concerns like authentication, logging, and metrics in a centralized way.
 
 ---
 

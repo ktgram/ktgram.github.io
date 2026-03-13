@@ -4,83 +4,85 @@ title: Guards
 ---
 
 ### Introduction
-نگهبان‌ها یک ویژگی ضروری برای توسعه‌دهندگانی که ربات می‌سازند هستند. این نگهبان‌ها به عنوان چک‌های پیش از اجرا عمل می‌کنند که تعیین می‌کنند آیا یک دستور خاص باید فراخوانی شود یا خیر. با پیاده‌سازی این چک‌ها، توسعه‌دهندگان می‌توانند کارکرد، امنیت و تجربه کاربری ربات‌های خود را ارتقا دهند.
+Guards are an essential feature for developers creating bots. These guards function as pre-execution checks that determine whether a particular command should be invoked. By implementing these checks, developers can enhance the functionality, security, and user experience of their bots.
 
-### هدف از نگهبان‌های فعالیت
-هدف اصلی نگهبان‌های فعالیت تضمین این است که فقط کاربران مجاز یا شرایط خاصی باعث فعال شدن یک فعالیت شوند.
+### Purpose of Activity Guards
+The primary purpose of activity guards is to ensure that only authorized users or specific conditions trigger a activity. 
 
-این می‌تواند مانع سوء استفاده شود، یکپارچگی ربات را حفظ کند و تعاملات را ساده‌تر کند.
+This can prevent misuse, maintain the bot's integrity, and streamline interactions.
 
-### موارد استفاده رایج
-1. تأیید هویت و مجوز: تضمین اینکه فقط کاربران خاص می‌توانند به دستورات خاصی دسترسی داشته باشند.
-2. چک‌های پیش‌شرط: تأیید اینکه شرایط خاصی قبل از اجرای یک فعالیت برقرار باشد (مثلاً تضمین اینکه یک کاربر در وضعیت یا زمینه خاصی قرار دارد).
-3. نگهبان‌های زمینه‌ای: تصمیم‌گیری بر اساس وضعیت گفتگوی فعلی یا کاربر.
+### Common Use Cases
+1. Authentication and Authorization: Ensuring only certain users can access specific commands.
+2. Pre-condition Checks: Verifying that certain conditions are met before executing a activity (e.g., ensuring a user is in a particular state or context).
+3. Contextual Guards: Making decisions based on the current chat or user state.
 
-### استراتژی‌های پیاده‌سازی
-پیاده‌سازی نگهبان‌های دستور تلگرام معمولاً شامل نوشتن توابع یا متدهایی است که منطق هر نگهبان را در خود جای می‌دهند. در زیر استراتژی‌های رایج آورده شده است:
+### Implementation Strategies
+Implementing Telegram Command Guards typically involves writing functions or methods that encapsulate the logic for each guard. Below are common strategies:
 
-1. چک نقش کاربر:
-   - تضمین اینکه کاربر نقش مورد نیاز (مثلاً مدیر، مدیر تالار) را قبل از اجرای دستور داشته باشد.
+1. User Role Check:
+   - Ensuring the user has the required role (e.g., admin, moderator) before executing the command.
       ```kotlin
        override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // بررسی اینکه آیا کاربر در گفتگوی داده شده مدیر است
+        // Check if the user is an admin in the given chat
        }
       ```
 
-2. تأیید وضعیت:
-   - بررسی وضعیت کاربر قبل از اجازه دادن به اجرای دستور.
+2. State Verification:
+   - Checking the user's state before allowing command execution.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         return bot.userData[user.id, "data"] == requiredState
      }
      ```
 
-3. نگهبان‌های سفارشی:
-   - ایجاد منطق سفارشی بر اساس نیازهای خاص.
+3. Custom Guards:
+   - Creating custom logic based on specific requirements.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // منطق سفارشی برای تعیین اینکه آیا دستور باید اجرا شود
+        // Custom logic to determine if the command should be executed
      }
      ```
 
-### ادغام نگهبان‌ها با فعالیت‌ها
-برای ادغام این نگهبان‌ها با دستورات ربات خود، می‌توانید یک نگهبان ایجاد کنید که این شرایط را قبل از اینکه handler دستور فراخوانی شود بررسی کند.
+### Integrating Guards with Activities
+To integrate these guards with your bot commands, you can create a guard that checks these conditions before the command handler is invoked.
 
-### پیاده‌سازی نمونه
+### Implementing Example
 
 ```kotlin
-// کلاس نگهبان خود را که interface Guard را پیاده‌سازی می‌کند، در جایی تعریف کنید
+// define somewhere your guard class that implements Guard interface
 object YourGuard : Guard {
     override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // شرط خود را اینجا بنویسید
+        // write your condition here
     }
 }
 
 // ...
 
 @CommandHandler(["yourCommand"])
-@Guard(YourGuard::class) // InputHandler نیز پشتیبانی می‌شود
+@Guard(YourGuard::class) // InputHandler also is supported
 fun command(bot: TelegramBot) {
-   // بدنه دستور
+   // command body
 }
 ```
 
-### بهترین شیوه‌ها
+### Best Practices
 
-- مدولاریته: منطق نگهبان را مدولار نگه دارید و از فعالیت‌ها جدا کنید.
-- قابلیت استفاده مجدد: توابع نگهبان قابل استفاده مجدد بنویسید که به راحتی می‌توان آن‌ها را در دستورات/ورودی‌های مختلف اعمال کرد.
-- کارایی: چک‌های نگهبان را بهینه کنید تا بار عملکردی را کمینه کنید.
-- بازخورد کاربر: بازخورد واضحی به کاربران بدهید وقتی دستوری توسط یک نگهبان مسدود می‌شود.
+- Modularity: Keep guard logic modular and separate from activities.
+- Reusability: Write reusable guard functions that can be easily applied across different commands/inputs.
+- Efficiency: Optimize guard checks to minimize performance overhead.
+- User Feedback: Provide clear feedback to users when a command is blocked by a guard.
 
-### نتیجه‌گیری
+### Conclusion
 
-نگهبان‌های فعالیت یک ابزار قدرتمند برای مدیریت اجرای دستورات/ورودی ربات هستند.
+Activity Guards are a powerful tool for managing bot command/input execution. 
 
-با پیاده‌سازی سازوکارهای نگهبان قوی، توسعه‌دهندگان می‌توانند تضمین کنند ربات‌هایشان به صورت امن و کارآمد عمل می‌کنند و تجربه بهتری برای کاربر ارائه می‌دهند.
+By implementing robust guard mechanisms, developers can ensure their bots operate securely and efficiently, providing a better user experience.
 
-### همچنین ببینید
+### See also
 
-* [فعالیت‌ها و پردازش‌گرها](Activites-and-Processors.md)
-* [پردازش آپدیت](Update-parsing.md)
-* [اقدامات](Actions.md)
-* [فراخوانی فعالیت](Activity-invocation.md)
+* [Activities and Proccessors](Activites-and-Processors.md)
+* [Update parsing](Update-parsing.md)
+* [Actions](Actions.md)
+* [Activity invocation](Activity-invocation.md)
+
+---

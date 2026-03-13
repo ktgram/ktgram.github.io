@@ -3,13 +3,13 @@
 title: Functional Dsl
 ---
 
-### To ~~infinity~~ functional dsl and beyond!
+### Menuju ~~infinity~~ functional dsl dan seterusnya!
 
-Bot mendukung pengaturan konteks baik berbasis anotasi maupun functional dsl. Anda dapat menggabungkan kedua pendekatan tersebut.
+Bot mendukung pengaturan konteks berbasis anotasi dan functional dsl. Anda dapat menggabungkan kedua pendekatan ini.
 
 ### Functional DSL
 
-Functional DSL adalah cara berbeda untuk mendefinisikan konteks bot.
+Functional DSL hanyalah cara yang berbeda untuk mendefinisikan konteks bot.
 
 Contoh:
 
@@ -49,7 +49,7 @@ suspend fun main() {
 }
 ```
 
-Pada `onCommand`, parameter yang diurai tersedia sebagai `Map<String, String>` berdasarkan konfigurasi Anda.
+Pada `onCommand`, parameter yang di-parsing tersedia sebagai `Map<String, String>` berdasarkan konfigurasi Anda.
 
 #### Inputs
 
@@ -91,7 +91,7 @@ bot.setFunctionality {
 }
 ```
 
-Chain secara otomatis melanjutkan ke langkah berikutnya kecuali kondisi break terpenuhi. Jika kondisi break cocok dan `repeat` adalah `true` (default), pengguna tetap pada langkah saat ini.
+Chain secara otomatis melanjutkan ke langkah berikutnya kecuali jika kondisi break terpenuhi. Jika kondisi break terpenuhi dan `repeat` adalah `true` (default), pengguna tetap pada langkah saat ini.
 
 #### Update Type Handlers
 
@@ -126,7 +126,7 @@ bot.setFunctionality {
 
 #### Fallback Handler
 
-Tangani updates yang tidak diproses oleh handler manapun:
+Tangani update yang tidak diproses oleh handler manapun:
 
 ```kotlin
 bot.setFunctionality {
@@ -140,7 +140,7 @@ bot.setFunctionality {
 
 #### Rate Limiting
 
-Terapkan batasan rate ke handler manapun:
+Terapkan batasan rate pada handler mana pun:
 
 ```kotlin
 bot.setFunctionality {
@@ -165,7 +165,7 @@ bot.setFunctionality {
 
 #### Argument Parsing
 
-Kustomisasi cara argumen command diurai:
+Kustomisasi cara argumen command di-parsing:
 
 ```kotlin
 bot.setFunctionality {
@@ -197,7 +197,7 @@ bot.setFunctionality {
 
 Kedua handler terdaftar dalam `ActivityRegistry` yang sama dan bekerja secara seamless bersama-sama.
 
-### Lihat juga
+### See also
 
 * [Action](Actions.md)
 * [Useful utilities](Useful-utilities-and-tips.md)

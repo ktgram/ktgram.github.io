@@ -3,50 +3,50 @@
 title: Guards
 ---
 
-### Introduction
-Guards are an essential feature for developers creating bots. These guards function as pre-execution checks that determine whether a particular command should be invoked. By implementing these checks, developers can enhance the functionality, security, and user experience of their bots.
+### Giới thiệu
+Guards là một tính năng thiết yếu cho các nhà phát triển tạo bot. Những guards này hoạt động như các kiểm tra trước khi thực thi để xác định xem một lệnh cụ thể có nên được gọi hay không. Bằng cách triển khai các kiểm tra này, các nhà phát triển có thể nâng cao chức năng, bảo mật và trải nghiệm người dùng của bot.
 
-### Purpose of Activity Guards
-The primary purpose of activity guards is to ensure that only authorized users or specific conditions trigger a activity. 
+### Mục đích của Activity Guards
+Mục đích chính của activity guards là đảm bảo chỉ những người dùng được ủy quyền hoặc điều kiện cụ thể mới có thể kích hoạt một activity.
 
-This can prevent misuse, maintain the bot's integrity, and streamline interactions.
+Điều này có thể ngăn chặn lạm dụng, duy trì tính toàn vẹn của bot và tối ưu hóa tương tác.
 
-### Common Use Cases
-1. Authentication and Authorization: Ensuring only certain users can access specific commands.
-2. Pre-condition Checks: Verifying that certain conditions are met before executing a activity (e.g., ensuring a user is in a particular state or context).
-3. Contextual Guards: Making decisions based on the current chat or user state.
+### Các trường hợp sử dụng phổ biến
+1. Xác thực và Ủy quyền: Đảm bảo chỉ một số người dùng nhất định có thể truy cập các lệnh cụ thể.
+2. Kiểm tra điều kiện tiên quyết: Xác minh rằng một số điều kiện được đáp ứng trước khi thực thi một activity (ví dụ: đảm bảo người dùng ở trong trạng thái hoặc ngữ cảnh cụ thể).
+3. Guards ngữ cảnh: Đưa ra quyết định dựa trên trạng thái chat hoặc người dùng hiện tại.
 
-### Implementation Strategies
-Implementing Telegram Command Guards typically involves writing functions or methods that encapsulate the logic for each guard. Below are common strategies:
+### Chiến lược triển khai
+Việc triển khai Telegram Command Guards thường liên quan đến việc viết các hàm hoặc phương thức đóng gói logic cho mỗi guard. Dưới đây là các chiến lược phổ biến:
 
-1. User Role Check:
-   - Ensuring the user has the required role (e.g., admin, moderator) before executing the command.
+1. Kiểm tra vai trò người dùng:
+   - Đảm bảo người dùng có vai trò yêu cầu (ví dụ: admin, moderator) trước khi thực thi lệnh.
       ```kotlin
        override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         // Check if the user is an admin in the given chat
        }
       ```
 
-2. State Verification:
-   - Checking the user's state before allowing command execution.
+2. Xác minh trạng thái:
+   - Kiểm tra trạng thái của người dùng trước khi cho phép thực thi lệnh.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         return bot.userData[user.id, "data"] == requiredState
      }
      ```
 
-3. Custom Guards:
-   - Creating custom logic based on specific requirements.
+3. Guards tùy chỉnh:
+   - Tạo logic tùy chỉnh dựa trên yêu cầu cụ thể.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         // Custom logic to determine if the command should be executed
      }
      ```
 
-### Integrating Guards with Activities
-To integrate these guards with your bot commands, you can create a guard that checks these conditions before the command handler is invoked.
+### Tích hợp Guards với Activities
+Để tích hợp các guards này với các lệnh bot của bạn, bạn có thể tạo một guard kiểm tra các điều kiện này trước khi trình xử lý lệnh được gọi.
 
-### Implementing Example
+### Ví dụ triển khai
 
 ```kotlin
 // define somewhere your guard class that implements Guard interface
@@ -65,22 +65,24 @@ fun command(bot: TelegramBot) {
 }
 ```
 
-### Best Practices
+### Các phương pháp tốt nhất
 
-- Modularity: Keep guard logic modular and separate from activities.
-- Reusability: Write reusable guard functions that can be easily applied across different commands/inputs.
-- Efficiency: Optimize guard checks to minimize performance overhead.
-- User Feedback: Provide clear feedback to users when a command is blocked by a guard.
+- Mô-đun hóa: Giữ logic guard mô-đun và tách biệt khỏi activities.
+- Tái sử dụng: Viết các hàm guard có thể tái sử dụng và dễ dàng áp dụng cho các lệnh/inputs khác nhau.
+- Hiệu quả: Tối ưu hóa các kiểm tra guard để giảm thiểu overhead về hiệu năng.
+- Phản hồi người dùng: Cung cấp phản hồi rõ ràng cho người dùng khi một lệnh bị block bởi guard.
 
-### Conclusion
+### Kết luận
 
-Activity Guards are a powerful tool for managing bot command/input execution. 
+Activity Guards là một công cụ mạnh mẽ để quản lý việc thực thi lệnh/input của bot.
 
-By implementing robust guard mechanisms, developers can ensure their bots operate securely and efficiently, providing a better user experience.
+Bằng cách triển khai các cơ chế guard mạnh mẽ, các nhà phát triển có thể đảm bảo bot của họ hoạt động an toàn và hiệu quả, cung cấp trải nghiệm người dùng tốt hơn.
 
-### See also
+### Xem thêm
 
 * [Activities and Proccessors](Activites-and-Processors.md)
 * [Update parsing](Update-parsing.md)
 * [Actions](Actions.md)
 * [Activity invocation](Activity-invocation.md)
+
+---

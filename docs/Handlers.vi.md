@@ -6,18 +6,18 @@ title: Handlers
 
 ### Variety of Handlers
 
-In bot development, particularly in systems involving user interactions, it is crucial to manage and process commands and events efficiently.
+Trong phát triển bot, đặc biệt là trong các hệ thống liên quan đến tương tác người dùng, việc quản lý và xử lý lệnh và sự kiện một cách hiệu quả là rất quan trọng.
 
-These annotations mark functions designed to process specific commands, inputs, or updates and provide metadata such as command keywords, scopes, and guards.
+Những annotations này đánh dấu các hàm được thiết kế để xử lý các lệnh, đầu vào, hoặc cập nhật cụ thể và cung cấp metadata như các từ khóa lệnh, phạm vi, và guards.
 
 ### Annotations Overview
 
 #### CommandHandler
 
-The `CommandHandler` annotation is used to mark functions that process specific commands. This annotation includes properties that define the command's keywords and scopes.
+Annotation `CommandHandler` được sử dụng để đánh dấu các hàm xử lý các lệnh cụ thể. Annotation này bao gồm các thuộc tính định nghĩa các từ khóa và phạm vi của lệnh.
 
--   **value**: Specifies the keywords associated with the command.
--   **scope**: Determines the context or scope in which the command will be checked.
+-   **value**: Xác định các từ khóa liên kết với lệnh.
+-   **scope**: Xác định ngữ cảnh hoặc phạm vi mà lệnh sẽ được kiểm tra.
 
 ```kotlin
 @CommandHandler(["text"])
@@ -28,12 +28,12 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 ##### CommandHandler.CallbackQuery
 
-A specialized version of the `CommandHandler` annotation designed specifically for handling callback queries. It includes similar properties as `CommandHandler`, with a focus on callback-related commands.
+Một phiên bản chuyên biệt của annotation `CommandHandler` được thiết kế đặc biệt để xử lý callback queries. Nó bao gồm các thuộc tính tương tự như `CommandHandler`, với trọng tâm là các lệnh liên quan đến callback.
 
-_It's actually the same as just `@CommandHandler` with a preset `UpdateType.CALLBACK_QUERY` scope_.
+_Nó thực sự giống hệt như `@CommandHandler` với phạm vi `UpdateType.CALLBACK_QUERY` đã được preset_.
 
--   **value**: Specifies the keywords associated with the command.
--   **autoAnswer**: Reply to `callbackQuery` automatically (call `answerCallbackQuery` before handling).
+-   **value**: Xác định các từ khóa liên kết với lệnh.
+-   **autoAnswer**: Tự động trả lời `callbackQuery` (gọi `answerCallbackQuery` trước khi xử lý).
 
 
 ```kotlin
@@ -45,18 +45,18 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 #### CommonHandler
 
-The `CommonHandler` annotation is intended for functions that process commands with lower priority compared to `CommandHandler` and `InputHandler`. It is used at the source level and provides a flexible way to define common command handlers.
+Annotation `CommonHandler` được sử dụng cho các hàm xử lý các lệnh với mức độ ưu tiên thấp hơn so với `CommandHandler` và `InputHandler`. Nó được sử dụng ở cấp độ nguồn và cung cấp cách linh hoạt để định nghĩa các common command handlers.
 
-**Be aware, priority works within just `@CommonHandler`'s itself  (ie. not affects other handlers).**
+**Lưu ý, mức độ ưu tiên chỉ hoạt động trong phạm vi `@CommonHandler` (tức là không ảnh hưởng đến các handlers khác).**
 
 ##### CommonHandler.Text
 
-This annotation specifies text matching against updates. It includes properties to define the matching text, filtering conditions, priority, and scope.
+Annotation này chỉ định việc so khớp văn bản với các cập nhật. Nó bao gồm các thuộc tính để định nghĩa văn bản so khớp, điều kiện lọc, mức độ ưu tiên, và phạm vi.
 
--   **value**: The text to match against incoming updates.
--   **filter**: A class that defines conditions used in the matching process.
--   **priority**: The priority level of the handler, where 0 is the highest priority.
--   **scope**: The context or scope in which the text matching will be checked.
+-   **value**: Văn bản để so khớp với các cập nhật đến.
+-   **filter**: Một class định nghĩa các điều kiện được sử dụng trong quá trình so khớp.
+-   **priority**: Mức độ ưu tiên của handler, trong đó 0 là mức độ ưu tiên cao nhất.
+-   **scope**: Ngữ cảnh hoặc phạm vi mà việc so khớp văn bản sẽ được kiểm tra.
 
 ```kotlin
 @CommonHandler.Text(["text"], filter = isNewUserFilter::class, priority = 10)
@@ -67,13 +67,13 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 ##### CommonHandler.Regex
 
-Similar to `CommonHandler.Text`, this annotation is used for matching updates based on regular expressions. It includes properties for defining the regex pattern, options, filtering conditions, priority, and scope.
+Tương tự như `CommonHandler.Text`, annotation này được sử dụng để so khớp các cập nhật dựa trên biểu thức chính quy. Nó bao gồm các thuộc tính để định nghĩa mẫu regex, tùy chọn, điều kiện lọc, mức độ ưu tiên, và phạm vi.
 
--   **value**: The regex pattern used for matching.
--   **options**: Regex options that modify the behavior of the regex pattern.
--   **filter**: A class that defines conditions used in the matching process.
--   **priority**: The priority level of the handler, where 0 is the highest priority.
--   **scope**: The context or scope in which the regex matching will be checked.
+-   **value**: Mẫu regex được sử dụng để so khớp.
+-   **options**: Các tùy chọn regex thay đổi hành vi của mẫu regex.
+-   **filter**: Một class định nghĩa các điều kiện được sử dụng trong quá trình so khớp.
+-   **priority**: Mức độ ưu tiên của handler, trong đó 0 là mức độ ưu tiên cao nhất.
+-   **scope**: Ngữ cảnh hoặc phạm vi mà việc so khớp regex sẽ được kiểm tra.
 
 ```kotlin
 @CommonHandler.Regex("^\d+$", scope = [UpdateType.EDITED_MESSAGE])
@@ -84,9 +84,9 @@ suspend fun test(update: EditedMessageUpdate, user: User, bot: TelegramBot) {
 
 #### InputHandler
 
-The `InputHandler` annotation marks functions that process specific input events. It is intended for functions that handle inputs at runtime and includes properties for defining input keywords and scopes.
+Annotation `InputHandler` đánh dấu các hàm xử lý các sự kiện đầu vào cụ thể. Nó được sử dụng cho các hàm xử lý đầu vào tại runtime và bao gồm các thuộc tính để định nghĩa các từ khóa đầu vào và phạm vi.
 
--   **value**: Specifies the keywords associated with the input event.
+-   **value**: Xác định các từ khóa liên kết với sự kiện đầu vào.
 
 ```kotlin
 @InputHandler("text")
@@ -97,7 +97,7 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 
 #### UnprocessedHandler
 
-The `UnprocessedHandler` annotation is used to mark functions that handle updates not processed by other handlers. It ensures that any unprocessed updates are managed appropriately, with only one processing point possible for this handler type.
+Annotation `UnprocessedHandler` được sử dụng để đánh dấu các hàm xử lý các cập nhật không được xử lý bởi các handlers khác. Nó đảm bảo rằng bất kỳ cập nhật nào chưa được xử lý đều được quản lý một cách thích hợp, với chỉ một điểm xử lý duy nhất có thể cho loại handler này.
 
 ```kotlin
 @UnprocessedHandler
@@ -108,9 +108,9 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 
 #### UpdateHandler
 
-The `UpdateHandler` annotation marks functions that handle specific types of incoming updates. It provides a way to categorize and process different update types systematically.
+Annotation `UpdateHandler` đánh dấu các hàm xử lý các loại cập nhật đến cụ thể. Nó cung cấp cách để phân loại và xử lý các loại cập nhật khác nhau một cách có hệ thống.
 
--   **type**: Specifies the types of updates the handler function will process.
+-   **type**: Xác định các loại cập nhật mà hàm handler sẽ xử lý.
 
 ```kotlin
 @UpdateHandler([UpdateType.PRE_CHECKOUT_QUERY])
@@ -120,22 +120,22 @@ suspend fun test(update: PreCheckoutQueryUpdate, user: User, bot: TelegramBot) {
 ```
 ### Handler Companion Annotations
 
-There are also additional annotations that are optional to the handlers, complementing the optional behavior of the handlers itself.
+Cũng có các annotations bổ sung là tùy chọn cho các handlers, bổ sung cho hành vi tùy chọn của các handlers.
 
-They can be placed both on functions to which a handler is applied and on classes, in the latter case they will be automatically applied to all handlers in that class, but if there is a need it is possible to have separate behavior for some functions.
+Chúng có thể được đặt cả trên các hàm mà handler được áp dụng và trên các class, trong trường hợp sau chúng sẽ được tự động áp dụng cho tất cả các handlers trong class đó, nhưng nếu cần thì có thể có hành vi riêng biệt cho một số hàm.
 
-I.e. the applying has such a priority, `Function` > `Class`, where function have higher priority.
+Tức là việc áp dụng có độ ưu tiên như sau, `Function` > `Class`, trong đó hàm có độ ưu tiên cao hơn.
 
 #### Rate Limiting
 
-In addition, let us also disclose the rate limiting mechanism described in the annotations.
+Ngoài ra, hãy cũng tiết lộ cơ chế rate limiting được mô tả trong các annotations.
 
-You can set general limits for each user:
+Bạn có thể đặt giới hạn chung cho mỗi người dùng:
 
 ```kotlin
 // ...
 val bot = TelegramBot("BOT_TOKEN") {
-    rateLimiter { // general limits
+    rateLimiter { // giới hạn chung
         limits = RateLimits(period = 10000, rate = 5)
     }
 }
@@ -143,7 +143,7 @@ val bot = TelegramBot("BOT_TOKEN") {
 
 ###### Handler specific
 
-Limits on certain actions can be defined using the `RateLimits` annotation, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`, `@CommonHandler`.
+Giới hạn cho một số hành động nhất định có thể được định nghĩa bằng annotation `RateLimits`, được hỗ trợ bởi `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`, `@CommonHandler`.
 
 ```kotlin
 @CommandHandler(["/start"])
@@ -155,7 +155,7 @@ suspend fun start(user: User, bot: TelegramBot) {
 
 #### Guard
 
-You can define guards separately to control access to handlers, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler` :
+Bạn có thể định nghĩa guards riêng biệt để kiểm soát truy cập vào các handlers, được hỗ trợ bởi `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler` :
 
 ```kotlin
 @CommandHandler(["text"])
@@ -167,7 +167,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 #### ArgParser
 
-You can define custom argument parser separately to change parameters parsing behaviour for handlers, supported `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@CommonHandler`:
+Bạn có thể định nghĩa trình phân tích đối số tùy chỉnh riêng biệt để thay đổi hành vi phân tích tham số cho các handlers, được hỗ trợ bởi `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@CommonHandler`:
 
 ```kotlin
 @CommandHandler(["text"])
@@ -177,11 +177,11 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-**see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
+**xem thêm [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
 
 ### Conclusion
 
-These annotations provide robust and flexible tools for handling commands, inputs, and events, while allowing for separate configurations of rate limits and guards, enhancing the overall structure and maintainability of bot development.
+Những annotations này cung cấp các công cụ mạnh mẽ và linh hoạt để xử lý các lệnh, đầu vào, và sự kiện, trong khi cho phép cấu hình riêng biệt các giới hạn tốc độ và guards, nâng cao cấu trúc tổng thể và khả năng bảo trì trong phát triển bot.
 
 ### See also
 
@@ -189,4 +189,3 @@ These annotations provide robust and flexible tools for handling commands, input
 * [Activity invocation](Activity-invocation.md)
 * [FSM and Conversation handling](FSM-and-Conversation-handling.md)
 * [Update parsing](Update-parsing.md)
-* [Aide](Aide.md)

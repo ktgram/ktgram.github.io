@@ -3,15 +3,15 @@
 title: Functional Dsl
 ---
 
-### To ~~infinity~~ functional dsl and beyond!
+### 迈向 ~~无限~~ 函数式 dsl！
 
-The bot supports both annotation-based and functional dsl setting context. You can combine both approaches.
+机器人同时支持基于注解和函数式 dsl 的设置上下文。你可以结合使用这两种方法。
 
-### Functional DSL
+### 函数式 DSL
 
-Functional DSL is just different way of defining bot context.
+函数式 DSL 是定义机器人上下文的另一种方式。
 
-Example:
+示例：
 
 ```kotlin
 suspend fun main() {
@@ -25,23 +25,23 @@ suspend fun main() {
 }
 ```
 
-### Commands and Inputs
+### 命令和输入
 
-You can handle both `commands` and `inputs` using the functional DSL.
+你可以使用函数式 DSL 处理 `命令` 和 `输入`。
 
-#### Commands
+#### 命令
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
 
     bot.setFunctionality {
-        // Regular command
+        // 常规命令
         onCommand("/start") {
             message { "Hello" }.send(user, bot)
         }
         
-        // Regex-based command matching
+        // 基于正则表达式的命令匹配
         onCommand("""(red|green|blue)""".toRegex()) {
             message { "you typed ${update.text} color" }.send(user, bot)
         }
@@ -49,11 +49,11 @@ suspend fun main() {
 }
 ```
 
-In `onCommand`, parsed parameters are available as `Map<String, String>` based on your configuration.
+在 `onCommand` 中，解析的参数可用作 `Map<String, String>`，具体取决于你的配置。
 
-#### Inputs
+#### 输入
 
-You can use inputs via [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html).
+你可以通过 [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html) 使用输入。
 
 ```kotlin
 suspend fun main() {
@@ -72,61 +72,61 @@ suspend fun main() {
 }
 ```
 
-#### Input Chains
+#### 输入链
 
-For multi-step input flows, use `inputChain`:
+对于多步骤输入流程，使用 `inputChain`：
 
 ```kotlin
 bot.setFunctionality {
     inputChain("conversation") {
         message { "Nice to meet you, ${update.text}" }.send(user, bot)
         message { "What is your favorite food?" }.send(user, bot)
-    }.breakIf({ update.text == "peanut butter" }) { // chain break condition
+    }.breakIf({ update.text == "peanut butter" }) { // 链式中断条件
         message { "Oh, too bad, I'm allergic to it." }.send(user, bot)
-        // action that will be applied when condition matches
+        // 当条件匹配时应用的操作
     }.andThen {
-        // next input point if break condition doesn't match
+        // 如果中断条件不匹配，则进入下一个输入点
         message { "Great choice!" }.send(user, bot)
     }
 }
 ```
 
-The chain automatically advances to the next step unless a break condition is met. If a break condition matches and `repeat` is `true` (default), the user stays on the current step.
+链式结构会自动进入下一步，除非遇到中断条件。如果中断条件匹配且 `repeat` 为 `true`（默认），用户会停留在当前步骤。
 
-#### Update Type Handlers
+#### 更新类型处理器
 
-Handle specific update types directly:
+直接处理特定更新类型：
 
 ```kotlin
 bot.setFunctionality {
     onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
-        // Handle both message and callback query updates
+        // 处理消息和回调查询更新
         println("Received update: ${update.type}")
     }
 }
 ```
 
-#### Common Matchers
+#### 通用匹配器
 
-Match text content (not just commands) using `common`:
+使用 `common` 匹配文本内容（不仅仅是命令）：
 
 ```kotlin
 bot.setFunctionality {
-    // String matching
+    // 字符串匹配
     common("hello") {
         message { "Hi there!" }.send(user, bot)
     }
     
-    // Regex matching
+    // 正则表达式匹配
     common("""\d+""".toRegex()) {
         message { "You sent a number!" }.send(user, bot)
     }
 }
 ```
 
-#### Fallback Handler
+#### 回退处理器
 
-Handle updates that weren't processed by any handler:
+处理未被任何处理器处理的更新：
 
 ```kotlin
 bot.setFunctionality {
@@ -136,24 +136,24 @@ bot.setFunctionality {
 }
 ```
 
-### Advanced Configuration
+### 高级配置
 
-#### Rate Limiting
+#### 速率限制
 
-Apply rate limits to any handler:
+对任何处理器应用速率限制：
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/expensive", rateLimits = RateLimits(5, 60)) {
-        // This command can only be called 5 times per 60 seconds
+        // 此命令每 60 秒只能调用 5 次
         message { "Processing..." }.send(user, bot)
     }
 }
 ```
 
-#### Guards
+#### 守卫
 
-Use guards to add custom validation logic:
+使用守卫添加自定义验证逻辑：
 
 ```kotlin
 bot.setFunctionality {
@@ -163,31 +163,31 @@ bot.setFunctionality {
 }
 ```
 
-#### Argument Parsing
+#### 参数解析
 
-Customize how command arguments are parsed:
+自定义命令参数的解析方式：
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/custom", argParser = CustomArgParser::class) {
-        // parameters will be parsed using CustomArgParser
+        // 参数将使用 CustomArgParser 进行解析
         message { "Parameters: $parameters" }.send(user, bot)
     }
 }
 ```
 
-### Combining Functional and Annotation-Based setting
+### 结合函数式和基于注解的设置
 
-You can use both approaches in the same bot:
+你可以在同一个机器人中使用这两种方法：
 
 ```kotlin
-// Annotation-based handler
+// 基于注解的处理器
 @CommandHandler(["/register"])
 suspend fun register(ctx: CommandContext) {
     message { "Registration started" }.send(ctx.user, ctx.bot)
 }
 
-// Functional handler
+// 函数式处理器
 bot.setFunctionality {
     onCommand("/help") {
         message { "Available commands: /register, /help" }.send(user, bot)
@@ -195,9 +195,9 @@ bot.setFunctionality {
 }
 ```
 
-Both handlers are registered in the same `ActivityRegistry` and work seamlessly together.
+两种处理器都注册在同一个 `ActivityRegistry` 中，并无缝协作。
 
-### See also
+### 另请参阅
 
 * [Action](Actions.md)
 * [Useful utilities](Useful-utilities-and-tips.md)

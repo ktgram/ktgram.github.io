@@ -1,11 +1,11 @@
 ---
 ---
-title: Análise de Atualizações
+title: Parsing de Atualização
 ---
 
 ### Payload de Texto
 
-Determinadas atualizações podem ter payload de texto que pode ser analisado para processamento adicional. Vamos dar uma olhada nelas:
+Certas atualizações podem ter um payload de texto que pode ser analisado para processamento adicional. Vamos dar uma olhada nelas:
 
 * `MessageUpdate` -> `message.text`
 * `EditedMessageUpdate` -> `editedMessage.text`
@@ -19,7 +19,7 @@ Determinadas atualizações podem ter payload de texto que pode ser analisado pa
 * `PollUpdate` -> `poll.question`
 * `PurchasedPaidMediaUpdate` -> `purchasedPaidMedia.paidMediaPayload`
 
-A partir das atualizações listadas, um determinado parâmetro é selecionado e tomado como [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html), para análise adicional.
+Das atualizações listadas, um determinado parâmetro é selecionado e tomado como [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html), para análise adicional.
 
 ### Análise
 
@@ -35,9 +35,9 @@ Você pode ver no diagrama abaixo quais componentes são mapeados para quais par
 
 ### @ParamMapping
 
-Há também uma anotação chamada [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) para conveniência ou para qualquer caso especial.
+Também há uma anotação chamada [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) para conveniência ou para qualquer caso especial.
 
-Ela permite mapear o nome do parâmetro do texto de entrada para qualquer parâmetro.
+Ela permite que você mapeie o nome do parâmetro do texto de entrada para qualquer parâmetro.
 
 Isto também é conveniente quando seus dados de entrada são limitados, por exemplo, `CallbackData` (64 caracteres).
 
@@ -51,7 +51,7 @@ suspend fun greeting(@ParamMapping("name") anyParameterName: String, user: User,
 }
 ```
 
-E também pode ser usado para capturar parâmetros não nomeados, em casos onde o analisador é configurado de forma que nomes de parâmetros são ignorados ou mesmo ausentes, o que passa pelo padrão 'param_n', onde `n` é seu ordinal.
+E também pode ser usado para capturar parâmetros não nomeados, em casos onde o analisador é configurado de forma que nomes de parâmetros são ignorados ou mesmo ausentes, que passam pelo padrão 'param_n', onde `n` é seu ordinal.
 
 Por exemplo, tal texto - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`, será analisado como:
 * comando - `myCommand`
@@ -62,7 +62,7 @@ Por exemplo, tal texto - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`, será analisado com
   * `p4` = `v4`
   * `p5` = ``
 
-Como você pode ver, desde o segundo parâmetro não tem nome declarado, ele é representado como `param_2`.
+Como você pode ver, desde que o segundo parâmetro não tenha nome declarado, ele é representado como `param_2`.
 
 Assim você pode abreviaar os nomes de variáveis no callback em si e usar nomes claros e legíveis no código.
 
@@ -79,7 +79,7 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 
 ### Comandos de Grupo
 
-Na configuração `commandParsing` temos o parâmetro [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) quando está ativado, podemos usar `TelegramBot.identifier` (não se esqueça de alterá-lo se você está usando o parâmetro descrito) no processo de correspondência de comando, isso ajuda a separar comandos similares entre vários bots, caso contrário a parte `@MyBot` será simplesmente ignorada.
+Na configuração `commandParsing` temos o parâmetro [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) quando ativado, podemos usar `TelegramBot.identifier` (não esqueça de alterá-lo se você estiver usando o parâmetro descrito) no processo de correspondência de comandos, isso ajuda a separar comandos similares entre vários bots, caso contrário a parte `@MyBot` será simplesmente ignorada.
 
 ### Veja também
 

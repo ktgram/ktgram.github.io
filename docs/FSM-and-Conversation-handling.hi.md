@@ -1,55 +1,55 @@
 ---
 ---
-title: एफएसएम और संवाद हैंडलिंग
+title: एफएसएम और संवाद संभालना
 ---
 
-लाइब्रेरी एफएसएम मैकेनिज्म का भी समर्थन करती है, जो उपयोगकर्ता इनपुट के प्रगतिशील प्रसंस्करण के लिए एक तंत्र है जिसमें गलत इनपुट हैंडलिंग शामिल है।
+लाइब्रेरी एफएसएम मैकेनिज्म को भी सपोर्ट करती है, जो उपयोगकर्ता इनपुट के प्रगतिशील प्रसंस्करण के लिए एक मैकेनिज्म है जिसमें गलत इनपुट संभालना शामिल है।
 
 > [!NOTE]
-> TL;DR: उदाहरण [वहां](https://github.com/vendelieu/telegram-bot_template/tree/conversation) देखें।
+> TL;DR: उदाहरण [वहाँ](https://github.com/vendelieu/telegram-bot_template/tree/conversation) देखें।
 
 ### सिद्धांत में
 
-आइए कल्पना करें कि आपको उपयोगकर्ता सर्वेक्षण एकत्र करने की आवश्यकता है, आप एक चरण में व्यक्ति के सभी डेटा के लिए पूछ सकते हैं, लेकिन पैरामीटर में से एक के गलत इनपुट के साथ, उपयोगकर्ता और हम दोनों के लिए इसे मुश्किल होगा, और प्रत्येक चरण कुछ इनपुट डेटा के आधार पर अलग हो सकता है।
+आइए कल्पना करें कि एक स्थिति जहाँ आपको उपयोगकर्ता सर्वेक्षण एकत्र करने की आवश्यकता है, आप एक ही चरण में किसी व्यक्ति के सभी डेटा के लिए पूछ सकते हैं, लेकिन पैरामीटर में से एक के गलत इनपुट के साथ, उपयोगकर्ता और हम दोनों के लिए यह कठिन होगा, और प्रत्येक चरण विशिष्ट इनपुट डेटा के आधार पर अलग हो सकता है।
 
-अब चरण-दर-चरण डेटा इनपुट की कल्पना करें, जहां बॉट उपयोगकर्ता के साथ संवाद मोड में प्रवेश करता है।
+अब डेटा के चरण-दर-चरण इनपुट की कल्पना करें, जहाँ बॉट उपयोगकर्ता के साथ संवाद मोड में प्रवेश करता है।
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="प्रक्रिया आरेख को संभालना" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="संभालने की प्रक्रिया आरेख" />
 </p>
 
-हरे तीर बिना किसी त्रुटि के चरणों के माध्यम से संक्रमण की प्रक्रिया को इंगित करते हैं, नीले तीर वर्तमान स्थिति को बचाने और पुन: इनपुट की प्रतीक्षा करने का मतलब है (उदाहरण के लिए, यदि उपयोगकर्ता ने इंगित किया कि वह -100 वर्ष का है, तो इसे आयु के लिए फिर से पूछना चाहिए), और लाल रंग पूरी प्रक्रिया से बाहर निकलना दिखाते हैं किसी भी कमांड या किसी अन्य अर्थ रद्दीकरण के कारण।
+हरे तीर त्रुटियों के बिना चरणों के माध्यम से संक्रमण की प्रक्रिया को इंगित करते हैं, नीले तीर वर्तमान स्थिति को सहेजना और पुन: इनपुट की प्रतीक्षा करना दर्शाते हैं (उदाहरण के लिए, यदि उपयोगकर्ता ने संकेत दिया कि वह -100 वर्ष का है, तो उसे आयु के लिए फिर से पूछना चाहिए), और लाल वाले पूरी प्रक्रिया से बाहर निकलना दिखाते हैं किसी भी कमांड या किसी अन्य अर्थपूर्ण रद्दीकरण के कारण।
 
 ### व्यवहार में
 
-विज़ार्ड सिस्टम टेलीग्राम बॉट्स में मल्टी-स्टेप उपयोगकर्ता इंटरैक्शन को सक्षम बनाता है। यह उपयोगकर्ताओं को चरणों की एक श्रृंखला के माध्यम से मार्गदर्शन करता है, इनपुट को मान्य करता है, स्थिति को संग्रहीत करता है, और चरणों के बीच संक्रमण करता है।
+विज़ार्ड सिस्टम टेलीग्राम बॉट्स में बहु-चरणीय उपयोगकर्ता इंटरैक्शन को सक्षम बनाता है। यह उपयोगकर्ताओं को चरणों की एक श्रृंखला के माध्यम से मार्गदर्शन करता है, इनपुट को मान्य करता है, स्थिति को संग्रहीत करता है, और चरणों के बीच संक्रमण करता है।
 
 **मुख्य लाभ:**
-- **टाइप-सुरक्षित**: स्थिति पहुंच के लिए संकलन-समय प्रकार जांच
-- **घोषणात्मक**: नेस्टेड क्लास/ऑब्जेक्ट के रूप में चरणों को परिभाषित करें
-- **लचीला**: शर्तीय संक्रमण, कूद और पुन: प्रयासों के लिए समर्थन
-- **स्टेटफुल**: प्लग करने योग्य भंडारण बैकएंड के साथ स्वचालित स्थिति स्थायित्व
+- **प्रकार-सुरक्षित**: स्थिति एक्सेस के लिए संकलन-समय प्रकार जाँच
+- **घोषणात्मक**: नेस्टेड क्लास/ऑब्जेक्ट्स के रूप में चरणों को परिभाषित करें
+- **लचीला**: शर्तीय संक्रमण, छलांग, और पुन: प्रयासों के लिए समर्थन
+- **स्थितिजन्य**: प्लग करने योग्य स्टोरेज बैकएंड के साथ स्वचालित स्थिति स्थायित्व
 - **एकीकृत**: मौजूदा एक्टिविटी सिस्टम के साथ काम करता है
 
-### मूल अवधारणाएँ
+### मुख्य अवधारणाएँ
 
 #### विज़ार्डस्टेप
 
 एक `विज़ार्डस्टेप` विज़ार्ड प्रवाह में एक एकल चरण का प्रतिनिधित्व करता है। प्रत्येक चरण को लागू करना चाहिए:
 
-- **`onEntry(ctx: WizardContext)`**: जब उपयोगकर्ता इस चरण में प्रवेश करता है तो कहा जाता है। इसका उपयोग उपयोगकर्ता से पूछने के लिए करें।
-- **`onRetry(ctx: WizardContext)`**: जब सत्यापन विफल हो जाता है और चरण को पुन: प्रयास करना चाहिए तो कहा जाता है। त्रुटि संदेश दिखाने के लिए इसका उपयोग करें।
-- **`validate(ctx: WizardContext): Transition`**: वर्तमान इनपुट को मान्य करता है और अगला क्या होता है यह इंगित करते हुए एक `Transition` लौटाता है।
-- **`store(ctx: WizardContext): Any?`** (वैकल्पिक): इस चरण के लिए बनाए रखने के लिए मान लौटाता है। `null` लौटाएं यदि चरण स्थिति को संग्रहीत नहीं करता है।
+- **`onEntry(ctx: WizardContext)`**: जब उपयोगकर्ता इस चरण में प्रवेश करता है तो बुलाया जाता है। इसका उपयोग उपयोगकर्ता को प्रेरित करने के लिए करें।
+- **`onRetry(ctx: WizardContext)`**: जब मान्यकरण विफल हो जाता है और चरण को पुन: प्रयास करना चाहिए तो बुलाया जाता है। इसका उपयोग त्रुटि संदेश दिखाने के लिए करें।
+- **`validate(ctx: WizardContext): Transition`**: वर्तमान इनपुट को मान्य करता है और अगला क्या होता है यह दर्शाने वाला `Transition` लौटाता है।
+- **`store(ctx: WizardContext): Any?`** (वैकल्पिक): इस चरण के लिए संग्रहीत करने के लिए मान लौटाता है। `null` लौटाएँ यदि चरण स्थिति संग्रहीत नहीं करता है।
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
     override suspend fun onEntry(ctx: WizardContext) {
-        message { "आपका नाम क्या है?" }.send(ctx.user, ctx.bot)
+        message { "What is your name?" }.send(ctx.user, ctx.bot)
     }
     
     override suspend fun onRetry(ctx: WizardContext) {
-        message { "नाम खाली नहीं हो सकता। कृपया पुन: प्रयास करें।" }.send(ctx.user, ctx.bot)
+        message { "Name cannot be empty. Please try again." }.send(ctx.user, ctx.bot)
     }
     
     override suspend fun validate(ctx: WizardContext): Transition {
@@ -71,15 +71,15 @@ object NameStep : WizardStep(isInitial = true) {
 
 #### संक्रमण
 
-एक `संक्रमण` सत्यापन के बाद क्या होता है यह निर्धारित करता है:
+एक `Transition` मान्यकरण के बाद क्या होता है यह निर्धारित करता है:
 
-- **`Transition.Next`**: अनुक्रम में अगले चरण पर जाएं
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: किसी विशिष्ट चरण पर कूदें
-- **`Transition.Retry`**: वर्तमान चरण को पुन: प्रयास करें (सत्यापन विफल)
+- **`Transition.Next`**: अनुक्रम में अगले चरण पर जाएँ
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: किसी विशिष्ट चरण पर जाएँ
+- **`Transition.Retry`**: वर्तमान चरण को पुन: प्रयास करें (मान्यकरण विफल रहा)
 - **`Transition.Finish`**: विज़ार्ड समाप्त करें
 
 ```kotlin
-// इनपुट के आधार पर शर्तीय कूद
+// इनपुट के आधार पर शर्तीय छलांग
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -95,18 +95,18 @@ override suspend fun validate(ctx: WizardContext): Transition {
 `विज़ार्डकंटेक्स्ट` प्रदान करता है:
 - **`user: User`**: वर्तमान उपयोगकर्ता
 - **`update: ProcessedUpdate`**: वर्तमान अपडेट
-- **`bot: TelegramBot`**: बॉट उदाहरण
-- **`userReference: UserChatReference`**: स्थिति भंडारण के लिए उपयोगकर्ता और चैट आईडी संदर्भ
+- **`bot: TelegramBot`**: बॉट इंस्टेंस
+- **`userReference: UserChatReference`**: स्थिति संग्रहण के लिए उपयोगकर्ता और चैट ID संदर्भ
 
-प्लस टाइप-सुरक्षित स्थिति पहुंच विधियाँ (KSP द्वारा उत्पन्न)।
+साथ ही प्रकार-सुरक्षित स्थिति एक्सेस विधियाँ (KSP द्वारा उत्पन्न)।
 
 ---
 
 ### विज़ार्ड को परिभाषित करना
 
-#### बुनियादी संरचना
+#### मूल संरचना
 
-एक विज़ार्ड को `@WizardHandler` एनोटेशन के साथ एक क्लास या ऑब्जेक्ट के रूप में परिभाषित किया गया है:
+एक विज़ार्ड `@WizardHandler` एनोटेशन के साथ एक क्लास या ऑब्जेक्ट के रूप में परिभाषित किया गया है:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
@@ -128,9 +128,9 @@ object SurveyWizard {
 #### एनोटेशन पैरामीटर
 
 **`@WizardHandler`** स्वीकार करता है:
-- **`trigger: Array<String>`**: विज़ार्ड शुरू करने वाले कमांड (जैसे, `["/start", "/survey"]`)
+- **`trigger: Array<String>`**: विज़ार्ड शुरू करने वाले कमांड (उदाहरण के लिए, `["/start", "/survey"]`)
 - **`scope: Array<UpdateType>`**: सुनने के लिए अपडेट प्रकार (डिफ़ॉल्ट: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: चरण डेटा संग्रहीत करने के लिए राज्य प्रबंधक कक्षाएं
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: चरण डेटा संग्रहीत करने के लिए स्टेट मैनेजर क्लास
 
 ---
 
@@ -138,7 +138,7 @@ object SurveyWizard {
 
 #### विज़ार्डस्टेटमैनेजर
 
-स्थिति `विज़ार्डस्टेटमैनेजर<T>` कार्यान्वयन का उपयोग करके संग्रहीत की जाती है। प्रत्येक प्रबंधक एक विशिष्ट प्रकार को संभालता है:
+स्थिति `विज़ार्डस्टेटमैनेजर<T>` कार्यान्वयनों का उपयोग करके संग्रहीत की जाती है। प्रत्येक प्रबंधक किसी विशिष्ट प्रकार को संभालता है:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +148,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-यह भी देखें: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html)।
+देखें भी: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html)।
 
 #### स्वचालित मिलान
 
-KSP `store()` रिटर्न प्रकार के आधार पर चरणों को राज्य प्रबंधकों से मिलाता है:
+KSP `store()` रिटर्न प्रकार के आधार पर चरणों को स्टेट मैनेजर्स से मिलाता है:
 
 ```kotlin
 @WizardHandler(
@@ -176,7 +176,7 @@ object SurveyWizard {
 
 #### प्रति-चरण ओवरराइड
 
-`@WizardHandler.StateManager` का उपयोग करके किसी विशिष्ट चरण के लिए राज्य प्रबंधक को ओवरराइड करें:
+किसी विशिष्ट चरण के लिए स्टेट मैनेजर को `@WizardHandler.StateManager` का उपयोग करके ओवरराइड करें:
 
 ```kotlin
 @WizardHandler(
@@ -190,20 +190,20 @@ object SurveyWizard {
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // इसके बजाय CustomStateManager का उपयोग करता है
+        // CustomStateManager के बजाय उपयोग करता है
     }
 }
 ```
 
 ---
 
-### टाइप-सुरक्षित स्थिति पहुंच
+### प्रकार-सुरक्षित स्थिति एक्सेस
 
-KSP प्रत्येक चरण के लिए टाइप-सुरक्षित एक्सटेंशन फ़ंक्शंस उत्पन्न करता है जो स्थिति को संग्रहीत करता है।
+KSP प्रत्येक स्थिति संग्रहीत करने वाले चरण के लिए `विज़ार्डकंटेक्स्ट` पर प्रकार-सुरक्षित एक्सटेंशन फ़ंक्शन उत्पन्न करता है।
 
-#### उत्पन्न फ़ंक्शंस
+#### उत्पन्न फ़ंक्शन
 
-एक चरण के लिए जो एक `String` संग्रहीत करता है:
+किसी चरण के लिए जो एक `String` संग्रहीत करता है:
 
 ```kotlin
 // KSP द्वारा स्वचालित रूप से उत्पन्न
@@ -217,15 +217,15 @@ suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // टाइप-सुरक्षित पहुंच - String? (नल योग्य) लौटाता है
+        // प्रकार-सुरक्षित एक्सेस - String? (nullable) लौटाता है
         val name: String? = ctx.getState<NameStep>()
         
-        // टाइप-सुरक्षित पहुंच - Int? (नल योग्य) लौटाता है
+        // प्रकार-सुरक्षित एक्सेस - Int? (nullable) लौटाता है
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
-            appendLine("नाम: $name")
-            appendLine("आयु: $age")
+            appendLine("Name: $name")
+            appendLine("Age: $age")
         }
         
         message { summary }.send(ctx.user, ctx.bot)
@@ -239,15 +239,15 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### फॉलबैक विधियाँ
+#### फ़ॉलबैक विधियाँ
 
-यदि टाइप-सुरक्षित विधियाँ उपलब्ध नहीं हैं, तो फॉलबैक विधियों का उपयोग करें:
+यदि प्रकार-सुरक्षित विधियाँ उपलब्ध नहीं हैं, तो फ़ॉलबैक विधियों का उपयोग करें:
 
 ```kotlin
-// फॉलबैक - Any? लौटाता है
+// फ़ॉलबैक - Any? लौटाता है
 val name = ctx.getState(NameStep::class)
 
-// फॉलबैक - Any? स्वीकार करता है
+// फ़ॉलबैक - Any? स्वीकार करता है
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
@@ -266,11 +266,11 @@ ctx.delState(NameStep::class)
 object RegistrationWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun onEntry(ctx: WizardContext) {
-            message { "आपका नाम क्या है?" }.send(ctx.user, ctx.bot)
+            message { "What is your name?" }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun onRetry(ctx: WizardContext) {
-            message { "कृपया एक वैध नाम दर्ज करें।" }.send(ctx.user, ctx.bot)
+            message { "Please enter a valid name." }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun validate(ctx: WizardContext): Transition {
@@ -289,11 +289,11 @@ object RegistrationWizard {
     
     object AgeStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            message { "आपकी आयु क्या है?" }.send(ctx.user, ctx.bot)
+            message { "How old are you?" }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun onRetry(ctx: WizardContext) {
-            message { "कृपया एक वैध आयु दर्ज करें (एक संख्या होनी चाहिए)." }.send(ctx.user, ctx.bot)
+            message { "Please enter a valid age (must be a number)." }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun validate(ctx: WizardContext): Transition {
@@ -314,7 +314,7 @@ object RegistrationWizard {
     object UnderageStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
             message { 
-                "क्षमा करें, पंजीकरण के लिए आपकी आयु 18 या उससे अधिक होनी चाहिए।" 
+                "Sorry, you must be 18 or older to register." 
             }.send(ctx.user, ctx.bot)
         }
         
@@ -327,30 +327,30 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // टाइप-सुरक्षित स्थिति पहुंच
+            // प्रकार-सुरक्षित स्थिति एक्सेस
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
             val confirmation = buildString {
-                appendLine("कृपया अपनी जानकारी की पुष्टि करें:")
-                appendLine("नाम: $name")
-                appendLine("आयु: $age")
+                appendLine("Please confirm your information:")
+                appendLine("Name: $name")
+                appendLine("Age: $age")
                 appendLine()
-                appendLine("पुष्टि के लिए 'हाँ' या पुन: शुरू करने के लिए 'नहीं' का उत्तर दें।")
+                appendLine("Reply 'yes' to confirm or 'no' to start over.")
             }
             
             message { confirmation }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun onRetry(ctx: WizardContext) {
-            message { "कृपया 'हाँ' या 'नहीं' का उत्तर दें।" }.send(ctx.user, ctx.bot)
+            message { "Please reply 'yes' or 'no'." }.send(ctx.user, ctx.bot)
         }
         
         override suspend fun validate(ctx: WizardContext): Transition {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
-                "हाँ" -> Transition.Finish
-                "नहीं" -> Transition.JumpTo(NameStep::class) // पुन: शुरू करें
+                "yes" -> Transition.Finish
+                "no" -> Transition.JumpTo(NameStep::class) // शुरू से शुरू करें
                 else -> Transition.Retry
             }
         }
@@ -363,7 +363,7 @@ object RegistrationWizard {
             
             // डेटाबेस में सहेजें, पुष्टि भेजें, आदि।
             message { 
-                "पंजीकरण पूरा! स्वागत है, $name (आयु $age)." 
+                "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
         }
         
@@ -382,33 +382,33 @@ object RegistrationWizard {
 
 #### शर्तीय संक्रमण
 
-शर्तीय प्रवाह के लिए `Transition.JumpTo` का उपयोग करें:
+`Transition.JumpTo` का उपयोग शर्तीय प्रवाह के लिए करें:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
     val choice = ctx.update.text?.lowercase()
     return when (choice) {
-        "प्रीमियम" -> Transition.JumpTo(PremiumStep::class)
-        "बेसिक" -> Transition.JumpTo(BasicStep::class)
+        "premium" -> Transition.JumpTo(PremiumStep::class)
+        "basic" -> Transition.JumpTo(BasicStep::class)
         else -> Transition.Retry
     }
 }
 ```
 
-#### स्टेटलेस चरण
+#### राज्यहीन चरण
 
-चरणों को स्थिति संग्रहीत करने की आवश्यकता नहीं है। बस `store()` से `null` लौटाएं (या जैसा है छोड़ दें):
+चरणों को स्थिति संग्रहीत करने की आवश्यकता नहीं है। बस `store()` से `null` लौटाएँ (या जैसा है रखें):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... शेष कार्यान्वयन
+    // ... बाकी कार्यान्वयन
 }
 ```
 
-#### कस्टम राज्य प्रबंधक
+#### कस्टम स्टेट मैनेजर
 
-कस्टम भंडारण (डेटाबेस, Redis, आदि) के लिए `WizardStateManager<T>` लागू करें:
+कस्टम स्टोरेज (डेटाबेस, Redis, आदि) के लिए `WizardStateManager<T>` कार्यान्वित करें:
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -433,7 +433,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // डेटाबेस से हटाएं
+        // डेटाबेस से हटाएँ
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -447,26 +447,26 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 KSP उत्पन्न करता है:
 
-1. **WizardActivity**: हार्डकोड चरणों के साथ `WizardActivity` का एक ठोस कार्यान्वयन
-2. **स्टार्ट एक्टिविटी**: कमांड ट्रिगर को संभालता है और विज़ार्ड शुरू करता है
-3. **इनपुट एक्टिविटी**: विज़ार्ड प्रवाह के दौरान उपयोगकर्ता इनपुट को संभालता है
-4. **स्थिति एक्सेसर्स**: स्थिति पहुंच के लिए टाइप-सुरक्षित एक्सटेंशन फ़ंक्शंस
+1. **WizardActivity**: `WizardActivity` का विस्तार करने वाला एक ठोस कार्यान्वयन जिसमें हार्डकोडेड चरण होते हैं
+2. **Start Activity**: कमांड ट्रिगर को संभालता है और विज़ार्ड शुरू करता है
+3. **Input Activity**: विज़ार्ड प्रवाह के दौरान उपयोगकर्ता इनपुट को संभालता है
+4. **State Accessors**: स्थिति एक्सेस के लिए प्रकार-सुरक्षित एक्सटेंशन फ़ंक्शन
 
 #### प्रवाह
 
-1. उपयोगकर्ता `/register` भेजता है → स्टार्ट एक्टिविटी बुलाई जाती है
-2. स्टार्ट एक्टिविटी `WizardContext` बनाता है और `wizardActivity.start(ctx)` कॉल करता है
+1. उपयोगकर्ता `/register` भेजता है → Start Activity बुलाया जाता है
+2. Start Activity `WizardContext` बनाता है और `wizardActivity.start(ctx)` को कॉल करता है
 3. `start()` प्रारंभिक चरण में प्रवेश करता है और वर्तमान चरण को ट्रैक करने के लिए `inputListener` सेट करता है
-4. उपयोगकर्ता संदेश भेजता है → इनपुट एक्टिविटी बुलाई जाती है
-5. इनपुट एक्टिविटी `wizardActivity.handleInput(ctx)` कॉल करता है
-6. `handleInput()` इनपुट को मान्य करता है, स्थिति को बनाए रखता है, और अगले चरण पर संक्रमण करता है
-7. प्रक्रिया तब तक दोहराती है जब तक `Transition.Finish` वापस नहीं आ जाता
+4. उपयोगकर्ता एक संदेश भेजता है → Input Activity बुलाया जाता है
+5. Input Activity `wizardActivity.handleInput(ctx)` को कॉल करता है
+6. `handleInput()` इनपुट को मान्य करता है, स्थिति को स्थायी बनाता है, और अगले चरण पर संक्रमण करता है
+7. प्रक्रिया तब तक दोहराई जाती है जब तक `Transition.Finish` वापस नहीं आ जाता
 
 #### स्थिति स्थायित्व
 
-- सफल सत्यापन के बाद स्थिति बनाए रखी जाती है (संक्रमण से पहले)
-- प्रत्येक चरण का `store()` रिटर्न मान मिलान `WizardStateManager` का उपयोग करके सहेजा जाता है
-- स्थिति प्रति उपयोगकर्ता और चैट (`UserChatReference`) पर स्कोप की जाती है
+- मान्यकरण के बाद स्थिति को स्थायी बनाया जाता है (संक्रमण से पहले)
+- प्रत्येक चरण का `store()` रिटर्न मान मिलान करने वाले `WizardStateManager` का उपयोग करके सहेजा जाता है
+- स्थिति उपयोगकर्ता और चैट प्रति स्कोप होती है (`UserChatReference`)
 
 ---
 
@@ -477,32 +477,32 @@ KSP उत्पन्न करता है:
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
     message { 
-        "कृपया अपना ईमेल पता दर्ज करें:\n" +
-        "(प्रारूप: user@example.com)" 
+        "Please enter your email address:\n" +
+        "(Format: user@example.com)" 
     }.send(ctx.user, ctx.bot)
 }
 ```
 
-#### 2. सत्यापन त्रुटियों को सौम्यता से संभालें
+#### 2. मान्यकरण त्रुटियों को सौम्यता से संभालें
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
     message { 
-        "अमान्य ईमेल प्रारूप। कृपया पुन: प्रयास करें।\n" +
-        "उदाहरण: user@example.com" 
+        "Invalid email format. Please try again.\n" +
+        "Example: user@example.com" 
     }.send(ctx.user, ctx.bot)
 }
 ```
 
-#### 3. टाइप-सुरक्षित स्थिति पहुंच का उपयोग करें
+#### 3. प्रकार-सुरक्षित स्थिति एक्सेस का उपयोग करें
 
-उत्पन्न टाइप-सुरक्षित विधियों को प्राथमिकता दें:
+उत्पन्न प्रकार-सुरक्षित विधियों को प्राथमिकता दें:
 
 ```kotlin
-// ✅ अच्छा - टाइप-सुरक्षित
+// ✅ अच्छा - प्रकार-सुरक्षित
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ टालें - टाइप सुरक्षा खो देता है
+// ❌ टालें - प्रकार सुरक्षा खो देता है
 val name = ctx.getState(NameStep::class) as? String
 ```
 
@@ -518,7 +518,7 @@ object EmailStep : WizardStep {
 
 // ❌ टालें - बहुत अधिक तर्क
 object PersonalInfoStep : WizardStep {
-    // नाम, ईमेल, फ़ोन, पता संभालता है...
+    // नाम, ईमेल, फोन, पता संभालता है...
 }
 ```
 
@@ -543,7 +543,7 @@ object CancelStep : WizardStep {
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
-        message { "पंजीकरण रद्द कर दिया गया।" }.send(ctx.user, ctx.bot)
+        message { "Registration cancelled." }.send(ctx.user, ctx.bot)
     }
 }
 ```
@@ -553,13 +553,13 @@ object CancelStep : WizardStep {
 ### सारांश
 
 विज़ार्ड सिस्टम प्रदान करता है:
-- ✅ **टाइप-सुरक्षित** स्थिति प्रबंधन संकलन-समय जांच के साथ
+- ✅ **प्रकार-सुरक्षित** संकलन-समय जाँच के साथ स्थिति प्रबंधन
 - ✅ **घोषणात्मक** नेस्टेड क्लास के रूप में चरण परिभाषाएँ
 - ✅ **लचीला** शर्तीय तर्क के साथ संक्रमण
-- ✅ **स्वचालित** KSP के माध्यम से कोड उत्पादन
+- ✅ **स्वचालित** KSP द्वारा कोड उत्पादन
 - ✅ **एकीकृत** मौजूदा एक्टिविटी सिस्टम के साथ
-- ✅ **प्लग करने योग्य** राज्य भंडारण बैकएंड
+- ✅ **प्लग करने योग्य** स्टेट स्टोरेज बैकएंड
 
-विज़ार्ड बनाना शुरू करें `@WizardHandler` एनोटेशन के साथ एक क्लास को एनोट करके और अपने चरणों को नेस्टेड `WizardStep` ऑब्जेक्ट के रूप में परिभाषित करके!
+`@WizardHandler` के साथ एक क्लास को एनोटेट करके और अपने चरणों को नेस्टेड `WizardStep` ऑब्जेक्ट्स के रूप में परिभाषित करके विज़ार्ड बनाना शुरू करें!
 यदि आपके कोई प्रश्न हैं तो हमसे चैट में संपर्क करें, हम मदद करने के लिए तैयार हैं :)
 ---

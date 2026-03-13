@@ -3,13 +3,13 @@
 title: फंक्शनल डीएसएल
 ---
 
-### To ~~infinity~~ functional dsl and beyond!
+### अनंत ~~अनंत तक~~ फंक्शनल डीएसएल और आगे!
 
 बॉट एनोटेशन-आधारित और फंक्शनल डीएसएल दोनों सेटिंग कंटेक्स्ट का समर्थन करता है। आप दोनों दृष्टिकोणों को मिला सकते हैं।
 
 ### फंक्शनल डीएसएल
 
-फंक्शनल डीएसएल बॉट कंटेक्स्ट को परिभाषित करने का एक अलग तरीका है।
+फंक्शनल डीएसएल बॉट कंटेक्स्ट परिभाषित करने का एक अलग तरीका है।
 
 उदाहरण:
 
@@ -27,7 +27,7 @@ suspend fun main() {
 
 ### कमांड और इनपुट
 
-आप फंक्शनल डीएसएल का उपयोग करके `commands` और `inputs` दोनों को संभाल सकते हैं।
+आप फंक्शनल डीएसएल का उपयोग करके दोनों `कमांड` और `इनपुट` को संभाल सकते हैं।
 
 #### कमांड
 
@@ -36,12 +36,12 @@ suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
 
     bot.setFunctionality {
-        // Regular command
+        // रेगुलर कमांड
         onCommand("/start") {
             message { "Hello" }.send(user, bot)
         }
         
-        // Regex-based command matching
+        // रेगुलर-आधारित कमांड मिलान
         onCommand("""(red|green|blue)""".toRegex()) {
             message { "you typed ${update.text} color" }.send(user, bot)
         }
@@ -91,7 +91,7 @@ bot.setFunctionality {
 }
 ```
 
-चेन स्वचालित रूप से अगले चरण पर आगे बढ़ती है जब तक कि कोई ब्रेक कंडीशन पूरी न हो। यदि कोई ब्रेक कंडीशन मैच होती है और `repeat` `true` (डिफ़ॉल्ट) है, तो उपयोगकर्ता वर्तमान चरण पर रहता है।
+चेन स्वचालित रूप से अगले चरण पर आगे बढ़ती है जब तक कि कोई ब्रेक कंडीशन पूरी न हो। यदि कोई ब्रेक कंडीशन मेल खाती है और `repeat` `true` है (डिफ़ॉल्ट), तो उपयोगकर्ता वर्तमान चरण पर रहता है।
 
 #### अपडेट प्रकार हैंडलर
 
@@ -108,7 +108,7 @@ bot.setFunctionality {
 
 #### सामान्य मैचर
 
-`common` का उपयोग करके टेक्स्ट कंटेंट (केवल कमांड नहीं) से मिलान करें:
+टेक्स्ट सामग्री (केवल कमांड नहीं) को `common` का उपयोग करके मिलाएं:
 
 ```kotlin
 bot.setFunctionality {
@@ -126,7 +126,7 @@ bot.setFunctionality {
 
 #### फॉलबैक हैंडलर
 
-उन अपडेट्स को संभालें जिन्हें किसी हैंडलर द्वारा प्रोसेस नहीं किया गया:
+वे अपडेट संभालें जिन्हें किसी भी हैंडलर द्वारा संसाधित नहीं किया गया था:
 
 ```kotlin
 bot.setFunctionality {
@@ -136,7 +136,7 @@ bot.setFunctionality {
 }
 ```
 
-### एडवांस्ड कॉन्फ़िगरेशन
+### उन्नत कॉन्फ़िगरेशन
 
 #### रेट लिमिटिंग
 
@@ -163,9 +163,9 @@ bot.setFunctionality {
 }
 ```
 
-#### आर्ग्युमेंट पार्सिंग
+#### आर्गुमेंट पार्सिंग
 
-कमांड आर्ग्युमेंट्स को कैसे पार्स किया जाता है, इसे कस्टमाइज़ करें:
+कमांड आर्गुमेंट्स को पार्स करने के तरीके को कस्टमाइज़ करें:
 
 ```kotlin
 bot.setFunctionality {
@@ -181,13 +181,13 @@ bot.setFunctionality {
 आप एक ही बॉट में दोनों दृष्टिकोणों का उपयोग कर सकते हैं:
 
 ```kotlin
-// Annotation-based handler
+// एनोटेशन-आधारित हैंडलर
 @CommandHandler(["/register"])
 suspend fun register(ctx: CommandContext) {
     message { "Registration started" }.send(ctx.user, ctx.bot)
 }
 
-// Functional handler
+// फंक्शनल हैंडलर
 bot.setFunctionality {
     onCommand("/help") {
         message { "Available commands: /register, /help" }.send(user, bot)
@@ -195,10 +195,10 @@ bot.setFunctionality {
 }
 ```
 
-दोनों हैंडलर एक ही `ActivityRegistry` में पंजीकृत हैं और सहजता से काम करते हैं।
+दोनों हैंडलर एक ही `ActivityRegistry` में पंजीकृत हैं और सहजता से एक साथ काम करते हैं।
 
-### देखें भी
+### संदर्भ देखें
 
 * [Action](Actions.md)
-* [Useful utilities](Useful-utilities-and-tips.md)
+* [उपयोगी उपयोगिताएँ](Useful-utilities-and-tips.md)
 ---

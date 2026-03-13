@@ -1,14 +1,14 @@
 ---
 ---
-title: 有用的实用工具和提示
+title: 实用工具和技巧
 ---
 
 
 ### 处理 ProcessedUpdate
 
-[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) 是一个泛型类，用于更新，根据原始数据，可以以不同类型提供（[`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html)、[`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) 等）
+[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) 是一个通用类，用于更新，根据原始数据，可以以不同类型提供（[`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html)、[`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) 等）
 
-因此，您可以检查传入数据的类型，并使用智能转换进一步操作特定数据，例如：
+因此，你可以检查传入数据的类型，并通过智能转换进一步操作特定数据，例如：
 
 ```kotlin
 // ...
@@ -19,7 +19,7 @@ if (update !is MessageUpdate) {
 // 进一步，ProcessedUpdate 将被视为 MessageUpdate。
 ```
 
-内部还有一个 [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) 接口，允许您确定内部是否有用户引用，使用案例示例：
+还有一个 [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) 接口，允许你确定其中是否包含用户引用，使用示例：
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
@@ -31,11 +31,11 @@ val user = if(update is UserReference) update.user else null
 
 ### 依赖注入
 
-该库使用简单的机制来初始化类，其中更新处理方法使用提供的注解进行注解。
+库使用简单的机制来初始化类，其中你的更新处理方法使用提供的注解进行标注。
 
-默认情况下使用 [`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) 来调用注解方法。
+[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) 默认用于调用注解方法。
 
-但如果您想使用其他库来实现，可以重新定义 [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) 接口，<br/>使用您偏好的机制，并在初始化机器人时传入。
+但如果你想使用其他库来实现，你可以重新定义 [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) 接口，<br/>使用你偏好的机制，并在初始化机器人时传入。
 
 ```kotlin
 fun main() = runBlocking {
@@ -49,7 +49,7 @@ fun main() = runBlocking {
 
 ### 过滤更新
 
-如果没有复杂的条件，您可以简单地过滤某些更新进行处理：
+如果没有复杂的条件，你可以简单地过滤某些更新以进行处理：
 
 ```kotlin
 // 定义更新过滤条件的函数
@@ -62,8 +62,8 @@ fun main() = runBlocking {
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // 因此，如果侦听器在到达处理程序函数之前离开了作用域，则表示它在过滤。
-    // 实际上，您甚至可以直接在那里编写 if 条件，使用 return@setListener，或将过滤扩展到单独的类。
+    // 所以，如果监听器在到达处理程序函数之前离开作用域，那就是过滤。
+    // 实际上你甚至可以直接在那里写 if 条件，使用 return@setListener，或者将过滤扩展到单独的类。
 
     handle(it) // 或使用块进行手动处理
   }
@@ -74,7 +74,7 @@ fun main() = runBlocking {
 
 ### 为不同方法通用化选项
 
-如果您必须经常应用相同的可选参数，您可以编写类似的函数来满足您的需求，并减轻样板代码 :)
+如果你经常需要应用相同的可选参数，你可以编写类似的函数来满足你的需求，并简化样板代码 :)
 
 一些通用属性被分离到[不同的接口](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html)中。
 
@@ -91,7 +91,7 @@ inline fun <T, R, O> T.markdownMode(crossinline block: O.() -> Unit = {}): T
     }
 
 
-// ... 在您的代码中
+// ... 在你的代码中
 
 message { "test" }.markdownMode().send(to, via)
 

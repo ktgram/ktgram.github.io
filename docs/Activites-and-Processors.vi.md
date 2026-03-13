@@ -1,19 +1,19 @@
 ---
 ---
-title: Hoạt động và Bộ xử lý
+title: Activites And Processors
 ---
 
 ### Giới thiệu
 
-`Activity` trong thư viện này là thực thể trừu tượng tổng quát hóa các thực thể như `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, và `@CommonHandler`.
+`Activity` trong thuật ngữ của thư viện này là thực thể trừu tượng là tổng quát hóa của các thực thể như `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, và `@CommonHandler`.
 
-Cũng xem thêm bài viết về [handlers](Handlers.md).
+Bạn cũng có thể xem [bài viết về handlers](Handlers.md).
 
-### Thu thập hoạt động
+### Thu thập activities
 
-Các hoạt động được thu thập và chuẩn bị tất cả ngữ cảnh trong thời gian biên dịch (trừ những hoạt động được định nghĩa thông qua DSL chức năng).
+Activities được thu thập và chuẩn bị tất cả ngữ cảnh trong thời gian biên dịch (trừ những cái được định nghĩa thông qua functional dsl).
 
-Nếu bạn muốn giới hạn khu vực mà gói sẽ được tìm kiếm, bạn có thể truyền tham số cho plugin:
+Nếu bạn muốn giới hạn vùng mà package sẽ được tìm kiếm, bạn có thể truyền tham số vào plugin:
 
 ```gradle
 ktGram {
@@ -21,7 +21,7 @@ ktGram {
 }
 ```
 
-hoặc không sử dụng plugin thông qua ksp:
+hoặc không dùng plugin thông qua ksp:
 
 ```gradle
 ksp {
@@ -29,18 +29,18 @@ ksp {
 }
 ```
 
-lưu ý rằng trong trường hợp này, để các hành động được thu thập được xử lý chính xác, bạn cũng phải chỉ định gói trong chính thể hiện đó.
+lưu ý trong trường hợp như vậy, để các actions được thu thập được xử lý chính xác, bạn cũng phải chỉ định package trong bản thân instance.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // bắt đầu trình lắng nghe long-polling
+    // bắt đầu long-polling listener
 }
 ```
 
-tùy chọn này được thêm vào để có thể chạy nhiều thể hiện bot:
+tùy chọn này được thêm vào để có thể chạy nhiều instance bot:
 
 ```gradle
 ktGram {
@@ -48,8 +48,7 @@ ktGram {
 }
 ```
 
-
-hoặc nếu bạn không sử dụng plugin để chỉ định các gói khác nhau, bạn cần chỉ định chúng với dấu phân cách `;`:
+hoặc nếu bạn không dùng plugin để chỉ định các package khác nhau, bạn cần chỉ định chúng với `;` làm separator:
 
 ```gradle
 ksp {
@@ -70,6 +69,8 @@ Gọi: `bot.handleUpdates()` hoặc thông qua `bot.update.setListener { handle(
 
 ### Xem thêm
 
-* [Cập nhật phân tích](Update-parsing.md)
-* [Gọi hoạt động](Activity-invocation.md)
-* [Hành động](Actions.md)
+* [Update parsing](Update-parsing.md)
+* [Activity invocation](Activity-invocation.md)
+* [Actions](Actions.md)
+
+---

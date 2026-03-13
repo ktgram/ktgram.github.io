@@ -3,9 +3,9 @@
 title: 함수형 DSL
 ---
 
-### ~~무한대~~ 함수형 DSL와 그 너머로!
+### ~~무한대로~~ 함수형 DSL 그리고 그 너머로!
 
-봇은 어노테이션 기반과 함수형 DSL 컨텍스트 설정 모두를 지원합니다. 두 접근 방식을 결합할 수 있습니다.
+봇은 어노테이션 기반과 함수형 DSL 설정 컨텍스트를 모두 지원합니다. 두 접근 방식을 결합할 수 있습니다.
 
 ### 함수형 DSL
 
@@ -49,7 +49,7 @@ suspend fun main() {
 }
 ```
 
-`onCommand`에서 파싱된 매개변수는 구성에 따라 `Map<String, String>`으로 사용할 수 있습니다.
+`onCommand`에서 파싱된 매개변수는 설정에 따라 `Map<String, String>`으로 제공됩니다.
 
 #### 입력
 
@@ -85,7 +85,7 @@ bot.setFunctionality {
         message { "Oh, too bad, I'm allergic to it." }.send(user, bot)
         // 조건이 일치할 때 적용될 작업
     }.andThen {
-        // 중단 조건이 일치하지 않으면 다음 입력 지점
+        // 중단 조건이 일치하지 않을 경우 다음 입력 지점
         message { "Great choice!" }.send(user, bot)
     }
 }
@@ -100,15 +100,15 @@ bot.setFunctionality {
 ```kotlin
 bot.setFunctionality {
     onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
-        // 메시지와 콜백 쿼리 업데이트 모두 처리
+        // 메시지와 콜백 쿼리 업데이트를 모두 처리
         println("Received update: ${update.type}")
     }
 }
 ```
 
-#### 일반 매처
+#### 공통 매처
 
-`common`을 사용하여 텍스트 내용(명령어뿐만 아니라)을 매칭합니다:
+`common`을 사용하여 텍스트 내용(명령어만이 아닌)과 일치합니다:
 
 ```kotlin
 bot.setFunctionality {
@@ -140,12 +140,12 @@ bot.setFunctionality {
 
 #### 속도 제한
 
-어떤 핸들러에도 속도 제한을 적용합니다:
+어떤 핸들러에든 속도 제한을 적용합니다:
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/expensive", rateLimits = RateLimits(5, 60)) {
-        // 이 명령어는 60초당 최대 5회만 호출할 수 있습니다
+        // 이 명령어는 60초당 최대 5번만 호출할 수 있습니다
         message { "Processing..." }.send(user, bot)
     }
 }
@@ -153,7 +153,7 @@ bot.setFunctionality {
 
 #### 가드
 
-가드를 사용하여 커스텀 유효성 검사 로직을 추가합니다:
+가드를 사용하여 커스텀 검증 로직을 추가합니다:
 
 ```kotlin
 bot.setFunctionality {
@@ -165,7 +165,7 @@ bot.setFunctionality {
 
 #### 인수 파싱
 
-명령어 인수를 파싱하는 방법을 커스터마이즈합니다:
+명령어 인수 파싱 방식을 커스터마이징합니다:
 
 ```kotlin
 bot.setFunctionality {
@@ -178,7 +178,7 @@ bot.setFunctionality {
 
 ### 함수형과 어노테이션 기반 설정 결합
 
-두 접근 방식을 같은 봇에서 사용할 수 있습니다:
+같은 봇에서 두 접근 방식을 모두 사용할 수 있습니다:
 
 ```kotlin
 // 어노테이션 기반 핸들러
@@ -195,9 +195,9 @@ bot.setFunctionality {
 }
 ```
 
-두 핸들러 모두 같은 `ActivityRegistry`에 등록되며 원활하게 함께 작동합니다.
+두 핸들러 모두 같은 `ActivityRegistry`에 등록되어 원활하게 함께 작동합니다.
 
-### 참고
+### 참고 자료
 
 * [Action](Actions.md)
 * [유용한 유틸리티](Useful-utilities-and-tips.md)

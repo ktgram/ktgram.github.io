@@ -1,37 +1,38 @@
 ---
 ---
-title: Ngữ cảnh Bot
+title: Bot Context
 ---
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Bot context diagram" />
 </p>
 
-Bot cũng có thể cung cấp khả năng ghi nhớ một số dữ liệu thông qua các giao diện `UserData` và `ClassData`.
+The bot can also provide the ability to remember some data through the `UserData` and `ClassData` interfaces.
 
-- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) là dữ liệu ở cấp độ người dùng.
-- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) là dữ liệu ở cấp độ lớp, tức là dữ liệu sẽ được lưu trữ cho đến khi người dùng chuyển sang lệnh hoặc đầu vào nằm trong
-  một lớp khác. (Ở chế độ hàm nó sẽ hoạt động giống như dữ liệu người dùng)
+- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) is a user-level data.
+- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) is a class-level data, i.e. the data will be stored until the user moves to a command or input that is in a
+  different class. (in function mode it will work like as user data)
 
-Mặc định, việc triển khai được cung cấp thông qua [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) nhưng có thể thay đổi thành của riêng bạn thông qua các giao diện [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) và [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) sử dụng
-các công cụ lưu trữ dữ liệu bạn chọn.
+By default, implementation is provided through [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) but can be changed to your own through [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) and [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) interfaces using
+the data storage tools of your choice.
 
 
 > [!CAUTION]
-> Đừng quên chạy gradle `kspKotlin`/hoặc bất kỳ tác vụ ksp liên quan nào để làm cho các ràng buộc sinh mã cần thiết có sẵn.
+> Đừng quên chạy gradle `kspKotlin`/hoặc bất kỳ task ksp liên quan nào để làm cho các codegen bindings cần thiết có sẵn. 
 
 
-Để thay đổi, tất cả những gì bạn cần làm là đặt annotation `@CtxProvider` dưới lớp triển khai của bạn và chạy tác vụ gradle ksp (hoặc build).
+Để thay đổi, tất cả những gì bạn cần làm là đặt annotation `@CtxProvider` dưới implementation của bạn và chạy gradle ksp task (hoặc build).
 
 ```kotlin
 @CtxProvider
 class MyRedis : UserData<String> {
     // ...
 }
+
 ```
 
-### Xem thêm
+### See also
 
-* [Trang chủ](https://github.com/vendelieu/telegram-bot/wiki)
-* [Cập nhật phân tích](Update-parsing.md)
+* [Home](https://github.com/vendelieu/telegram-bot/wiki)
+* [Update parsing](Update-parsing.md)
 ---

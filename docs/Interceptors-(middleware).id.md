@@ -3,9 +3,9 @@
 title: Interceptors (Middleware)
 ---
 
-### Interceptors: Logika Lintas-Kepentingan untuk Bot Anda
+### Interceptors: Cross-Cutting Logic untuk Bot Anda
 
-Saat membangun bot Telegram, Anda sering mengulang setup, pengecekan, atau pembersihan di seluruh handler. Interceptors memungkinkan Anda memasang logika bersama di sekitar handler, menjaga handler tetap fokus dan mudah dikelola.
+Saat membangun bot Telegram, Anda sering mengulangi setup, pengecekan, atau pembersihan di berbagai handler. Interceptors memungkinkan Anda menyisipkan logika bersama di sekitar handler, menjaga handler tetap fokus dan mudah dipelihara.
 
 Inilah cara interceptors bekerja di *telegram-bot* dan cara menggunakannya.
 
@@ -13,26 +13,26 @@ Inilah cara interceptors bekerja di *telegram-bot* dan cara menggunakannya.
 
 Interceptors adalah fungsi yang berjalan pada titik-titik tertentu dalam pipeline pemrosesan update. Mereka memungkinkan Anda:
 - Memeriksa dan memodifikasi konteks pemrosesan
-- Menambahkan logika lintas-kepentingan (logging, auth, metrik)
+- Menambahkan logika cross-cutting (logging, auth, metrics)
 - Menghentikan pemrosesan lebih awal jika diperlukan
 - Membersihkan sumber daya setelah pemrosesan
 
-Bayangkan interceptors sebagai pos pemeriksaan yang dilewati setiap update sebelum, selama, dan setelah eksekusi handler.
+Bayangkan interceptors sebagai checkpoint yang setiap update lalui sebelum, selama, dan setelah eksekusi handler.
 
 
 ### Pipeline Pemrosesan
 
 Bot memproses update melalui pipeline dengan tujuh fase:
 
-| Fase | Kapan Dijalankan | Apa yang Dapat Digunakan |
+| Fase | Kapan Dijalankan | Apa yang Bisa Anda Gunakan |
 |-------|--------------|-------------------------|
-| **Setup** | Segera setelah update tiba, sebelum pemrosesan | ✔ Pembatasan laju global<br>✔ Filter spam atau update tidak valid<br>✔ Logging awal<br>✔ Setup konteks bersama |
-| **Parsing** | Setelah setup, mengekstrak perintah dan parameter | ✔ Parsing perintah kustom<br>✔ Perkaya konteks dengan data yang diparsing<br>✔ Validasi struktur update |
-| **Match** | Menemukan handler yang sesuai (Command/Input/Common) | ✔ Override pemilihan handler<br>✔ Logika penanganan input kustom<br>✔ Log handler yang cocok |
-| **Validation** | Setelah handler ditemukan, sebelum dipanggil | ✔ Izin khusus handler<br>✔ Pembatasan laju per handler<br>✔ Pengecekan guard<br>✔ Batalkan pemrosesan jika kondisi tidak terpenuhi |
-| **PreInvoke** | Segera sebelum handler berjalan | ✔ Pengecekan menit terakhir<br>✔ Mulai timer/metrik<br>✔ Perkaya konteks untuk handler<br>✔ Modifikasi perilaku handler |
-| **Invoke** | Handler dieksekusi di sini | ✔ Bungkus eksekusi handler<br>✔ Penanganan error<br>✔ Logging hasil handler |
-| **PostInvoke** | Setelah handler selesai (berhasil atau gagal) | ✔ Bersihkan sumber daya<br>✔ Log hasil<br>✔ Kirim pesan fallback pada error<br>✔ Modifikasi hasil sebelum dikembalikan |
+| **Setup** | Segera setelah update tiba, sebelum pemrosesan | ✔ Pembatasan laju global<br>✔ Filter spam atau update yang salah format<br>✔ Logging awal<br>✔ Setup konteks bersama |
+| **Parsing** | Setelah setup, mengekstrak command dan parameter | ✔ Custom command parsing<br>✔ Enrich konteks dengan data yang telah diparsing<br>✔ Validasi struktur update |
+| **Match** | Mencari handler yang sesuai (Command/Input/Common) | ✔ Override pemilihan handler<br>✔ Custom logic penanganan input<br>✔ Log handler yang cocok |
+| **Validation** | Setelah handler ditemukan, sebelum invokasi | ✔ Permissions spesifik handler<br>✔ Pembatasan laju per handler<br>✔ Guard checks<br>✔ Batalkan pemrosesan jika kondisi tidak terpenuhi |
+| **PreInvoke** | Segera sebelum handler berjalan | ✔ Pengecekan menit terakhir<br>✔ Mulai timer/metrics<br>✔ Enrich konteks untuk handler<br>✔ Modifikasi perilaku handler |
+| **Invoke** | Handler dieksekusi di sini | ✔ Wrap eksekusi handler<br>✔ Error handling<br>✔ Logging hasil handler |
+| **PostInvoke** | Setelah handler selesai (sukses atau gagal) | ✔ Cleanup sumber daya<br>✔ Log hasil<br>✔ Kirim pesan fallback saat error<br>✔ Modifikasi hasil sebelum dikembalikan |
 
 
 ### Membuat Interceptor
@@ -44,7 +44,7 @@ import eu.vendeli.tgbot.core.PipelineInterceptor
 import eu.vendeli.tgbot.types.component.ProcessingContext
 
 val myInterceptor: PipelineInterceptor = { context ->
-    // Logika Anda di sini
+    // Your logic here
     println("Processing update: ${context.update.updateId}")
 }
 ```
@@ -66,77 +66,77 @@ Daftarkan interceptors pada pipeline pemrosesan:
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-    
-    // Daftarkan interceptor untuk fase Setup
+
+    // Register an interceptor for the Setup phase
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-        // Cek apakah user diblokir
+        // Check if user is banned
         val user = context.update.userOrNull
         if (user != null && isBanned(user.id)) {
-            context.finish() // Hentikan pemrosesan
+            context.finish() // Stop processing
             return@intercept
         }
     }
-    
-    // Daftarkan interceptor untuk fase PreInvoke
+
+    // Register an interceptor for the PreInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
-        // simpan waktu mulai
+        // store start time
     }
-    
-    // Daftarkan interceptor untuk fase PostInvoke
+
+    // Register an interceptor for the PostInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
-        val startTime = // dapatkan waktu mulai
+        val startTime = // get start time
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             println("Handler took ${duration}ms")
         }
     }
-    
+
     bot.handleUpdates()
 }
 ```
 
-### Contoh Dunia Nyata: Authentication & Metrics
+### Contoh Nyata: Authentication & Metrics
 
-Contoh: bot yang memerlukan autentikasi untuk perintah tertentu, mengukur waktu eksekusi handler, dan melog semua perintah.
+Contoh: bot yang memerlukan autentikasi untuk command tertentu, mengukur waktu eksekusi handler, dan melog semua command.
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-    
-    // Fase Setup: Cek apakah user terautentikasi
+
+    // Setup phase: Check if user is authenticated
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
         val user = context.update.userOrNull ?: return@intercept
-        
+
         if (!isAuthenticated(user.id)) {
             message { "Please authenticate first using /login" }
                 .send(user, context.bot)
             context.finish()
         }
     }
-    
-    // Fase PreInvoke: Mulai timer dan cek izin
+
+    // PreInvoke phase: Start timer and check permissions
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
-        
-        // Cek apakah user memiliki izin untuk handler spesifik ini
+
+        // Check if user has permission for this specific handler
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
             context.finish()
             return@intercept
         }
-        
-        // Mulai timer
-        // simpan waktu mulai
+
+        // Start timer
+        // store start time
     }
-    
-    // Fase PostInvoke: Log dan cleanup
+
+    // PostInvoke phase: Log and cleanup
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
-        val startTime = // dapatkan waktu mulai
-        
+        val startTime = // get start time
+
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             val logger = context.bot.config.loggerFactory.get("Metrics")
@@ -146,7 +146,7 @@ suspend fun main() {
             )
         }
     }
-    
+
     bot.handleUpdates()
 }
 ```
@@ -157,14 +157,14 @@ suspend fun main() {
 `ProcessingContext` menyediakan akses ke:
 
 - **`update: ProcessedUpdate`** - Update yang sedang diproses
-- **`bot: TelegramBot`** - Instance bot
-- **`registry: ActivityRegistry`** - Registry aktivitas
-- **`parsedInput: String`** - Teks input/perintah yang diparsing
-- **`parameters: Map<String, String>`** - Parameter perintah yang diparsing
-- **`activity: Activity?`** - Handler yang diresolusi (null hingga fase Match)
+- **`bot: TelegramBot`** - Bot instance
+- **`registry: ActivityRegistry`** - Activity registry
+- **`parsedInput: String`** - Text command/input yang telah diparsing
+- **`parameters: Map<String, String>`** - Parameter command yang telah diparsing
+- **`activity: Activity?`** - Handler yang telah diresolusi (null sampai fase Match)
 - **`shouldProceed: Boolean`** - Apakah pemrosesan harus dilanjutkan
 - **`additionalContext: AdditionalContext`** - Data konteks tambahan
-- **`finish()`** - Hentikan pemrosesan lebih awal
+- **`finish()`** - Stop pemrosesan lebih awal
 
 #### Menghentikan Pemrosesan Lebih Awal
 
@@ -178,15 +178,15 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
 }
 ```
 
-#### Menyimpan Data Kustom
+#### Menyimpan Data Custom
 
 Gunakan `additionalContext` untuk mengirim data antar interceptors:
 
 ```kotlin
-// Di PreInvoke
+// In PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// Di PostInvoke
+// In PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
@@ -204,65 +204,65 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     println("Second interceptor")
 }
 
-// Saat update diproses:
+// When an update is processed:
 // Output: "First interceptor"
 // Output: "Second interceptor"
 ```
 
-Jika interceptor memanggil `context.finish()`, interceptors selanjutnya di fase tersebut akan dilewati, dan fase selanjutnya tidak akan dieksekusi.
+Jika interceptor memanggil `context.finish()`, interceptors selanjutnya pada fase tersebut akan dilewati, dan fase selanjutnya tidak akan dieksekusi.
 
 
 ### Best Practices
 
 #### 1. Gunakan Fase yang Tepat
 
-- Setup: Pengecekan global, filtering, setup awal
-- Parsing: Logika parsing kustom
-- Match: Logika pemilihan handler
-- Validation: Izin, pembatasan laju, guard
-- PreInvoke: Persiapan khusus handler
+- Setup: Global checks, filtering, initial setup
+- Parsing: Custom parsing logic
+- Match: Handler selection logic
+- Validation: Permissions, rate limits, guards
+- PreInvoke: Handler-specific preparation
 - Invoke: Biasanya ditangani oleh interceptor default
-- PostInvoke: Cleanup, logging, penanganan error
+- PostInvoke: Cleanup, logging, error handling
 
-#### 2. Jaga Interceptors Tetap Fokus
+#### 2. Keep Interceptors Focused
 
-Setiap interceptor harus melakukan satu hal:
+Setiap interceptor seharusnya melakukan satu hal:
 
 ```kotlin
-// ✅ Baik - interceptor fokus
+// ✅ Good - focused interceptor
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     if (isBanned(context.update.userOrNull?.id)) {
         context.finish()
     }
 }
 
-// ❌ Hindari - melakukan terlalu banyak
+// ❌ Avoid - doing too much
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     // Authentication
     // Logging
     // Metrics
     // Rate limiting
-    // ... terlalu banyak!
+    // ... too much!
 }
 ```
 
-#### 3. Tangani Error dengan Elegan
+#### 3. Handle Errors Gracefully
 
-Interceptors tidak boleh crash bot:
+Interceptors seharusnya tidak crash bot:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     try {
-        // Logika Anda
+        // Your logic
     } catch (e: Exception) {
         val logger = context.bot.config.loggerFactory.get("Interceptor")
         logger.error("Interceptor error", e)
-        // Jangan panggil context.finish() kecuali Anda ingin menghentikan pemrosesan
+        // Don't call context.finish() unless you want to stop processing
     }
 }
 ```
 
-#### 4. Bersihkan Sumber Daya
+#### 4. Clean Up Resources
 
 Jika Anda membuka sumber daya di `PreInvoke`, bersihkan di `PostInvoke`:
 
@@ -280,23 +280,23 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 }
 ```
 
-#### 5. Urutan Penting
+#### 5. Order Matters
 
-Daftarkan interceptors dalam urutan yang Anda inginkan:
+Daftarkan interceptors dalam urutan yang Anda inginkan untuk dieksekusi:
 
 ```kotlin
-// Pengecekan umum lebih dulu
-bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { 
-    // Pengecekan ban global
+// More general checks first
+bot.update.pipeline.intercept(ProcessingPipePhase.Setup) {
+    // Global ban check
 }
 
-// Pengecekan spesifik kemudian
-bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { 
-    // Pengecekan izin khusus handler
+// More specific checks later
+bot.update.pipeline.intercept(ProcessingPipePhase.Validation) {
+    // Handler-specific permission check
 }
 ```
 
-#### 6. Gunakan Interceptors untuk Cross-Cutting Concerns
+#### 6. Use Interceptors for Cross-Cutting Concerns
 
 Interceptors ideal untuk:
 - ✅ Authentication/authorization
@@ -306,34 +306,34 @@ Interceptors ideal untuk:
 - ✅ Error handling
 - ✅ Request/response transformation
 
-Untuk logika khusus handler, simpan di handler.
+Untuk logic spesifik handler, simpan di handler.
 
 
 ### Default Interceptors
 
 Framework menyertakan default interceptors untuk fungsionalitas inti:
 
-- **DefaultSetupInterceptor**: Pembatasan laju global
-- **DefaultParsingInterceptor**: Parsing perintah
-- **DefaultMatchInterceptor**: Pematching handler (commands, inputs, common matchers)
-- **DefaultValidationInterceptor**: Guard checks dan pembatasan laju per-handler
-- **DefaultInvokeInterceptor**: Eksekusi handler dan penanganan error
+- **DefaultSetupInterceptor**: Global rate limiting
+- **DefaultParsingInterceptor**: Command parsing
+- **DefaultMatchInterceptor**: Handler matching (commands, inputs, common matchers)
+- **DefaultValidationInterceptor**: Guard checks dan per-handler rate limiting
+- **DefaultInvokeInterceptor**: Handler execution dan error handling
 
-Custom interceptors Anda berjalan bersama default ini. Anda dapat menambahkan logika sebelum atau sesudah default, tetapi Anda tidak dapat menghapus default interceptors.
+Custom interceptors Anda berjalan bersama default ini. Anda bisa menambahkan logic sebelum atau sesudah default, tapi Anda tidak bisa menghapus default interceptors.
 
 ---
 
 ### Advanced: Conditional Interceptors
 
-Anda dapat membuat interceptors kondisional:
+Anda bisa membuat interceptors kondisional:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
-    
-    // Hanya terapkan ke handler spesifik
+
+    // Only apply to specific handlers
     if (activity::class.simpleName?.contains("Admin") == true) {
-        // Logika khusus admin
+        // Admin-specific logic
         checkAdminPermissions(context)
     }
 }
@@ -342,20 +342,20 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
 
 ### Summary
 
-Interceptors menyediakan cara bersih untuk menambahkan logika lintas-kepentingan ke bot Anda:
+Interceptors menyediakan cara bersih untuk menambahkan logika cross-cutting ke bot Anda:
 
-- ✅ **Tujuh fase** untuk tahap pemrosesan berbeda
+- ✅ **Tujuh fase** untuk tahapan pemrosesan yang berbeda
 - ✅ **API sederhana**: Cukup implementasikan `PipelineInterceptor`
 - ✅ **Fleksibel**: Daftarkan multiple interceptors per fase
-- ✅ **Kuat**: Akses ke konteks pemrosesan lengkap
-- ✅ **Aman**: Dapat menghentikan pemrosesan lebih awal dengan `context.finish()`
+- ✅ **Powerful**: Akses ke full processing context
+- ✅ **Aman**: Bisa stop pemrosesan lebih awal dengan `context.finish()`
 
-Gunakan interceptors untuk menjaga handler fokus pada logika bisnis sambil menangani kepentingan bersama seperti authentication, logging, dan metrics secara terpusat.
+Gunakan interceptors untuk menjaga handler Anda fokus pada business logic sambil menangani concerns bersama seperti authentication, logging, dan metrics secara terpusat.
 
 ---
 
-### See also
+### Lihat juga
 
-* [Functional Handling DSL](Functional-handling-DSL.md) - Pemrosesan update fungsional
-* [Guards](Guards.md) - Pengecekan izin level handler
+* [Functional Handling DSL](Functional-handling-DSL.md) - Functional update processing
+* [Guards](Guards.md) - Handler-level permission checks
 ---

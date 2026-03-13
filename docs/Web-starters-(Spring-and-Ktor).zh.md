@@ -5,22 +5,22 @@ title: Web Starters (Spring And Ktor)
 
 ### Spring starter
 
-Spring Starter模块是一个自动配置模块，用于将Telegram bot功能集成到Spring Boot应用程序中。它利用了Spring Boot的依赖注入和配置属性功能，根据提供的配置自动配置Telegram bot。这个库对于希望使用Kotlin和Spring Boot构建Telegram bot的开发者特别有用，提供了一种流畅的bot开发和管理方法。
+The Spring Starter module for library is an auto-configuration module that integrates Telegram bot functionalities into Spring Boot applications. It leverages the power of Spring Boot's dependency injection and configuration properties to automatically configure Telegram bots based on the provided configuration. This library is particularly useful for developers looking to build Telegram bots using Kotlin and Spring Boot, offering a streamlined approach to bot development and management.
 
-### 主要特性
+### Key Features
 
-- **自动配置**: 库根据提供的配置属性自动配置Telegram bot，无需手动设置。
-- **配置属性**: 支持配置属性以便轻松自定义bot设置，例如bot令牌、包名和标识符。
-- **Spring集成**: 与Spring生态系统无缝集成，利用Spring的依赖注入和应用上下文管理bot实例。
-- **协程支持**: 利用Kotlin协程进行异步bot操作，确保高效且非阻塞的执行。
+- **Auto-Configuration**: The library automatically configures Telegram bots based on the provided configuration properties, eliminating the need for manual setup.
+- **Configuration Properties**: It supports configuration properties for easy customization of bot settings, such as bot tokens, package names, and identifiers.
+- **Spring Integration**: Seamlessly integrates with the Spring ecosystem, utilizing Spring's dependency injection and application context for managing bot instances.
+- **Coroutine Support**: Leverages Kotlin coroutines for asynchronous bot operations, ensuring efficient and non-blocking execution.
 
-### 入门指南
+### Getting Started
 
-要使用Spring Starter Library for Telegram Bots，您需要在Spring Boot项目中将其作为依赖项包含。该库设计为与Spring Boot应用程序一起工作，需要Spring Boot框架才能正常运行。
+To use the Spring Starter Library for Telegram Bots, you need to include it as a dependency in your Spring Boot project. The library is designed to work with Spring Boot applications and requires the Spring Boot framework to function.
 
-#### 依赖项
+#### Dependency
 
-将以下依赖项添加到您的 `build.gradle` 或 `pom.xml` 文件中：
+Add the following dependency to your `build.gradle` or `pom.xml` file:
 
 ```gradle
 dependencies {
@@ -28,11 +28,11 @@ dependencies {
 }
 ```
 
-将 `<version>` 替换为库的最新版本。
+Replace `<version>` with the latest version of the library.
 
-#### 配置
+#### Configuration
 
-该库使用Spring Boot的 `@ConfigurationProperties` 来绑定配置属性。您可以在Spring Boot应用程序的 `application.properties` 或 `application.yml` 文件中定义bot配置。
+The library uses Spring Boot's `@ConfigurationProperties` to bind configuration properties. You can define your bot configurations in the `application.properties` or `application.yml` file of your Spring Boot application.
 
 ```yaml
 ktgram:
@@ -44,11 +44,11 @@ ktgram:
       identifier: MyBot
 ```
 
-#### 使用方法
+#### Usage
 
-包含并配置库后，它会根据提供的配置自动创建和配置Telegram bot实例。
+Once the library is included and configured, it automatically creates and configures Telegram bot instances based on the provided configuration.
 
-它还支持多个bot实例，要初始化多个实例，只需在bot部分声明新的条目：
+It also supports multiple bot instances, to initialize several ones just declare it as new entry in bot section:
 
 ```yaml
 ktgram:
@@ -57,81 +57,81 @@ ktgram:
     - token: SECOND_BOT_TOKEN
 ```
 
-### 高级配置
+### Advanced Configuration
 
-对于更高级的配置，如自定义bot行为或与其他Spring组件集成，您可以扩展 `BotConfiguration` 类并通过其 `applyCfg` 方法更改bot配置，您可以在[这里](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt)看到示例。
+For more advanced configurations, such as customizing bot behavior or integrating with other Spring components, you can extend the `BotConfiguration` class and change bot configuration through its `applyCfg` method, you can see example [there](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
 
 > [!TIP]
-> 要使用自定义配置配置每个初始化的实例，通过其标识符区分它们（BotConfiguration类也有标识符）。
+> To configure each initialized instance with a custom configuration, distinguish them by their identifier (the BotConfiguration class also has an identifier).
 
 ### Ktor
 
-该模块旨在促进为Telegram bot创建webhook服务器。它允许开发者配置服务器，包括SSL/TLS设置，并声明具有自定义配置的多个Telegram bot。设置过程灵活，使开发者能够根据具体需求定制服务器。
+The module is designed to facilitate the creation of a webhook server for Telegram bots. It allows developers to configure the server, including SSL/TLS settings, and declare multiple Telegram bots with custom configurations. The setup process is flexible, enabling developers to tailor the server to their specific needs.
 
-### 安装
+### Installation
 
-要安装ktor starter，请在主依赖项中添加：
+To install ktor starter add additional to main dependency:
 
 ```gradle
 dependencies {
     implementation("eu.vendeli:ktor-starter:x.y.z") // there
-    // 将x.y.z更改为当前库版本
+    // change x.y.z to current library version
 }
 ```
 
-### 关键组件
+### Key Components
 
-`serveWebhook` 函数
+`serveWebhook` Function
 
-serveWebhook函数是库的核心。它为Telegram bot设置和启动webhook服务器。它接受两个参数：
+The serveWebhook function is the core of the library. It sets up and starts the webhook server for Telegram bots. It accepts two parameters:
 
-- `wait`: 一个布尔值，指示服务器是否应该在关闭之前等待应用程序停止。默认为true。
-- `serverBuilder`: 一个lambda函数，用于配置服务器。默认为一个空lambda。
+- `wait`: A boolean indicating whether the server should wait for the application to stop before shutting down. Defaults to true.
+- `serverBuilder`: A lambda function that configures the server. Defaults to an empty lambda.
 
-### 配置
+### Configuration
 
-* `WEBHOOK_PREFIX`: 它是一个参数，将用于webhook监听器路由的地址前缀。(默认为 "/")
+* `WEBHOOK_PREFIX`: it's paramter that will be used for address prefix for webhook listener route. (defaults to "/")
 
-#### 服务器设置
+#### Server Setup
 
-- `server`: 一种使用EnvConfiguration或ManualConfiguration设置服务器配置的方法。
-- `engine`: 一种配置Netty应用引擎的方法。
-- `ktorModule`: 一种将Ktor模块添加到应用程序的方法。
+- `server`: A method to set the server configuration using either EnvConfiguration or ManualConfiguration.
+- `engine`: A method to configure the Netty application engine.
+- `ktorModule`: A method to add Ktor modules to the application.
 
-该库为服务器提供了广泛的可配置参数，包括主机、端口、SSL设置等。有两种具体的配置选项：
+The library provides wide range of configurable parameters for the server, including host, port, SSL settings, and more. There are two concrete options for its configuring: 
 
-* `EnvConfiguration`: 从带有 `KTGRAM_` 前缀的环境中读取配置值。
-* `ManualConfiguration`: 允许手动设置配置值，在 `server {}` 函数中设置参数。
+* `EnvConfiguration`: Reads configuration values from environment with `KTGRAM_` prefix.
+* `ManualConfiguration`: Allows for manual setting of configuration values, set your parameters in `server {}` function.
 
-以下是可以设置的参数列表：
+There's list of parameters that can be set:
 
-- `HOST`: 服务器的主机名或IP地址。
-- `PORT`: 服务器的端口号。
-- `SSL_PORT`: SSL/TLS连接的端口号。
-- `PEM_PRIVATE_KEY_PATH`: PEM私钥文件路径。
-- `PEM_CHAIN_PATH`: PEM证书链文件路径。
-- `PEM_PRIVATE_KEY`: 以字符数组形式表示的PEM私钥密码。
-- `KEYSTORE_PATH`: Java密钥库文件路径。
-- `KEYSTORE_PASSWORD`: 密钥库密码。
-- `KEY_ALIAS`: 密钥库中密钥的别名。
-- `SSL_ON`: 一个布尔值，指示是否应启用SSL/TLS。默认为true。
+- `HOST`: The hostname or IP address of the server.
+- `PORT`: The port number for the server.
+- `SSL_PORT`: The port number for SSL/TLS connections.
+- `PEM_PRIVATE_KEY_PATH`: The path to the PEM private key file.
+- `PEM_CHAIN_PATH`: The path to the PEM certificate chain file.
+- `PEM_PRIVATE_KEY`: The PEM private key PASSWORD as a character array.
+- `KEYSTORE_PATH`: The path to the Java KeyStore file.
+- `KEYSTORE_PASSWORD`: The password for the KeyStore.
+- `KEY_ALIAS`: The alias for the key in the KeyStore.
+- `SSL_ON`: A boolean indicating whether SSL/TLS should be enabled. Defaults to true.
 
 > [!TIP]
-> 如果存在pem证书，模块本身将在指定路径创建jks存储。
+> If pem certificates are present, the module itself will create a jks storage from them at the specified path.
 
-#### Bot配置：
+#### Bot Configuration:
 
-要配置bot，调用 `declareBot {}`，它有以下参数：
+To configure bot call `declareBot {}` which have such parameters:
 
-- `token`: Bot令牌。
-- `pckg`: Bot的包名。
-- `configuration`: 用于配置bot的lambda函数。
-- `handlingBehaviour`: 用于设置bot处理行为的lambda函数。
-- `onInit`: bot初始化时执行的lambda函数。
+- `token`: The bot token.
+- `pckg`: The package name for the bot.
+- `configuration`: A lambda function for configuring the bot.
+- `handlingBehaviour`: A lambda function for setting the bot's handling behavior.
+- `onInit`: A lambda function to be executed when the bot is initialized.
 
-### 示例用法
+### Example Usage
 
-要使用此模块，调用 `serveWebhook` 函数，使用所需设置进行配置，声明您的bot。这是一个简化的示例：
+To use this module, call `serveWebhook` function, configure it with your desired settings, declare your bots. Here's a simplified example:
 
 ```kotlin
 fun main() = runBlocking {
@@ -147,21 +147,21 @@ fun main() = runBlocking {
 
             KEYSTORE_PATH = "/etc/ssl/certs/java/cacerts/bot_keystore.jks"
             KEYSTORE_PASSWORD = "changeit".toCharArray()
-            // 根据需要设置其他配置参数
+            // Set other configuration parameters as needed
         }
         declareBot {
             token = "YOUR_BOT_TOKEN"
-            // 配置其他bot设置
+            // Configure other bot settings
         }
-        // 如有需要，添加更多bot或设置其他参数
+        // Add more bots or set other parameters if needed
     }
 }
 ```
 
 > [!CAUTION]
-> 别忘了设置webhook以使一切正常工作。 :)
+> Don't forget to set webhook to make everything work. :)
 
-默认情况下，模块将webhook监听端点作为 `host/BOT_TOKEN` 提供
+By default module will serve webhook listenening endpoints as `host/BOT_TOKEN`
 
 
 ---

@@ -5,7 +5,7 @@ title: Functional Dsl
 
 ### Đến ~~vô cực~~ functional dsl và xa hơn!
 
-Bot hỗ trợ cả hai cách thiết lập ngữ cảnh dựa trên annotation và functional dsl. Bạn có thể kết hợp cả hai cách tiếp cận.
+Bot hỗ trợ cả hai cách tiếp cận dựa trên chú thích và functional dsl để thiết lập ngữ cảnh. Bạn có thể kết hợp cả hai cách tiếp cận.
 
 ### Functional DSL
 
@@ -19,41 +19,41 @@ suspend fun main() {
 
     bot.setFunctionality {
         onChosenInlineResult {
-            println("got a result ${update.chosenInlineResult.resultId} from ${update.user}")
+            println("nhận được kết quả ${update.chosenInlineResult.resultId} từ ${update.user}")
         }
     }
 }
 ```
 
-### Commands và Inputs
+### Lệnh và Đầu vào
 
-Bạn có thể xử lý cả `commands` và `inputs` sử dụng functional DSL.
+Bạn có thể xử lý cả `lệnh` và `đầu vào` bằng functional DSL.
 
-#### Commands
+#### Lệnh
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
 
     bot.setFunctionality {
-        // Regular command
+        // Lệnh thông thường
         onCommand("/start") {
             message { "Hello" }.send(user, bot)
         }
         
-        // Regex-based command matching
+        // Khớp lệnh dựa trên regex
         onCommand("""(red|green|blue)""".toRegex()) {
-            message { "you typed ${update.text} color" }.send(user, bot)
+            message { "bạn đã nhập màu ${update.text}" }.send(user, bot)
         }
     }
 }
 ```
 
-Trong `onCommand`, các tham số đã được parse có sẵn dưới dạng `Map<String, String>` dựa trên cấu hình của bạn.
+Trong `onCommand`, các tham số đã được phân tích có sẵn dưới dạng `Map<String, String>` dựa trên cấu hình của bạn.
 
-#### Inputs
+#### Đầu vào
 
-Bạn có thể sử dụng inputs thông qua [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html).
+Bạn có thể sử dụng đầu vào qua [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html).
 
 ```kotlin
 suspend fun main() {
@@ -61,117 +61,117 @@ suspend fun main() {
 
     bot.setFunctionality {
         onCommand("/start") {
-            message { "Hello, what's your name?" }.send(user, bot)
+            message { "Hello, tên bạn là gì?" }.send(user, bot)
             bot.inputListener[user] = "testInput"
         }
         
         onInput("testInput") {
-            message { "Hey, nice to meet you, ${update.text}" }.send(user, bot)
+            message { "Xin chào, rất vui được gặp bạn, ${update.text}" }.send(user, bot)
         }
     }
 }
 ```
 
-#### Input Chains
+#### Chuỗi Đầu vào
 
-Đối với luồng input nhiều bước, sử dụng `inputChain`:
+Đối với luồng đầu vào nhiều bước, sử dụng `inputChain`:
 
 ```kotlin
 bot.setFunctionality {
     inputChain("conversation") {
-        message { "Nice to meet you, ${update.text}" }.send(user, bot)
-        message { "What is your favorite food?" }.send(user, bot)
-    }.breakIf({ update.text == "peanut butter" }) { // chain break condition
-        message { "Oh, too bad, I'm allergic to it." }.send(user, bot)
-        // action that will be applied when condition matches
+        message { "Rất vui được gặp bạn, ${update.text}" }.send(user, bot)
+        message { "Món ăn yêu thích của bạn là gì?" }.send(user, bot)
+    }.breakIf({ update.text == "peanut butter" }) { // điều kiện dừng chuỗi
+        message { "Ồ, tiếc quá, tôi bị dị ứng với nó." }.send(user, bot)
+        // hành động sẽ được áp dụng khi điều kiện khớp
     }.andThen {
-        // next input point if break condition doesn't match
-        message { "Great choice!" }.send(user, bot)
+        // điểm đầu vào tiếp theo nếu điều kiện dừng không khớp
+        message { "Lựa chọn tuyệt vời!" }.send(user, bot)
     }
 }
 ```
 
-Chuỗi tự động chuyển sang bước tiếp theo trừ khi điều kiện break được đáp ứng. Nếu điều kiện break được đáp ứng và `repeat` là `true` (mặc định), người dùng sẽ ở lại bước hiện tại.
+Chuỗi tự động chuyển sang bước tiếp theo trừ khi gặp điều kiện dừng. Nếu điều kiện dừng khớp và `repeat` là `true` (mặc định), người dùng sẽ ở lại bước hiện tại.
 
-#### Update Type Handlers
+#### Trình xử lý Loại Cập nhật
 
-Xử lý trực tiếp các loại update cụ thể:
+Xử lý trực tiếp các loại cập nhật cụ thể:
 
 ```kotlin
 bot.setFunctionality {
     onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
-        // Handle both message and callback query updates
-        println("Received update: ${update.type}")
+        // Xử lý cả cập nhật message và callback query
+        println("Đã nhận cập nhật: ${update.type}")
     }
 }
 ```
 
-#### Common Matchers
+#### Trình so khớp Chung
 
-Match nội dung văn bản (không chỉ commands) sử dụng `common`:
+So khớp nội dung văn bản (không chỉ lệnh) bằng `common`:
 
 ```kotlin
 bot.setFunctionality {
-    // String matching
+    // So khớp chuỗi
     common("hello") {
-        message { "Hi there!" }.send(user, bot)
+        message { "Xin chào!" }.send(user, bot)
     }
     
-    // Regex matching
+    // So khớp regex
     common("""\d+""".toRegex()) {
-        message { "You sent a number!" }.send(user, bot)
+        message { "Bạn đã gửi một số!" }.send(user, bot)
     }
 }
 ```
 
-#### Fallback Handler
+#### Trình xử lý Dự phòng
 
-Xử lý các update không được xử lý bởi bất kỳ handler nào:
+Xử lý các cập nhật không được xử lý bởi bất kỳ trình xử lý nào:
 
 ```kotlin
 bot.setFunctionality {
     whenNotHandled {
-        message { "I didn't understand that." }.send(user, bot)
+        message { "Tôi không hiểu điều đó." }.send(user, bot)
     }
 }
 ```
 
 ### Cấu hình Nâng cao
 
-#### Rate Limiting
+#### Giới hạn Tốc độ
 
-Áp dụng giới hạn tốc độ cho bất kỳ handler nào:
+Áp dụng giới hạn tốc độ cho bất kỳ trình xử lý nào:
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/expensive", rateLimits = RateLimits(5, 60)) {
-        // This command can only be called 5 times per 60 seconds
-        message { "Processing..." }.send(user, bot)
+        // Lệnh này chỉ có thể được gọi 5 lần mỗi 60 giây
+        message { "Đang xử lý..." }.send(user, bot)
     }
 }
 ```
 
 #### Guards
 
-Sử dụng guards để thêm logic validation tùy chỉnh:
+Sử dụng guards để thêm logic xác thực tùy chỉnh:
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/admin", guard = AdminGuard::class) {
-        message { "Admin command executed" }.send(user, bot)
+        message { "Đã thực thi lệnh admin" }.send(user, bot)
     }
 }
 ```
 
-#### Argument Parsing
+#### Phân tích Tham số
 
-Tùy chỉnh cách parse tham số command:
+Tùy chỉnh cách phân tích tham số lệnh:
 
 ```kotlin
 bot.setFunctionality {
     onCommand("/custom", argParser = CustomArgParser::class) {
-        // parameters will be parsed using CustomArgParser
-        message { "Parameters: $parameters" }.send(user, bot)
+        // tham số sẽ được phân tích bằng CustomArgParser
+        message { "Tham số: $parameters" }.send(user, bot)
     }
 }
 ```
@@ -181,24 +181,24 @@ bot.setFunctionality {
 Bạn có thể sử dụng cả hai cách tiếp cận trong cùng một bot:
 
 ```kotlin
-// Annotation-based handler
+// Trình xử lý dựa trên chú thích
 @CommandHandler(["/register"])
 suspend fun register(ctx: CommandContext) {
-    message { "Registration started" }.send(ctx.user, ctx.bot)
+    message { "Đã bắt đầu đăng ký" }.send(ctx.user, ctx.bot)
 }
 
-// Functional handler
+// Trình xử lý functional
 bot.setFunctionality {
     onCommand("/help") {
-        message { "Available commands: /register, /help" }.send(user, bot)
+        message { "Các lệnh khả dụng: /register, /help" }.send(user, bot)
     }
 }
 ```
 
-Cả hai handlers đều được đăng ký trong cùng một `ActivityRegistry` và hoạt động liền mạch với nhau.
+Cả hai trình xử lý đều được đăng ký trong cùng một `ActivityRegistry` và hoạt động liền mạch với nhau.
 
-### See also
+### Xem thêm
 
 * [Action](Actions.md)
-* [Useful utilities](Useful-utilities-and-tips.md)
+* [Tiện ích hữu ích](Useful-utilities-and-tips.md)
 ---

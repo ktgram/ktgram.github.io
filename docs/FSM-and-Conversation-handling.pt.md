@@ -10,23 +10,23 @@ A biblioteca também suporta o mecanismo FSM, que é um mecanismo para processam
 
 ### Na teoria
 
-Vamos imaginar uma situação onde você precisa coletar uma pesquisa do usuário, você pode pedir todos os dados de uma pessoa em uma etapa, mas com entrada incorreta de um dos parâmetros, será difícil tanto para o usuário quanto para nós, e cada etapa pode ter uma diferença dependendo de certos dados de entrada.
+Vamos imaginar uma situação onde você precisa coletar uma pesquisa do usuário, você pode pedir todos os dados de uma pessoa em um único passo, mas com entrada incorreta de um dos parâmetros, será difícil tanto para o usuário quanto para nós, e cada passo pode ter uma diferença dependendo de certos dados de entrada.
 
-Agora vamos imaginar entrada passo a passo dos dados, onde o bot entra em modo de diálogo com o usuário.
+Agora vamos imaginar entrada de dados passo a passo, onde o bot entra no modo de diálogo com o usuário.
 
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Diagrama do processo de tratamento" />
 </p>
 
-As setas verdes indicam o processo de transição pelas etapas sem erros, as setas azuis significam salvar o estado atual e esperar por re-entrada (por exemplo, se o usuário indicou que ele tem -100 anos, deve pedir idade novamente), e as vermelhas mostram saída de todo o processo devido a qualquer comando ou qualquer outro cancelamento significativo.
+Setas verdes indicam o processo de transição através dos passos sem erros, setas azuis significam salvar o estado atual e aguardar nova entrada (por exemplo, se o usuário indicou que tem -100 anos, deve pedir idade novamente), e vermelhas mostram saída de todo o processo devido a qualquer comando ou qualquer outra cancelamento significativo.
 
 ### Na prática
 
-O sistema Wizard permite interações de múltiplos passos em bots Telegram. Ele guia os usuários através de uma sequência de etapas, valida entrada, armazena estado e transita entre etapas.
+O sistema Wizard permite interações multi-passos com usuários em bots Telegram. Ele guia usuários através de uma sequência de passos, valida entrada, armazena estado e transita entre passos.
 
-**Principais Benefícios:**
-- **Type-safe**: Verificação de tipo em tempo de compilação para acesso ao estado
-- **Declarativo**: Defina etapas como classes/objeto aninhados
+**Benefícios Principais:**
+- **Type-safe**: Verificação de tipo em tempo de compilação para acesso a estado
+- **Declarativo**: Defina passos como classes/objeto aninhados
 - **Flexível**: Suporte para transições condicionais, saltos e novas tentativas
 - **Stateful**: Persistência automática de estado com backends de armazenamento plugáveis
 - **Integrado**: Funciona com o sistema Activity existente
@@ -35,12 +35,12 @@ O sistema Wizard permite interações de múltiplos passos em bots Telegram. Ele
 
 #### WizardStep
 
-Um `WizardStep` representa uma única etapa no fluxo do wizard. Cada etapa deve implementar:
+Um `WizardStep` representa um único passo no fluxo wizard. Cada passo deve implementar:
 
-- **`onEntry(ctx: WizardContext)`**: Chamado quando o usuário entra nesta etapa. Use isso para solicitar ao usuário.
-- **`onRetry(ctx: WizardContext)`**: Chamado quando a validação falha e a etapa deve tentar novamente. Use isso para mostrar mensagens de erro.
+- **`onEntry(ctx: WizardContext)`**: Chamado quando o usuário entra neste passo. Use isso para solicitar ao usuário.
+- **`onRetry(ctx: WizardContext)`**: Chamado quando validação falha e o passo deve tentar novamente. Use isso para mostrar mensagens de erro.
 - **`validate(ctx: WizardContext): Transition`**: Valida a entrada atual e retorna uma `Transition` indicando o que acontece em seguida.
-- **`store(ctx: WizardContext): Any?`** (opcional): Retorna o valor a persistir para esta etapa. Retorne `null` se a etapa não armazenar estado.
+- **`store(ctx: WizardContext): Any?`** (opcional): Retorna o valor a persistir para este passo. Retorne `null` se o passo não armazenar estado.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -49,7 +49,7 @@ object NameStep : WizardStep(isInitial = true) {
     }
 
     override suspend fun onRetry(ctx: WizardContext) {
-        message { "Nome não pode estar vazio. Por favor, tente novamente." }.send(ctx.user, ctx.bot)
+        message { "Nome não pode ser vazio. Por favor, tente novamente." }.send(ctx.user, ctx.bot)
     }
 
     override suspend fun validate(ctx: WizardContext): Transition {
@@ -67,16 +67,16 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> Se alguma etapa não estiver marcada como inicial -> a primeira etapa declarada é considerada como.
+> Se algum passo não estiver marcado como inicial -> o primeiro passo declarado é considerado como.
 
 #### Transition
 
-Uma `Transition` determina o que acontece após a validação:
+Uma `Transition` determina o que acontece após validação:
 
-- **`Transition.Next`**: Vá para a próxima etapa na sequência
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Salte para uma etapa específica
-- **`Transition.Retry`**: Tente novamente a etapa atual (validação falhou)
-- **`Transition.Finish`**: Termine o wizard
+- **`Transition.Next`**: Vai para o próximo passo na sequência
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Salta para um passo específico
+- **`Transition.Retry`**: Tenta novamente o passo atual (validação falhou)
+- **`Transition.Finish`**: Finaliza o wizard
 
 ```kotlin
 // Salto condicional baseado na entrada
@@ -94,11 +94,11 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 `WizardContext` fornece acesso a:
 - **`user: User`**: O usuário atual
-- **`update: ProcessedUpdate`**: A atualização atual
+- **`update: ProcessedUpdate`**: O update atual
 - **`bot: TelegramBot`**: A instância do bot
 - **`userReference: UserChatReference`**: Referência de ID de usuário e chat para armazenamento de estado
 
-Além de métodos de acesso a estado type-safe (gerados pelo KSP).
+Além de métodos de acesso a estado type-safe (gerados por KSP).
 
 ---
 
@@ -112,15 +112,15 @@ Um wizard é definido como uma classe ou objeto anotado com `@WizardHandler`:
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... implementação da etapa
+        // ... implementação do passo
     }
 
     object AgeStep : WizardStep {
-        // ... implementação da etapa
+        // ... implementação do passo
     }
 
     object FinishStep : WizardStep {
-        // ... implementação da etapa
+        // ... implementação do passo
     }
 }
 ```
@@ -128,9 +128,9 @@ object SurveyWizard {
 #### Parâmetros de Anotação
 
 **`@WizardHandler`** aceita:
-- **`trigger: Array<String>`**: Comandos que iniciam o wizard (e.g., `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: Tipos de atualização para escutar (padrão: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Classes de gerenciador de estado para armazenar dados de etapa
+- **`trigger: Array<String>`**: Comandos que iniciam o wizard (ex: `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Tipos de update para escutar (padrão: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Classes de gerenciador de estado para armazenar dados de passo
 
 ---
 
@@ -138,7 +138,7 @@ object SurveyWizard {
 
 #### WizardStateManager
 
-O estado é armazenado usando implementações de `WizardStateManager<T>`. Cada gerenciador lida com um tipo específico:
+Estado é armazenado usando implementações de `WizardStateManager<T>`. Cada gerenciador lida com um tipo específico:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -152,7 +152,7 @@ Veja também: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/tele
 
 #### Correspondência Automática
 
-KSP corresponde etapas a gerenciadores de estado baseado no tipo de retorno do `store()`:
+KSP corresponde passos a gerenciadores de estado baseado no tipo de retorno de `store()`:
 
 ```kotlin
 @WizardHandler(
@@ -174,9 +174,9 @@ object SurveyWizard {
 }
 ```
 
-#### Substituição Por Etapa
+#### Substituição por Passo
 
-Substitua o gerenciador de estado para uma etapa específica usando `@WizardHandler.StateManager`:
+Substitua o gerenciador de estado para um passo específico usando `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -197,16 +197,16 @@ object SurveyWizard {
 
 ---
 
-### Acesso Type-Safe ao Estado
+### Acesso Type-Safe a Estado
 
-KSP gera funções de extensão type-safe em `WizardContext` para cada etapa que armazena estado.
+KSP gera funções de extensão type-safe em `WizardContext` para cada passo que armazena estado.
 
 #### Funções Geradas
 
-Para uma etapa que armazena uma `String`:
+Para um passo que armazena uma `String`:
 
 ```kotlin
-// Gerado automaticamente pelo KSP
+// Gerado automaticamente por KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
@@ -217,10 +217,10 @@ suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Acesso type-safe - retorna String? (nulável)
+        // Acesso type-safe - retorna String? (nuloável)
         val name: String? = ctx.getState<NameStep>()
 
-        // Acesso type-safe - retorna Int? (nulável)
+        // Acesso type-safe - retorna Int? (nuloável)
         val age: Int? = ctx.getState<AgeStep>()
 
         val summary = buildString {
@@ -241,7 +241,7 @@ object FinishStep : WizardStep {
 
 #### Métodos de Fallback
 
-Se os métodos type-safe não estiverem disponíveis, use os métodos de fallback:
+Se métodos type-safe não estiverem disponíveis, use os métodos de fallback:
 
 ```kotlin
 // Fallback - retorna Any?
@@ -327,7 +327,7 @@ object RegistrationWizard {
 
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // Acesso type-safe ao estado
+            // Acesso type-safe a estado
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
 
@@ -336,7 +336,7 @@ object RegistrationWizard {
                 appendLine("Nome: $name")
                 appendLine("Idade: $age")
                 appendLine()
-                appendLine("Responda 'sim' para confirmar ou 'não' para começar de novo.")
+                appendLine("Responda 'sim' para confirmar ou 'não' para recomeçar.")
             }
 
             message { confirmation }.send(ctx.user, ctx.bot)
@@ -350,7 +350,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "sim" -> Transition.Finish
-                "não" -> Transition.JumpTo(NameStep::class) // Começar de novo
+                "não" -> Transition.JumpTo(NameStep::class) // Recomeçar
                 else -> Transition.Retry
             }
         }
@@ -395,9 +395,9 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### Etapas Sem Estado
+#### Passos Stateless
 
-Etapas não precisam armazenar estado. Simplesmente retorne `null` do `store()` (ou mantenha como está):
+Passos não precisam armazenar estado. Simplesmente retorne `null` de `store()` (ou mantenha como está):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
@@ -447,25 +447,25 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 KSP gera:
 
-1. **WizardActivity**: Uma implementação concreta estendendo `WizardActivity` com etapas hardcoded
-2. **Start Activity**: Lida com o comando trigger e inicia o wizard
-3. **Input Activity**: Lida com entrada do usuário durante o fluxo do wizard
-4. **State Accessors**: Funções de extensão type-safe para acesso ao estado
+1. **WizardActivity**: Uma implementação concreta estendendo `WizardActivity` com passos hardcoded
+2. **Start Activity**: Lida com o trigger de comando e inicia o wizard
+3. **Input Activity**: Lida com entrada do usuário durante o fluxo wizard
+4. **State Accessors**: Funções de extensão type-safe para acesso a estado
 
 #### Fluxo
 
-1. Usuário envia `/register` → Start Activity é invocado
+1. Usuário envia `/register` → Start Activity é invocada
 2. Start Activity cria `WizardContext` e chama `wizardActivity.start(ctx)`
-3. `start()` entra na etapa inicial e define `inputListener` para rastrear a etapa atual
-4. Usuário envia uma mensagem → Input Activity é invocado
+3. `start()` entra no passo inicial e define `inputListener` para rastrear o passo atual
+4. Usuário envia uma mensagem → Input Activity é invocada
 5. Input Activity chama `wizardActivity.handleInput(ctx)`
-6. `handleInput()` valida entrada, persiste estado e transita para a próxima etapa
+6. `handleInput()` valida entrada, persiste estado e transita para o próximo passo
 7. Processo se repete até `Transition.Finish` ser retornado
 
 #### Persistência de Estado
 
 - Estado é persistido após validação bem-sucedida (antes da transição)
-- O valor de retorno do `store()` de cada etapa é salvo usando o `WizardStateManager` correspondente
+- O valor de retorno de `store()` de cada passo é salvo usando o `WizardStateManager` correspondente
 - Estado é escopo por usuário e chat (`UserChatReference`)
 
 ---
@@ -483,7 +483,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. Trate Erros de Validação Graciosamente
+#### 2. Trate Erros de Validação com Elegância
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,7 +494,7 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. Use Acesso Type-Safe ao Estado
+#### 3. Use Acesso Type-Safe a Estado
 
 Prefira métodos type-safe gerados:
 
@@ -506,23 +506,23 @@ val name: String? = ctx.getState<NameStep>()
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. Mantenha Etapas Focadas
+#### 4. Mantenha Passos Focados
 
-Cada etapa deve ter uma única responsabilidade:
+Cada passo deve ter uma única responsabilidade:
 
 ```kotlin
-// ✅ Bom - etapa focada
+// ✅ Bom - passo focado
 object EmailStep : WizardStep {
     // Apenas lida com coleta de email
 }
 
-// ❌ Evite - lógica demais
+// ❌ Evite - muita lógica
 object PersonalInfoStep : WizardStep {
     // Lida com nome, email, telefone, endereço...
 }
 ```
 
-#### 5. Use Nomes Significativos para Etapas
+#### 5. Use Nomes Significativos para Passos
 
 ```kotlin
 // ✅ Bom
@@ -539,11 +539,11 @@ Se precisar limpar estado manualmente:
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Limpar todo estado do wizard
+        // Limpar todo estado wizard
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
 
-        message { "Registro cancelado." }.send(ctx.user, ctx.bot)
+        message { "Cadastro cancelado." }.send(ctx.user, ctx.bot)
     }
 }
 ```
@@ -553,13 +553,13 @@ object CancelStep : WizardStep {
 ### Resumo
 
 O sistema Wizard fornece:
-- ✅ **Type-safe** gerenciamento de estado com verificação em tempo de compilação
-- ✅ **Declarativo** definições de etapas como classes aninhadas
-- ✅ **Flexível** transições com lógica condicional
-- ✅ **Automático** geração de código via KSP
-- ✅ **Integrado** com o sistema Activity existente
-- ✅ **Plugável** backends de armazenamento de estado
+- ✅ **Gerenciamento type-safe** de estado com verificação em tempo de compilação
+- ✅ **Definições declarativas** de passos como classes aninhadas
+- ✅ **Transições flexíveis** com lógica condicional
+- ✅ **Geração automática** de código via KSP
+- ✅ **Integração** com o sistema Activity existente
+- ✅ **Backends de armazenamento** plugáveis
 
-Comece a construir wizards anotando uma classe com `@WizardHandler` e definindo suas etapas como objetos `WizardStep` aninhados!
-se você tiver alguma dúvida entre em contato conosco no chat, teremos prazer em ajudar :)
+Comece a construir wizards anotando uma classe com `@WizardHandler` e definindo seus passos como objetos `WizardStep` aninhados!
+se você tiver alguma dúvida entre em contato conosco no chat, ficaremos felizes em ajudar :)
 ---

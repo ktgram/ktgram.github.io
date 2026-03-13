@@ -1,38 +1,38 @@
 ---
 ---
-title: Interceptors (Middleware)
+title: Interceptores (Middleware)
 ---
 
-### Interceptors: Lógica Cross-Cutting para seu Bot
+### Interceptores: Lógica de Corte Transversal para seu Bot
 
-Ao construir um bot Telegram, você frequentemente repete configuração, verificações ou limpeza entre handlers. Os interceptors permitem que você insira lógica compartilhada ao redor dos handlers, mantendo-os focados e manuteníveis.
+Ao construir um bot do Telegram, você frequentemente repete configuração, verificações ou limpeza entre manipuladores. Os interceptores permitem que você insira lógica compartilhada ao redor dos manipuladores, mantendo-os focados e manuteníveis.
 
-Aqui está como os interceptors funcionam no *telegram-bot* e como usá-los.
+Aqui está como os interceptores funcionam no *telegram-bot* e como usá-los.
 
-### O que são Interceptors? (Explicação Simples)
+### O que são Interceptores? (Explicação Simples)
 
-Interceptors são funções que executam em pontos específicos do pipeline de processamento de updates. Eles permitem que você:
+Interceptores são funções que executam em pontos específicos no pipeline de processamento de atualizações. Eles permitem que você:
 - Inspecione e modifique o contexto de processamento
-- Adicione lógica cross-cutting (logging, auth, métricas)
+- Adicione lógica de corte transversal (log, autenticação, métricas)
 - Pare o processamento antecipadamente se necessário
 - Limpe recursos após o processamento
 
-Pense nos interceptors como checkpoints que todo update passa antes, durante e após a execução do handler.
+Pense nos interceptores como checkpoints que toda atualização passa antes, durante e após a execução do manipulador.
 
 
 ### O Pipeline de Processamento
 
-O bot processa updates através de um pipeline com sete fases:
+O bot processa atualizações através de um pipeline com sete fases:
 
-| Fase | Quando é executado | Para que você pode usá-lo |
+| Fase | Quando Executa | Para que Você Pode Usá-lo |
 |-------|--------------|-------------------------|
-| **Setup** | Assim que o update chega, antes de qualquer processamento | ✔ Rate limiting global<br>✔ Filtrar spam ou updates malformados<br>✔ Logging inicial<br>✔ Configurar contexto compartilhado |
-| **Parsing** | Após o setup, extrai comando e parâmetros | ✔ Parsing de comandos customizado<br>✔ Enriquecer contexto com dados parseados<br>✔ Validar estrutura do update |
-| **Match** | Encontra o handler apropriado (Command/Input/Common) | ✔ Sobrescrever seleção de handler<br>✔ Lógica customizada de input handling<br>✔ Log de handlers correspondidos |
-| **Validation** | Após o handler ser encontrado, antes da invocação | ✔ Permissões específicas do handler<br>✔ Rate limiting por handler<br>✔ Guard checks<br>✔ Cancelar processamento se condições não forem atendidas |
-| **PreInvoke** | Imediatamente antes do handler rodar | ✔ Últimas verificações<br>✔ Iniciar timers/métricas<br>✔ Enriquecer contexto para o handler<br>✔ Modificar comportamento do handler |
-| **Invoke** | O handler é executado aqui | ✔ Wrapper na execução do handler<br>✔ Tratamento de erros<br>✔ Logging de resultados do handler |
-| **PostInvoke** | Após o handler completar (sucesso ou falha) | ✔ Limpar recursos<br>✔ Log de resultados<br>✔ Enviar mensagens de fallback em erros<br>✔ Modificar resultados antes de retornar |
+| **Setup** | Assim que a atualização chega, antes de qualquer processamento | ✔ Rate limiting global<br>✔ Filtrar spam ou atualizações malformadas<br>✔ Log inicial<br>✔ Configurar contexto compartilhado |
+| **Parsing** | Após o setup, extrai comando e parâmetros | ✔ Parsing personalizado de comandos<br>✔ Enriquecer contexto com dados parseados<br>✔ Validar estrutura da atualização |
+| **Match** | Encontra o manipulador apropriado (Command/Input/Common) | ✔ Sobrescrever seleção de manipulador<br>✔ Lógica personalizada de manipulação de entrada<br>✔ Log de manipuladores correspondidos |
+| **Validation** | Após o manipulador ser encontrado, antes da invocação | ✔ Permissões específicas do manipulador<br>✔ Rate limiting por manipulador<br>✔ Verificações de guarda<br>✔ Cancelar processamento se condições não forem atendidas |
+| **PreInvoke** | Imediatamente antes do manipulador executar | ✔ Últimas verificações<br>✔ Iniciar temporizadores/métricas<br>✔ Enriquecer contexto para o manipulador<br>✔ Modificar comportamento do manipulador |
+| **Invoke** | O manipulador é executado aqui | ✔ Envolve execução do manipulador<br>✔ Tratamento de erros<br>✔ Log de resultados do manipulador |
+| **PostInvoke** | Após o manipulador completar (sucesso ou falha) | ✔ Limpar recursos<br>✔ Log de resultados<br>✔ Enviar mensagens de fallback em erros<br>✔ Modificar resultados antes de retornar |
 
 
 ### Criando um Interceptor
@@ -49,7 +49,7 @@ val myInterceptor: PipelineInterceptor = { context ->
 }
 ```
 
-Ou usando lambda:
+Ou usando uma lambda:
 
 ```kotlin
 val loggingInterceptor = PipelineInterceptor { context ->
@@ -59,9 +59,9 @@ val loggingInterceptor = PipelineInterceptor { context ->
 ```
 
 
-### Registrando Interceptors
+### Registrando Interceptores
 
-Registre interceptors no pipeline de processamento:
+Registre interceptores no pipeline de processamento:
 
 ```kotlin
 suspend fun main() {
@@ -80,12 +80,12 @@ suspend fun main() {
     // Registra um interceptor para a fase PreInvoke
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
-        // store start time
+        // armazenar tempo inicial
     }
 
     // Registra um interceptor para a fase PostInvoke
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
-        val startTime = // get start time
+        val startTime = // obter tempo inicial
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             println("Handler took ${duration}ms")
@@ -98,7 +98,7 @@ suspend fun main() {
 
 ### Exemplo Real: Autenticação & Métricas
 
-Exemplo: um bot que requer autenticação para certos comandos, mede tempo de execução dos handlers e loga todos os comandos.
+Exemplo: um bot que requer autenticação para certos comandos, mede tempo de execução do manipulador e loga todos os comandos.
 
 ```kotlin
 suspend fun main() {
@@ -115,12 +115,12 @@ suspend fun main() {
         }
     }
 
-    // Fase PreInvoke: Inicia timer e verifica permissões
+    // Fase PreInvoke: Iniciar temporizador e verificar permissões
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
 
-        // Verifica se usuário tem permissão para este handler específico
+        // Verifica se usuário tem permissão para este manipulador específico
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
@@ -128,14 +128,14 @@ suspend fun main() {
             return@intercept
         }
 
-        // Iniciar timer
-        // store start time
+        // Iniciar temporizador
+        // armazenar tempo inicial
     }
 
-    // Fase PostInvoke: Log e cleanup
+    // Fase PostInvoke: Log e limpeza
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
-        val startTime = // get start time
+        val startTime = // obter tempo inicial
 
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
@@ -156,12 +156,12 @@ suspend fun main() {
 
 O `ProcessingContext` fornece acesso a:
 
-- **`update: ProcessedUpdate`** - O update atual sendo processado
+- **`update: ProcessedUpdate`** - A atualização atual sendo processada
 - **`bot: TelegramBot`** - A instância do bot
-- **`registry: ActivityRegistry`** - O registry de activities
-- **`parsedInput: String`** - O texto parseado de comando/input
+- **`registry: ActivityRegistry`** - O registry de atividades
+- **`parsedInput: String`** - O texto do comando/entrada parseado
 - **`parameters: Map<String, String>`** - Parâmetros do comando parseados
-- **`activity: Activity?`** - O handler resolvido (null até a fase Match)
+- **`activity: Activity?`** - O manipulador resolvido (nulo até a fase Match)
 - **`shouldProceed: Boolean`** - Se o processamento deve continuar
 - **`additionalContext: AdditionalContext`** - Dados de contexto adicionais
 - **`finish()`** - Para processamento antecipadamente
@@ -173,27 +173,27 @@ Chame `context.finish()` para parar processamento:
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
     if (someCondition) {
-        context.finish() // Nenhuma fase posterior será executada
+        context.finish() // Nenhuma fase subsequente executará
     }
 }
 ```
 
-#### Armazenando Dados Customizados
+#### Armazenando Dados Personalizados
 
-Use `additionalContext` para passar dados entre interceptors:
+Use `additionalContext` para passar dados entre interceptores:
 
 ```kotlin
-// No PreInvoke
+// Em PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// No PostInvoke
+// Em PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
 
-### Múltiplos Interceptors
+### Múltiplos Interceptores
 
-Você pode registrar múltiplos interceptors para a mesma fase. Eles executam na ordem de registro:
+Você pode registrar múltiplos interceptores para a mesma fase. Eles executam na ordem de registro:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
@@ -204,27 +204,27 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     println("Second interceptor")
 }
 
-// Quando um update é processado:
+// Quando uma atualização é processada:
 // Output: "First interceptor"
 // Output: "Second interceptor"
 ```
 
-Se um interceptor chama `context.finish()`, interceptors subsequentes naquela fase são pulados, e fases posteriores não serão executadas.
+Se um interceptor chamar `context.finish()`, os interceptores subsequentes naquela fase são pulados, e fases posteriores não executarão.
 
 
-### Boas Práticas
+### Melhores Práticas
 
 #### 1. Use a Fase Correta
 
 - Setup: Verificações globais, filtragem, configuração inicial
-- Parsing: Lógica de parsing customizada
-- Match: Lógica de seleção de handler
-- Validation: Permissões, rate limits, guards
-- PreInvoke: Preparação específica do handler
-- Invoke: Geralmente manipulado pelo interceptor padrão
-- PostInvoke: Cleanup, logging, tratamento de erros
+- Parsing: Lógica personalizada de parsing
+- Match: Lógica de seleção de manipulador
+- Validation: Permissões, rate limits, verificações de guarda
+- PreInvoke: Preparação específica do manipulador
+- Invoke: Geralmente tratado pelo interceptor padrão
+- PostInvoke: Limpeza, log, tratamento de erros
 
-#### 2. Mantenha Interceptors Focados
+#### 2. Mantenha Interceptores Focados
 
 Cada interceptor deve fazer uma coisa:
 
@@ -239,7 +239,7 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
 // ❌ Evite - fazendo muito
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     // Autenticação
-    // Logging
+    // Log
     // Métricas
     // Rate limiting
     // ... muito!
@@ -248,7 +248,7 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
 
 #### 3. Trate Erros Graciosamente
 
-Interceptors não devem quebrar o bot:
+Interceptores não devem travar o bot:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
@@ -264,7 +264,7 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
 
 #### 4. Limpe Recursos
 
-Se você abre recursos no `PreInvoke`, limpe-os no `PostInvoke`:
+Se você abrir recursos em `PreInvoke`, limpe-os em `PostInvoke`:
 
 ```kotlin
 var timer: Timer? = null
@@ -282,7 +282,7 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 
 #### 5. Ordem Importa
 
-Registre interceptors na ordem que você quer que eles executem:
+Registre interceptores na ordem que você quer que executem:
 
 ```kotlin
 // Verificações mais gerais primeiro
@@ -292,46 +292,46 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) {
 
 // Verificações mais específicas depois
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) {
-    // Verificação de permissão específica do handler
+    // Verificação de permissão específica do manipulador
 }
 ```
 
-#### 6. Use Interceptors para Cross-Cutting Concerns
+#### 6. Use Interceptores para Preocupações de Corte Transversal
 
-Interceptors são ideais para:
+Interceptores são ideais para:
 - ✅ Autenticação/autorização
-- ✅ Logging
-- ✅ Monitoramento de métricas/performance
+- ✅ Log
+- ✅ Monitoramento de métricas/desempenho
 - ✅ Rate limiting
 - ✅ Tratamento de erros
-- ✅ Transformação de request/response
+- ✅ Transformação de requisição/resposta
 
-Para lógica específica do handler, mantenha no handler.
+Para lógica específica do manipulador, mantenha no manipulador.
 
 
-### Interceptors Padrão
+### Interceptores Padrão
 
-O framework inclui interceptors padrão para funcionalidade core:
+O framework inclui interceptores padrão para funcionalidade core:
 
 - **DefaultSetupInterceptor**: Rate limiting global
 - **DefaultParsingInterceptor**: Parsing de comandos
-- **DefaultMatchInterceptor**: Matching de handlers (commands, inputs, common matchers)
-- **DefaultValidationInterceptor**: Guard checks e rate limiting por handler
-- **DefaultInvokeInterceptor**: Execução de handler e tratamento de erros
+- **DefaultMatchInterceptor**: Correspondência de manipuladores (comandos, entradas, matchers comuns)
+- **DefaultValidationInterceptor**: Verificações de guarda e rate limiting por manipulador
+- **DefaultInvokeInterceptor**: Execução de manipulador e tratamento de erros
 
-Seus interceptors customizados rodam ao lado desses defaults. Você pode adicionar lógica antes ou depois dos defaults, mas não pode remover os interceptors padrão.
+Seus interceptores personalizados executam ao lado desses padrões. Você pode adicionar lógica antes ou depois dos padrões, mas não pode remover os interceptores padrão.
 
 ---
 
-### Avançado: Interceptors Condicionais
+### Avançado: Interceptores Condicionais
 
-Você pode tornar interceptors condicionais:
+Você pode tornar interceptores condicionais:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
 
-    // Apenas aplicar a handlers específicos
+    // Aplicar apenas a manipuladores específicos
     if (activity::class.simpleName?.contains("Admin") == true) {
         // Lógica específica de admin
         checkAdminPermissions(context)
@@ -342,20 +342,20 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
 
 ### Resumo
 
-Interceptors fornecem uma maneira limpa de adicionar lógica cross-cutting ao seu bot:
+Interceptores fornecem uma maneira limpa de adicionar lógica de corte transversal ao seu bot:
 
 - ✅ **Sete fases** para diferentes estágios de processamento
 - ✅ **API simples**: Basta implementar `PipelineInterceptor`
-- ✅ **Flexível**: Registre múltiplos interceptors por fase
+- ✅ **Flexível**: Registre múltiplos interceptores por fase
 - ✅ **Poderoso**: Acesso ao contexto completo de processamento
 - ✅ **Seguro**: Pode parar processamento antecipadamente com `context.finish()`
 
-Use interceptors para manter seus handlers focados na lógica de negócio enquanto lida com preocupações compartilhadas como autenticação, logging e métricas de forma centralizada.
+Use interceptores para manter seus manipuladores focados na lógica de negócio enquanto lida com preocupações compartilhadas como autenticação, log e métricas de forma centralizada.
 
 ---
 
 ### Veja também
 
-* [Functional Handling DSL](Functional-handling-DSL.md) - Processamento de updates funcional
-* [Guards](Guards.md) - Verificações de permissão no nível do handler
+* [Functional Handling DSL](Functional-handling-DSL.md) - Processamento funcional de atualizações
+* [Guards](Guards.md) - Verificações de permissão em nível de manipulador
 ---

@@ -3,7 +3,7 @@
 title: F.A.Q
 ---
 
-### `AbstractMethodError` exception
+### Pengecualian `AbstractMethodError`
 
 Jika Anda mendapatkan pengecualian seperti ini saat startup aplikasi Anda:
 
@@ -12,13 +12,13 @@ Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-Hal ini terjadi karena sistem build Anda menggunakan library serialisasi lama yang mekanisme internalnya berbeda.
+Ini terjadi karena sistem build Anda menggunakan library serialisasi lama yang mekanisme internalnya berbeda.
 Untuk mengatasinya, Anda harus membuatnya menggunakan versi yang lebih baru, misalnya dengan menambahkan ini ke buildscript Anda:
 
 ```kotlin
 configurations.all {
     resolutionStrategy.eachDependency {
-        val serdeVer = "x.x.x" // should be >= 1.8.0
+        val serdeVer = "x.x.x" // harus >= 1.8.0
         when(requested.module.toString()) {
             // json serialiazaton
             "org.jetbrains.kotlinx:kotlinx-serialization-json" -> useVersion(serdeVer)
@@ -31,19 +31,19 @@ configurations.all {
 }
 ```
 
-(Jika ini sudah dijelaskan dengan baik di changelog, saya tidak akan pernah memutakhirkannya karena saya mendapat banyak laporan tentang masalah ini)
+(Jika ini dijelaskan dengan baik di changelog, saya tidak akan pernah memutakhirkannya karena saya mendapat begitu banyak laporan tentang masalah ini)
 
-### Bagaimana cara mendapatkan respons dari method?
+### Bagaimana cara mendapatkan respons dari metode?
 
-Untuk mendapatkan respons dan dapat mengoperasikannya, Anda perlu menggunakan `sendReturning` di akhir method sebagai ganti `send`.
+Untuk mendapatkan respons dan dapat mengoperasikannya, Anda perlu menggunakan `sendReturning` di akhir metode sebagai ganti `send`.
 
-Dalam hal ini, class `Response` dikembalikan, yang berisi respons, keberhasilan atau kegagalan, selanjutnya Anda perlu menangani kegagalan atau cukup panggil `getOrNull()`.
+Dalam hal ini, kelas `Response` dikembalikan, yang berisi respons, sukses atau gagal, selanjutnya Anda perlu menangani kegagalan atau cukup memanggil `getOrNull()`.
 
-Ada bagian tentang: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
+Ada bagian tentang: [Memproses respons](https://github.com/vendelieu/telegram-bot#processing-responses).
 
 ### Saya mendapatkan error saat menggunakan `spring-boot-devtools`
 
-Hal ini terjadi karena `spring-boot-devtools` memiliki `classloader` sendiri dan tidak menemukan method.
+Ini terjadi karena `spring-boot-devtools` memiliki `classloader` sendiri dan tidak menemukan metode.
 
 Anda perlu menambahkan ke `resources/META-INF/spring-devtools.properties`:
 
@@ -51,17 +51,17 @@ Anda perlu menambahkan ke `resources/META-INF/spring-devtools.properties`:
 restart.include.generated=/eu.vendeli
 ```
 
-### Bagaimana cara mengubah engine ktor
+### Cara mengubah engine ktor
 
-Jika Anda ingin mengubah engine yang digunakan oleh client, Anda dapat dengan mudah mengubah [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) di [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
+Jika Anda ingin mengubah engine yang digunakan oleh klien, Anda dapat dengan mudah mengubah [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) di [pengaturan plugin](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-### Bagaimana cara menggunakan logging provider favorit saya
+### Cara menggunakan logging provider favorit saya
 
-Library menggunakan `slf4j-api` dan untuk menggunakan provider, Anda hanya perlu menambahkannya ke dependencies.
+Library menggunakan `slf4j-api` dan untuk menggunakan provider, Anda hanya perlu menambahkannya ke dependensi.
 
 Plugin library secara otomatis mendeteksi penggunaan provider, jika provider tidak ada, `logback` akan digunakan secara default.
 
-### Menangkap network exceptions dalam long-polling handler
+### Menangkap exception jaringan dalam handler long-polling
 
 Misalnya jika Anda memiliki koneksi yang tidak stabil dan perlu menangkap error karena ini, mungkin pendekatan ini akan membantu Anda:
 
@@ -81,5 +81,3 @@ fun main() {
 ```
 
 Anda juga dapat melihat bagaimana ini dilakukan di [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
-
----

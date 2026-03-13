@@ -1,11 +1,11 @@
 ---
 ---
-title: به‌روزرسانی پارسینگ
+title: به‌روزرسانی تجزیه
 ---
 
-### بار متنی
+### محتوای متنی
 
-برخی از به‌روزرسانی‌ها ممکن است بار متنی داشته باشند که می‌توان آن‌ها را برای پردازش بیشتر تجزیه کرد. بیایید به آن‌ها نگاهی بیندازیم:
+برخی از به‌روزرسانی‌ها ممکن است حاوی محتوای متنی باشند که برای پردازش بیشتر قابل تجزیه هستند. بیایید به آن‌ها نگاهی بیندازیم:
 
 * `MessageUpdate` -> `message.text`
 * `EditedMessageUpdate` -> `editedMessage.text`
@@ -19,15 +19,15 @@ title: به‌روزرسانی پارسینگ
 * `PollUpdate` -> `poll.question`
 * `PurchasedPaidMediaUpdate` -> `purchasedPaidMedia.paidMediaPayload`
 
-از به‌روزرسانی‌های فهرست شده، یک پارامتر خاص انتخاب و به عنوان [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html) برای پردازش بیشتر در نظر گرفته می‌شود.
+از به‌روزرسانی‌های لیست شده، یک پارامتر خاص انتخاب شده و به عنوان [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html) در نظر گرفته شده و برای تجزیه بیشتر استفاده می‌شود.
 
-### پارسینگ
+### تجزیه
 
-پارامترهای انتخاب شده با جداکننده‌های پیکربندی شده مناسب به دستور و پارامترهای آن تجزیه می‌شوند.
+پارامترهای انتخاب شده با جداکننده‌های پیکربندی شده مناسب به فرمان و پارامترهای آن تجزیه می‌شوند.
 
-پیکربندی بلوک [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/command-parsing.html) را مشاهده کنید.
+پیکربندی [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/command-parsing.html) را مشاهده کنید.
 
-می‌توانید در نمودار زیر ببینید کدام کامپوننت‌ها به کدام بخش از تابع هدف نگاشت شده‌اند.
+در نمودار زیر می‌توانید ببینید کدام کامپوننت‌ها به کدام بخش از تابع هدف نگاشت شده‌اند.
 
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/7489099a-cca8-4049-a374-efaf6ce52128" alt="نمودار تجزیه متن" />
@@ -35,13 +35,13 @@ title: به‌روزرسانی پارسینگ
 
 ### @ParamMapping
 
-همچنین یک انتزاع به نام [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) برای راحتی یا هر مورد خاصی وجود دارد.
+برای راحتی یا هر مورد خاص، یک آنوتشن به نام [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) نیز وجود دارد.
 
-به شما اجازه می‌دهد نام پارامتر را از متن ورودی به هر پارامتری نگاشت کنید.
+این آنوتشن به شما امکان می‌دهد نام پارامتر از متن ورودی را به هر پارامتری نگاشت دهید.
 
-این همچنین برای زمانی که داده ورودی شما محدود است راحت است، به عنوان مثال `CallbackData` (64 کاراکتر).
+این کار همچنین برای زمانی که داده ورودی شما محدود است، مانند `CallbackData` (64 کاراکتر)، راحت است.
 
-مثال استفاده را مشاهده کنید:
+مثالی از کاربرد را مشاهده کنید:
 `greeting?name=Adam`
 
 ```kotlin
@@ -51,10 +51,10 @@ suspend fun greeting(@ParamMapping("name") anyParameterName: String, user: User,
 }
 ```
 
-و همچنین می‌تواند برای گرفتن پارامترهای بدون نام استفاده شود، در مواردی که پارس‌گر طوری تنظیم شده که نام پارامترها رد شوند یا حتی وجود نداشته باشند، که با الگوی 'param_n' عبور می‌کند، جایی که `n` توالی آن است.
+همچنین می‌تواند برای گرفتن پارامترهای بدون نام استفاده شود، در مواردی که تجزیه‌گر به گونه‌ای تنظیم شده باشد که نام پارامترها رد می‌شوند یا حتی وجود نداشته باشند، که با الگوی 'param_n' عبور می‌کند، که در آن `n` توالی آن است.
 
-برای مثال متن زیر - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`، به این صورت تجزیه می‌شود:
-* دستور - `myCommand`
+برای مثال، این متن - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`، به این صورت تجزیه می‌شود:
+* فرمان - `myCommand`
 * پارامترها
   * `p1` = `v1`
   * `param_2` = `v2`
@@ -62,13 +62,13 @@ suspend fun greeting(@ParamMapping("name") anyParameterName: String, user: User,
   * `p4` = `v4`
   * `p5` = ``
 
-همان‌طور که می‌بینید از آنجا که پارامتر دوم نام اعلام شده ندارد، به عنوان `param_2` نمایش داده می‌شود.
+همان‌طور که می‌بینید از آنجا که پارامتر دوم نام اعلام شده ندارد، به عنوان `param_2` نمایش داده شده است.
 
-پس می‌توانید نام متغیرها را در کالبک خود کوتاه کنید و از نام‌های خوانا و روشن در کد استفاده کنید.
+بنابراین می‌توانید نام متغیرها را در کال‌بک خود مخفی کنید و از نام‌های قابل خواندن واضح در کد استفاده کنید.
 
-### Deeplink
+### لینک عمیق
 
-با توجه به اطلاعات بالا، اگر در دستور start خود deeplink انتظار دارید می‌توانید آن را با:
+با توجه به اطلاعات بالا، اگر در فرمان شروع خود انتظار لینک عمیق دارید، می‌توانید آن را به این صورت بگیرید:
 
 ```kotlin
 @CommandHandler(["/start"])
@@ -77,14 +77,12 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 }
 ```
 
-بگیرید.
+### فرمان‌های گروهی
 
-### دستورات گروهی
-
-در پیکربندی `commandParsing` ما پارامتر [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) داریم که وقتی روشن است، می‌توانیم از `TelegramBot.identifier` (فراموش نکنید که اگر از پارامتر توصیف شده استفاده می‌کنید آن را تغییر دهید) در فرآیند تطبیق دستور استفاده کنیم، این به جداسازی دستورات مشابه بین چندین ربات کمک می‌کند، در غیر این صورت بخش `@MyBot` صرفاً رد می‌شود.
+در پیکربندی `commandParsing` ما پارامتری به نام [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) داریم که وقتی فعال باشد، می‌توانیم از `TelegramBot.identifier` (فراموش نکنید که اگر از این پارامتر استفاده می‌کنید آن را تغییر دهید) در فرآیند تطبیق فرمان استفاده کنیم، این کار به جداسازی فرمان‌های مشابه بین چندین ربات کمک می‌کند، در غیر این صورت بخش `@MyBot` صرفاً رد خواهد شد.
 
 ### همچنین ببینید
 
 * [فعال‌سازی فعالیت](Activity-invocation.md)
-* [فعالیت‌ها و پردازش‌گرها](Activites-and-Processors.md)
+* [فعالیت‌ها و پردازنده‌ها](Activites-and-Processors.md)
 * [اقدامات](Actions.md)

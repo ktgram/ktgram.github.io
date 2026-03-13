@@ -1,46 +1,46 @@
 ---
 ---
-عنوان: Fsm And Conversation Handling
+title: Fsm And Conversation Handling
 ---
 
-کتابخانه همچنین از مکانیزم FSM پشتیبانی می‌کند، که مکانیزمی برای پردازش تدریجی ورودی کاربر با مدیریت ورودی نادرست است.
+The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
 > [!NOTE]
-> TL;DR: نمونه را [در اینجا](https://github.com/vendelieu/telegram-bot_template/tree/conversation) ببینید.
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### در تئوری
+### In theory
 
-بیایید یک موقعیت را تصور کنیم که شما نیاز به جمع‌آوری یک نظرسنجی از کاربر دارید، می‌توانید تمام داده‌های یک شخص را در یک مرحله بپرسید، اما با ورودی نادرست یکی از پارامترها، هم برای کاربر و هم برای ما دشوار خواهد بود، و هر مرحله ممکن است متفاوت باشد بسته به داده‌های ورودی خاص.
+Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
 
-حال بیایید ورودی گام‌به‌گام داده‌ها را تصور کنیم، جایی که ربات وضعیت گفت‌وگو با کاربر را وارد می‌کند.
+Now let's imagine step-by-step input of data, where the bot enters dialogue mode with the user.
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="نمودار فرآیند مدیریت" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-پیکان‌های سبز فرآیند گذار از مرحله به مرحله بدون خطا را نشان می‌دهند، پیکان‌های آبی به معنای ذخیره وضعیت فعلی و منتظر ورودی مجدد است (برای مثال اگر کاربر اشاره کرد که سن او -100 سال است، باید دوباره از سن بپرسد)، و قرمزها خروج از کل فرآیند به دلیل هر دستوری یا هر معنای لغو دیگری را نشان می‌دهند.
+Green arrows indicate the process of transitioning through steps without errors, blue arrows mean saving the current state and waiting for re-input (for example, if the user indicated that he is -100 years old, it should ask for age again), and red ones show exit from the entire process due to any command or any other meaning cancellation.
 
-### در عمل
+### In practice
 
-سیستم Wizard تعامل‌های چندمرحله‌ای کاربر را در ربات‌های تلگرام فعال می‌کند. کاربران را از طریق یک توالی مراحل راهنمایی می‌کند، ورودی را تأیید می‌کند، وضعیت را ذخیره می‌کند و بین مراحل گذار می‌کند.
+The Wizard system enables multi-step user interactions in Telegram bots. It guides users through a sequence of steps, validates input, stores state, and transitions between steps.
 
-**مزایای کلیدی:**
-- **تایپ ایمن**: بررسی تایپ در زمان کامپایل برای دسترسی به وضعیت
-- **اعلامی**: مراحل را به عنوان کلاس‌های تو در تو تعریف کنید
-- **انعطاف‌پذیر**: پشتیبانی از گذارهای شرطی، پرش‌ها و تلاش مجدد
-- **وضعیت‌دار**: پایداری خودکار وضعیت با ذخیره‌سازی backend قابل plug-in
-- **یکپارچه**: با سیستم فعالیت موجود کار می‌کند
+**Key Benefits:**
+- **Type-safe**: Compile-time type checking for state access
+- **Declarative**: Define steps as nested classes/objects
+- **Flexible**: Support for conditional transitions, jumps, and retries
+- **Stateful**: Automatic state persistence with pluggable storage backends
+- **Integrated**: Works with the existing Activity system
 
-### مفاهیم پایه
+### Core Concepts
 
 #### WizardStep
 
-یک `WizardStep` یک مرحله منفرد در جریان wizard را نشان می‌دهد. هر مرحله باید پیاده‌سازی کند:
+A `WizardStep` represents a single step in the wizard flow. Each step must implement:
 
-- **`onEntry(ctx: WizardContext)`**: زمانی که کاربر وارد این مرحله می‌شود فراخوانی می‌شود. از این برای درخواست از کاربر استفاده کنید.
-- **`onRetry(ctx: WizardContext)`**: زمانی که تأیید ناموفق بوده و مرحله باید تلاش مجدد کند فراخوانی می‌شود. از این برای نمایش پیام‌های خطا استفاده کنید.
-- **`validate(ctx: WizardContext): Transition`**: ورودی فعلی را تأیید می‌کند و یک `Transition` باز می‌گرداند که نشان می‌دهد چه اتفاقی بعد از آن می‌افتد.
-- **`store(ctx: WizardContext): Any?`** (اختیاری): مقداری را باز می‌گرداند که باید برای این مرحله ذخیره شود. `null` بازگردانید اگر مرحله وضعیتی ذخیره نکند.
+- **`onEntry(ctx: WizardContext)`**: Called when the user enters this step. Use this to prompt the user.
+- **`onRetry(ctx: WizardContext)`**: Called when validation fails and the step should retry. Use this to show error messages.
+- **`validate(ctx: WizardContext): Transition`**: Validates the current input and returns a `Transition` indicating what happens next.
+- **`store(ctx: WizardContext): Any?`** (optional): Returns the value to persist for this step. Return `null` if the step doesn't store state.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -67,19 +67,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> اگر برخی از مراحل به عنوان اولیه مشخص نشده باشند -> اولین مرحله اعلام شده به عنوان اولیه در نظر گرفته می‌شود.
+> If some step is not marked as initial -> first declared step is considered as.
 
 #### Transition
 
-یک `Transition` تعیین می‌کند چه اتفاقی بعد از تأیید می‌افتد:
+A `Transition` determines what happens after validation:
 
-- **`Transition.Next`**: به مرحله بعدی در توالی برو
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: به یک مرحله خاص پرش کن
-- **`Transition.Retry`**: مرحله فعلی را تلاش مجدد کن (تأیید ناموفق بود)
-- **`Transition.Finish`**: wizard را به پایان برسان
+- **`Transition.Next`**: Move to the next step in sequence
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Jump to a specific step
+- **`Transition.Retry`**: Retry the current step (validation failed)
+- **`Transition.Finish`**: Finish the wizard
 
 ```kotlin
-// پرش شرطی بر اساس ورودی
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +92,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext` دسترسی به:
-- **`user: User`**: کاربر فعلی
-- **`update: ProcessedUpdate`**: آپدیت فعلی
-- **`bot: TelegramBot`**: نمونه ربات
-- **`userReference: UserChatReference`**: مرجع شناسه کاربر و چت برای ذخیره‌سازی وضعیت
+`WizardContext` provides access to:
+- **`user: User`**: The current user
+- **`update: ProcessedUpdate`**: The current update
+- **`bot: TelegramBot`**: The bot instance
+- **`userReference: UserChatReference`**: User and chat ID reference for state storage
 
-علاوه بر متدهای دسترسی به وضعیت تایپ ایمن (توسط KSP تولید می‌شود).
+Plus type-safe state access methods (generated by KSP).
 
 ---
 
-### تعریف یک Wizard
+### Defining a Wizard
 
-#### ساختار پایه
+#### Basic Structure
 
-یک wizard به عنوان یک کلاس یا شی با کامنت `@WizardHandler` تعریف می‌شود:
+A wizard is defined as a class or object annotated with `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... پیاده‌سازی مرحله
+        // ... step implementation
     }
     
     object AgeStep : WizardStep {
-        // ... پیاده‌سازی مرحله
+        // ... step implementation
     }
     
     object FinishStep : WizardStep {
-        // ... پیاده‌سازی مرحله
+        // ... step implementation
     }
 }
 ```
 
-#### پارامترهای کامنت
+#### Annotation Parameters
 
-**`@WizardHandler`** پذیرفته می‌کند:
-- **`trigger: Array<String>`**: دستوراتی که wizard را شروع می‌کنند (مثلاً `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: انواع آپدیت‌هایی که گوش می‌کند (پیش‌فرض: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: کلاس‌های مدیر وضعیت برای ذخیره‌سازی داده مراحل
+**`@WizardHandler`** accepts:
+- **`trigger: Array<String>`**: Commands that start the wizard (e.g., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Update types to listen for (default: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: State manager classes for storing step data
 
 ---
 
-### مدیریت وضعیت
+### State Management
 
 #### WizardStateManager
 
-وضعیت با استفاده از پیاده‌سازی‌های `WizardStateManager<T>` ذخیره می‌شود. هر مدیر یک نوع خاص را مدیریت می‌کند:
+State is stored using `WizardStateManager<T>` implementations. Each manager handles a specific type:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +148,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-همچنین ببینید: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html)، [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html)، [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html)، [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
+See also: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### تطبیق خودکار
+#### Automatic Matching
 
-KSP مراحل را با مدیران وضعیت بر اساس نوع بازگشتی `store()` تطبیق می‌دهد:
+KSP matches steps to state managers based on the `store()` return type:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +162,21 @@ KSP مراحل را با مدیران وضعیت بر اساس نوع بازگش
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // با StringStateManager تطبیق می‌خورد
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
     
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // با IntStateManager تطبیق می‌خورد
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### بازنویسی تک مرحله‌ای
+#### Per-Step Override
 
-برای بازنویسی مدیر وضعیت برای یک مرحله خاص از `@WizardHandler.StateManager` استفاده کنید:
+Override the state manager for a specific step using `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,42 +185,42 @@ object SurveyWizard {
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // از DefaultStateManager استفاده می‌کند
+        // Uses DefaultStateManager
     }
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // به جای آن از CustomStateManager استفاده می‌کند
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### دسترسی به وضعیت تایپ ایمن
+### Type-Safe State Access
 
-KSP توابع گسترش تایپ ایمن برای `WizardContext` برای هر مرحله‌ای که وضعیت ذخیره می‌کند تولید می‌کند.
+KSP generates type-safe extension functions on `WizardContext` for each step that stores state.
 
-#### توابع تولید شده
+#### Generated Functions
 
-برای یک مرحله که یک `String` ذخیره می‌کند:
+For a step that stores a `String`:
 
 ```kotlin
-// به صورت خودکار توسط KSP تولید می‌شود
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### استفاده
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // دسترسی تایپ ایمن - String? (nullable) باز می‌گرداند
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
         
-        // دسترسی تایپ ایمن - Int? (nullable) باز می‌گرداند
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
@@ -239,24 +239,24 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### متدهای fallback
+#### Fallback Methods
 
-اگر متدهای تایپ ایمن در دسترس نباشند، از متدهای fallback استفاده کنید:
+If type-safe methods aren't available, use the fallback methods:
 
 ```kotlin
-// Fallback - Any? باز می‌گرداند
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// Fallback - Any? می‌پذیرد
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### نمونه کامل
+### Complete Example
 
-#### wizard ثبت‌نام کاربر
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -327,7 +327,7 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // دسترسی تایپ ایمن به وضعیت
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
@@ -350,7 +350,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // از نو شروع کن
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
@@ -361,7 +361,7 @@ object RegistrationWizard {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
-            // ذخیره در دیتابیس، ارسال تأیید، و غیره.
+            // Save to database, send confirmation, etc.
             message { 
                 "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
@@ -378,11 +378,11 @@ object RegistrationWizard {
 
 ---
 
-### ویژگی‌های پیشرفته
+### Advanced Features
 
-#### گذارهای شرطی
+#### Conditional Transitions
 
-برای جریان‌های شرطی از `Transition.JumpTo` استفاده کنید:
+Use `Transition.JumpTo` for conditional flows:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,20 +395,20 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### مراحل بدون وضعیت
+#### Stateless Steps
 
-مراحل نیازی به ذخیره وضعیت ندارند. ببسید `null` از `store()` بازگردانید (یا همانطور که هست بگذارید):
+Steps don't need to store state. Simply return `null` from `store()` (or keep as is):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... بقیه پیاده‌سازی
+    // ... rest of implementation
 }
 ```
 
-#### مدیران وضعیت سفارشی
+#### Custom State Managers
 
-`WizardStateManager<T>` را برای ذخیره‌سازی سفارشی (دیتابیس، Redis و غیره) پیاده‌سازی کنید:
+Implement `WizardStateManager<T>` for custom storage (database, Redis, etc.):
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -416,7 +416,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // از دیتابیس بارگذاری کن
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
     
@@ -425,7 +425,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         reference: UserChatReference,
         value: String
     ) {
-        // در دیتابیس ذخیره کن
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
     
@@ -433,7 +433,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // از دیتابیس حذف کن
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,38 +441,38 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### چگونه در درون کار می‌کند
+### How It Works Internally
 
-#### تولید کد
+#### Code Generation
 
-KSP تولید می‌کند:
+KSP generates:
 
-1. **WizardActivity**: یک پیاده‌سازی ملموس که از `WizardActivity` ارث می‌برد با مراحل hardcoded
-2. **Start Activity**: دستور trigger را مدیریت کرده و wizard را شروع می‌کند
-3. **Input Activity**: ورودی کاربر را در جریان wizard مدیریت می‌کند
-4. **State Accessors**: توابع گسترش تایپ ایمن برای دسترسی به وضعیت
+1. **WizardActivity**: A concrete implementation extending `WizardActivity` with hardcoded steps
+2. **Start Activity**: Handles the command trigger and starts the wizard
+3. **Input Activity**: Handles user input during the wizard flow
+4. **State Accessors**: Type-safe extension functions for state access
 
-#### جریان
+#### Flow
 
-1. کاربر `/register` را ارسال می‌کند → Start Activity فراخوانی می‌شود
-2. Start Activity یک `WizardContext` می‌سازد و `wizardActivity.start(ctx)` را فراخوانی می‌کند
-3. `start()` وارد مرحله اولیه می‌شود و `inputListener` را برای ردیابی مرحله فعلی تنظیم می‌کند
-4. کاربر یک پیام ارسال می‌کند → Input Activity فراخوانی می‌شود
-5. Input Activity `wizardActivity.handleInput(ctx)` را فراخوانی می‌کند
-6. `handleInput()` ورودی را تأیید می‌کند، وضعیت را ذخیره می‌کند و به مرحله بعدی گذار می‌کند
-7. فرآیند تا زمانی که `Transition.Finish` بازگردانده شود تکرار می‌شود
+1. User sends `/register` → Start Activity is invoked
+2. Start Activity creates `WizardContext` and calls `wizardActivity.start(ctx)`
+3. `start()` enters the initial step and sets `inputListener` to track the current step
+4. User sends a message → Input Activity is invoked
+5. Input Activity calls `wizardActivity.handleInput(ctx)`
+6. `handleInput()` validates input, persists state, and transitions to the next step
+7. Process repeats until `Transition.Finish` is returned
 
-#### پایداری وضعیت
+#### State Persistence
 
-- وضعیت بعد از تأیید موفق (قبل از گذار) ذخیره می‌شود
-- مقدار بازگشتی `store()` هر مرحله با استفاده از `WizardStateManager` مطابق ذخیره می‌شود
-- وضعیت در هر کاربر و چت (`UserChatReference`) scoped است
+- State is persisted after successful validation (before transition)
+- Each step's `store()` return value is saved using the matching `WizardStateManager`
+- State is scoped per user and chat (`UserChatReference`)
 
 ---
 
-### بهترین شیوه‌ها
+### Best Practices
 
-#### 1. همیشه پیام‌های روشن ارائه دهید
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
@@ -483,7 +483,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. خطاهای تأیید را با مهربانی مدیریت کنید
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,52 +494,52 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. از دسترسی تایپ ایمن به وضعیت استفاده کنید
+#### 3. Use Type-Safe State Access
 
-ترجیحاً از متدهای تایپ ایمن تولید شده استفاده کنید:
+Prefer generated type-safe methods:
 
 ```kotlin
-// ✅ خوب - تایپ ایمن
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ اجتناب کنید - تایپ ایمنی از دست می‌دهد
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. مراحل را متمرکز نگه دارید
+#### 4. Keep Steps Focused
 
-هر مرحله باید یک مسئولیت واحد داشته باشد:
+Each step should have a single responsibility:
 
 ```kotlin
-// ✅ خوب - مرحله متمرکز
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // فقط جمع‌آوری ایمیل را مدیریت می‌کند
+    // Only handles email collection
 }
 
-// ❌ اجتناب کنید - منطق زیاد
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // نام، ایمیل، تلفن، آدرس را مدیریت می‌کند...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. از نام‌های معنی‌دار مرحله استفاده کنید
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ خوب
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ اجتناب کنید
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. وضعیت را هنگام نیاز پاک کنید
+#### 6. Clean Up State When Needed
 
-اگر نیاز به پاک کردن دستی وضعیت دارید:
+If you need to clear state manually:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // تمام وضعیت wizard را پاک کن
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
@@ -550,16 +550,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### خلاصه
+### Summary
 
-سیستم Wizard ارائه می‌دهد:
-- ✅ **تایپ ایمن** مدیریت وضعیت با بررسی در زمان کامپایل
-- ✅ **اعلامی** تعریف مراحل به عنوان کلاس‌های تو در تو
-- ✅ **انعطاف‌پذیر** گذارها با منطق شرطی
-- ✅ **خودکار** تولید کد توسط KSP
-- ✅ **یکپارچه** با سیستم فعالیت موجود
-- ✅ **قابل plug-in** backend‌های ذخیره‌سازی وضعیت
+The Wizard system provides:
+- ✅ **Type-safe** state management with compile-time checking
+- ✅ **Declarative** step definitions as nested classes
+- ✅ **Flexible** transitions with conditional logic
+- ✅ **Automatic** code generation via KSP
+- ✅ **Integrated** with the existing Activity system
+- ✅ **Pluggable** state storage backends
 
-شروع به ساختن wizardها با کامنت کردن یک کلاس با `@WizardHandler` و تعریف مراحل خود به عنوان اشیای `WizardStep` تو در تو کنید!
-اگر سوالی دارید با ما در چت تماس بگیرید، ما خوشحالیم که کمک کنیم :)
+Start building wizards by annotating a class with `@WizardHandler` and defining your steps as nested `WizardStep` objects!
+if you have any questions contact us in chat, we will be glad to help :)
 ---

@@ -1,19 +1,19 @@
 ---
 ---
-title: فعالیت‌ها و پردازنده‌ها
+title: فعالیت‌ها و پردازش‌گرها
 ---
 
 ### مقدمه
 
-`Activity` در اصطلاح این کتابخانه موجودیت انتزاعی است که تعمیمی از موجودیت‌هایی مانند `@CommandHandler`، `@InputHandler`، `@UnprocessedHandler` و `@CommonHandler` است.
+`Activity` در اصطلاح این کتابخانه موجودیت انتزاعی است که تعمیمی از موجودیت‌هایی مانند `@CommandHandler`، `@InputHandler`، `@UnprocessedHandler` و `@CommonHandler` می‌باشد.
 
-همچنین مقاله [handlers](Handlers.md) را نیز بررسی کنید.
+همچنین به مقاله [handlers](Handlers.md) هم نگاهی بیندازید.
 
 ### جمع‌آوری فعالیت‌ها
 
-فعالیت‌ها در زمان کامپایل جمع‌آوری و کلیه متن در آن‌ها آماده می‌شوند (به جز آن‌هایی که از طریق functional dsl تعریف شده‌اند).
+فعالیت‌ها در زمان کامپایل جمع‌آوری و تمام متن‌بست برای آن‌ها آماده می‌شود (به جز آن‌هایی که از طریق DSL توابعی تعریف شده‌اند).
 
-اگر می‌خواهید منطقه‌ای را که بسته در آن جستجو می‌شود محدود کنید، می‌توانید پارامتری را به پلاگین ارسال کنید:
+اگر می‌خواهید حوزه‌ای را محدود کنید که بسته در آن جستجو شود، می‌توانید پارامتری به پلاگین ارسال کنید:
 
 ```gradle
 ktGram {
@@ -21,7 +21,7 @@ ktGram {
 }
 ```
 
-یا بدون پلاگین از طریق ksp:
+یا بدون پلاگین از طریق KSP:
 
 ```gradle
 ksp {
@@ -29,25 +29,24 @@ ksp {
 }
 ```
 
-توجه داشته باشید که در چنین حالتی، برای اینکه اقدامات جمع‌آوری شده به درستی پردازش شوند، باید بسته را در خود نمونه نیز مشخص کنید.
+توجه داشته باشید که در چنین حالتی، برای اینکه اقدامات جمع‌آوری شده به درستی پردازش شوند، باید بسته را در خود نمونه هم مشخص کنید.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // شروع گوش‌دهنده long-polling
+    // شروع لیست‌گیری طولانی
 }
 ```
 
-این گزینه برای این اضافه شده است که بتوان نمونه‌های چندگانه بات را اجرا کرد:
+این گزینه برای این اضافه شده تا بتوانید چند نمونه ربات را اجرا کنید:
 
 ```gradle
 ktGram {
     packages = listOf("com.example.mybot", "com.example.mybot2")
 }
 ```
-
 
 یا اگر از پلاگین استفاده نمی‌کنید و بسته‌های متفاوتی را مشخص می‌کنید، باید آن‌ها را با جداکننده `;` مشخص کنید:
 
@@ -61,7 +60,7 @@ ksp {
 
 #### Webhooks
 
-در کنترلر خود (یا مکانی دیگری که `webhook` در آن پردازش می‌شود)، فراخوانی می‌کنید: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+در کنترلر خود (یا مکانی دیگری که `webhook` در آن پردازش می‌شود)، فراخوانی کنید: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
 #### Long polling
 
@@ -70,6 +69,6 @@ ksp {
 
 ### همچنین ببینید
 
-* [پردازش آپدیت](Update-parsing.md)
+* [پردازش به‌روزرسانی](Update-parsing.md)
 * [فراخوانی فعالیت](Activity-invocation.md)
 * [اقدامات](Actions.md)

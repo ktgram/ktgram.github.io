@@ -1,23 +1,23 @@
 ---
 ---
-title: Activity Invocation
+title: فعال‌سازی فعالیت
 ---
 
-During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions. 
+در طول فعال‌سازی فعالیت، امکان گذراندن متن‌بات زمینه وجود دارد، زیرا به عنوان پارامتر در توابع هدف اعلام شده است.
 
-The parameters that can be passed are: 
+پارامترهایی که می‌توان گذارد عبارتند از:
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses) - current processing update.
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - low level context of handling activity.
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - if present.
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance. 
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (و تمام زیرکلاس‌های آن) - آپدیت در حال پردازش فعلی.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - زمینه سطح پایین مدیریت فعالیت.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - در صورت وجود.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - در صورت وجود.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - نمونه فعلی متن‌بات.
 
-It is also possible to add a custom type for passing. 
+همچنین امکان اضافه کردن نوع سفارشی برای گذراندن وجود دارد.
 
-To do this, add a class that implements [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) and mark it with the [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) annotation. 
+برای این کار، یک کلاس که از [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) پیاده‌سازی می‌کند اضافه کنید و آن را با کدکدن [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) نشانه‌گذاری کنید.
 
-After implementing the `Autowiring` interface - `T` will be available for passing in target functions and will be obtained through the method described in the interface. 
+پس از پیاده‌سازی رابط `Autowiring` - `T` برای گذراندن در توابع هدف در دسترس خواهد بود و از طریق متد توصیف‌شده در رابط به دست خواهد آمد.
 
 ```kotlin
 @Injectable
@@ -29,9 +29,9 @@ object UserResolver : Autowiring<UserRecord> {
 ```
 
 
-Other parameters declared in functions will be **searched** in parsed parameters. 
+سایر پارامترهای اعلام شده در توابع **جستجو** خواهند شد در پارامترهای تجزیه‌شده.
 
-Additionally, parsed parameters during passing can be cast to certain types, here is their list: 
+علاوه بر این، پارامترهای تجزیه‌شده در طول گذراندن می‌توانند به انواع خاصی کست شوند، اینجا فهرست آنها است:
 
 - `String`
 - `Integer`
@@ -40,16 +40,16 @@ Additionally, parsed parameters during passing can be cast to certain types, her
 - `Float`
 - `Double`
 
-Moreover, note that if parameters are declared and missing (or in parsed parameters or for example `User` is missing in `Update`) or the declared type does not fit the received parameter in the function, **`null`** will be passed so be careful.
+علاوه بر این، توجه داشته باشید که اگر پارامترها اعلام شده و موجود نباشند (یا در پارامترهای تجزیه‌شده یا به عنوان مثال `User` در `Update` موجود نباشد) یا نوع اعلام‌شده با پارامتر دریافتی در تابع تطبیق نداشته باشد، **`null`** گذارده خواهد شد پس مراقب باشید.
 
-Summarizing everything, below here is an example of how function parameters are usually formed:
+خلاصه‌بندی همه موارد، در زیر مثالی از چگونگی شکل‌گیری معمولی پارامترهای تابع وجود دارد:
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="نمودار فرآیند فراخوانی" />
 </p>
 
-### See also
+### همچنین ببینید
 
-* [Update parsing](Update-parsing.md)
-* [Activities & Processors](Activites-and-Processors.md)
+* [تجزیه آپدیت](Update-parsing.md)
+* [فعالیت‌ها و پردازنده‌ها](Activites-and-Processors.md)
 ---

@@ -3,13 +3,13 @@
 title: Functional Dsl
 ---
 
-### Para ~~infinito~~ functional dsl e além!
+### Para a ~~infinidade~~ functional dsl e além!
 
-O bot suporta configuração de contexto baseada em anotações e functional dsl. Você pode combinar ambas as abordagens.
+O bot suporta tanto configuração de contexto baseada em anotações quanto funcional dsl. Você pode combinar ambas as abordagens.
 
 ### Functional DSL
 
-Functional DSL é apenas uma forma diferente de definir o contexto do bot.
+Functional DSL é apenas uma maneira diferente de definir o contexto do bot.
 
 Exemplo:
 
@@ -27,7 +27,7 @@ suspend fun main() {
 
 ### Comandos e Entradas
 
-Você pode lidar com ambos `comandos` e `entradas` usando o functional DSL.
+Você pode manipular tanto `comandos` quanto `entradas` usando o functional DSL.
 
 #### Comandos
 
@@ -49,7 +49,7 @@ suspend fun main() {
 }
 ```
 
-Em `onCommand`, os parâmetros analisados estão disponíveis como `Map<String, String>` com base na sua configuração.
+No `onCommand`, os parâmetros analisados estão disponíveis como `Map<String, String>` baseado na sua configuração.
 
 #### Entradas
 
@@ -74,7 +74,7 @@ suspend fun main() {
 
 #### Cadeias de Entrada
 
-Para fluxos de entrada de vários passos, use `inputChain`:
+Para fluxos de entrada de múltiplos passos, use `inputChain`:
 
 ```kotlin
 bot.setFunctionality {
@@ -91,7 +91,7 @@ bot.setFunctionality {
 }
 ```
 
-A cadeia avança automaticamente para a próxima etapa, a menos que uma condição de quebra seja atendida. Se uma condição de quebra corresponder e `repeat` for `true` (padrão), o usuário permanece no passo atual.
+A cadeia avança automaticamente para o próximo passo a menos que uma condição de quebra seja atendida. Se uma condição de quebra corresponder e `repeat` for `true` (padrão), o usuário permanece na etapa atual.
 
 #### Manipuladores de Tipo de Atualização
 
@@ -100,13 +100,13 @@ Manipule tipos específicos de atualização diretamente:
 ```kotlin
 bot.setFunctionality {
     onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
-        // Manipula atualizações de mensagem e callback query
+        // Manipular ambos os tipos de atualização: mensagem e callback query
         println("Received update: ${update.type}")
     }
 }
 ```
 
-#### Correspondências Comuns
+#### Correspondentes Comuns
 
 Corresponda conteúdo de texto (não apenas comandos) usando `common`:
 
@@ -165,7 +165,7 @@ bot.setFunctionality {
 
 #### Análise de Argumentos
 
-Personalize como os argumentos de comando são analisados:
+Personalize como os argumentos do comando são analisados:
 
 ```kotlin
 bot.setFunctionality {
@@ -187,7 +187,7 @@ suspend fun register(ctx: CommandContext) {
     message { "Registration started" }.send(ctx.user, ctx.bot)
 }
 
-// Manipulador functional
+// Manipulador funcional
 bot.setFunctionality {
     onCommand("/help") {
         message { "Available commands: /register, /help" }.send(user, bot)
@@ -197,7 +197,7 @@ bot.setFunctionality {
 
 Ambos os manipuladores são registrados no mesmo `ActivityRegistry` e funcionam perfeitamente juntos.
 
-### Consulte também
+### Veja também
 
 * [Action](Actions.md)
 * [Useful utilities](Useful-utilities-and-tips.md)

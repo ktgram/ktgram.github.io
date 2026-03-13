@@ -1,23 +1,23 @@
 ---
 ---
-title: Activity Invocation
+title: Вызов Activity
 ---
 
-During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions.
+При вызове activity можно передать контекст бота, так как он объявлен как параметр в целевых функциях.
 
-The parameters that can be passed are:
+Параметры, которые можно передать:
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses) - current processing update.
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - low level context of handling activity.
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - if present.
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance.
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (и все его подклассы) - текущий обрабатываемый update.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - низкоуровневый контекст обработки activity.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - если присутствует.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - если присутствует.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - текущий экземпляр бота.
 
-It is also possible to add a custom type for passing.
+Также возможно добавить пользовательский тип для передачи.
 
-To do this, add a class that implements [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) and mark it with the [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) annotation.
+Для этого добавьте класс, реализующий интерфейс [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) и пометьте его аннотацией [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html).
 
-After implementing the `Autowiring` interface - `T` will be available for passing in target functions and will be obtained through the method described in the interface.
+После реализации интерфейса `Autowiring` - `T` станет доступен для передачи в целевые функции и будет получен через метод, описанный в интерфейсе.
 
 ```kotlin
 @Injectable
@@ -28,9 +28,9 @@ object UserResolver : Autowiring<UserRecord> {
 }
 ```
 
-Other parameters declared in functions will be **searched** in parsed parameters.
+Другие параметры, объявленные в функциях, будут **искаться** в распарсенных параметрах.
 
-Additionally, parsed parameters during passing can be cast to certain types, here is their list:
+Дополнительно, распарсенные параметры при передаче могут приводиться к определенным типам, вот их список:
 
 - `String`
 - `Integer`
@@ -39,16 +39,16 @@ Additionally, parsed parameters during passing can be cast to certain types, her
 - `Float`
 - `Double`
 
-Moreover, note that if parameters are declared and missing (or in parsed parameters or for example `User` is missing in `Update`) or the declared type does not fit the received parameter in the function, **`null`** will be passed so be careful.
+Более того, обратите внимание, что если параметры объявлены и отсутствуют (или в распарсенных параметрах или например `User` отсутствует в `Update`) или объявленный тип не соответствует полученному параметру в функции, будет передано **`null`**, так что будьте внимательны.
 
-Summarizing everything, below here is an example of how function parameters are usually formed:
+Подводя итог всему, ниже приведен пример того, как обычно формируются параметры функции:
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Схема процесса вызова" />
 </p>
 
-### See also
+### См. также
 
-* [Update parsing](Update-parsing.md)
+* [Парсинг Update](Update-parsing.md)
 * [Activities & Processors](Activites-and-Processors.md)
 ---
