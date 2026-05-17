@@ -3,17 +3,17 @@
 title: Activites And Processors
 ---
 
-### परिचय
+### Introduction
 
-इस लाइब्रेरी के शब्दों में, `Activity` एक अमूर्त इकाई है जो `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, और `@CommonHandler` जैसी इकाइयों का सामान्यीकरण है।
+`Activity` इस लाइब्रेरी की शर्तों में वह अमूर्त इकाई है जो `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler`, और `@WizardHandler` जैसी इकाइयों का सामान्यीकरण है।
 
-कृपया [handlers article](Handlers.md) भी देखें।
+साथ ही [handlers article](Handlers.md) देखें।
 
-### गतिविधियों को एकत्र करना
+### Collecting activities
 
-गतिविधियों को कंपाइल समय में एकत्रित और तैयार किया जाता है (फंक्शनल डीएसएल के माध्यम से परिभाषित को छोड़कर)।
+Activities को **compile time** पर **ktnip** KSP प्रोसेसर द्वारा खोजा और जोड़ा जाता है। [Functional DSL](Handlers#functional-dsl.md) एकमात्र अपवाद है — `bot.setFunctionality { ... }` के माध्यम से परिभाषित हैंडलर रनटाइम पर रजिस्टर्ड होते हैं।
 
-यदि आप उस क्षेत्र को सीमित करना चाहते हैं जिसमें पैकेज की खोज की जाएगी, तो आप प्लगइन को पैरामीटर पास कर सकते हैं:
+यदि आप पैकेज की खोज सीमा को सीमित करना चाहते हैं, तो प्लगइन में एक पैरामीटर पास कर सकते हैं:
 
 ```gradle
 ktGram {
@@ -23,24 +23,24 @@ ktGram {
 
 या प्लगइन के बिना ksp के माध्यम से:
 
-```kotlin
+```gradle
 ksp {
     arg("package", "com.example.mybot")
 }
 ```
 
-ध्यान दें कि इस तरह के मामले में, एकत्रित क्रियाओं को सही ढंग से संसाधित करने के लिए, आपको इंस्टेंस में स्वयं पैकेज भी निर्दिष्ट करना होगा।
+ध्यान दें कि ऐसे मामले में, एकत्रित actions को सही ढंग से प्रोसेस करने के लिए, आपको स्वयं इंस्टेंस में भी पैकेज निर्दिष्ट करना होगा।
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // लंबे-पोलिंग श्रोता शुरू करें
+    // start long-polling listener
 }
 ```
 
-यह विकल्प इसलिए जोड़ा गया है ताकि एकाधिक बॉट इंस्टेंस चलाए जा सकें:
+यह विकल्प कई bot इंस्टेंस चलाने के लिए जोड़ा गया है:
 
 ```gradle
 ktGram {
@@ -49,7 +49,7 @@ ktGram {
 ```
 
 
-या यदि आप प्लगइन का उपयोग नहीं कर रहे हैं तो विभिन्न पैकेज निर्दिष्ट करने के लिए आपको उन्हें `;` सेपरेटर के साथ निर्दिष्ट करना होगा:
+या यदि आप प्लगइन का उपयोग नहीं कर रहे हैं, तो विभिन्न पैकेज निर्दिष्ट करने के लिए `;` सेपरेटर का उपयोग करें:
 
 ```gradle
 ksp {
@@ -57,19 +57,21 @@ ksp {
 }
 ```
 
-### प्रोसेसिंग
+### Processing
 
-#### वेबहुक
+#### Webhooks
 
-अपने कंट्रोलर (या किसी अन्य स्थान पर जहां `webhook` संसाधित होता है) में, आप कॉल करते हैं: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+अपने कंट्रोलर (या किसी अन्य स्थान जहाँ `webhook` प्रोसेस किया जाता है) में आप कॉल करते हैं: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
-#### लंबे-पोलिंग
+#### Long polling
 
 कॉल करें: `bot.handleUpdates()` या `bot.update.setListener { handle(it) }` के माध्यम से
 
 
-### इसे भी देखें
+### See also
 
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)
 * [Actions](Actions.md)
+
+---

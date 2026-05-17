@@ -1,23 +1,24 @@
 ---
 ---
-title: فعال‌سازی فعالیت
+title: Activity Invocation
 ---
 
-در طول فعال‌سازی فعالیت، امکان گذراندن متن‌بات زمینه وجود دارد، زیرا به عنوان پارامتر در توابع هدف اعلام شده است.
+در هنگام فراخوانی فعالیت، امکان عبور زمینه (context) ربات وجود دارد، زیرا به‌صورت پارامتر در توابع هدف اعلام شده است. 
 
-پارامترهایی که می‌توان گذارد عبارتند از:
+پارامترهایی که می‌توانند عبور داده شوند عبارتند از: 
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (و تمام زیرکلاس‌های آن) - آپدیت در حال پردازش فعلی.
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (و تمام زیرکلاس‌های آن، مانند `MessageUpdate`، `CallbackQueryUpdate`، …) - به‌روزرسانی جاری پردازش‌شده.
 * [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - زمینه سطح پایین مدیریت فعالیت.
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - در صورت وجود.
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - در صورت وجود.
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - نمونه فعلی متن‌بات.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - در صورت موجود بودن.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - در صورت موجود بودن.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - نمونه فعلی ربات.
+* [`Session`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.session/-session/index.html) *(اضافه شده در نسخه 9.5)* - جلسه برای چت/کاربر فعلی. پارامتر را با [`@SessionQualifier("name")`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-session-qualifier/index.html) علامت‌گذاری کنید تا یک جلسه نام‌دار مستقل تزریق شود. مقاله [Sessions] را ببینید (Sessions.md).
 
-همچنین امکان اضافه کردن نوع سفارشی برای گذراندن وجود دارد.
+همچنین می‌توان یک نوع سفارشی برای عبور اضافه کرد. 
 
-برای این کار، یک کلاس که از [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) پیاده‌سازی می‌کند اضافه کنید و آن را با کدکدن [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) نشانه‌گذاری کنید.
+برای این کار، کلاسی که `Autowiring<T>` را پیاده‌سازی می‌کند اضافه کنید و آن را با حاشیه‌نویسی [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) علامت‌گذاری کنید. 
 
-پس از پیاده‌سازی رابط `Autowiring` - `T` برای گذراندن در توابع هدف در دسترس خواهد بود و از طریق متد توصیف‌شده در رابط به دست خواهد آمد.
+پس از پیاده‌سازی رابط `Autowiring` - `T` برای عبور در توابع هدف در دسترس خواهد بود و از طریق روشی که در رابط توضیح داده شده است، دریافت می‌شود. 
 
 ```kotlin
 @Injectable
@@ -29,9 +30,9 @@ object UserResolver : Autowiring<UserRecord> {
 ```
 
 
-سایر پارامترهای اعلام شده در توابع **جستجو** خواهند شد در پارامترهای تجزیه‌شده.
+پارامترهای دیگر اعلام‌شده در توابع **در پارامترهای تجزیه‌شده جستجو** می‌شوند. 
 
-علاوه بر این، پارامترهای تجزیه‌شده در طول گذراندن می‌توانند به انواع خاصی کست شوند، اینجا فهرست آنها است:
+علاوه بر این، پارامترهای تجزیه‌شده هنگام عبور می‌توانند به برخی انواع تبدیل شوند؛ در ادامه فهرست آن‌ها آورده شده است: 
 
 - `String`
 - `Integer`
@@ -40,16 +41,29 @@ object UserResolver : Autowiring<UserRecord> {
 - `Float`
 - `Double`
 
-علاوه بر این، توجه داشته باشید که اگر پارامترها اعلام شده و موجود نباشند (یا در پارامترهای تجزیه‌شده یا به عنوان مثال `User` در `Update` موجود نباشد) یا نوع اعلام‌شده با پارامتر دریافتی در تابع تطبیق نداشته باشد، **`null`** گذارده خواهد شد پس مراقب باشید.
+همچنین توجه داشته باشید که اگر پارامترها اعلام شده باشند ولی موجود نباشند (در پارامترهای تجزیه‌شده یا مثلاً `User` در `Update` موجود نباشد) یا نوع اعلام‌شده با پارامتر دریافت‌شده در تابع منطبق نباشد، **`null`** عبور داده می‌شود، پس مراقب باشید.
 
-خلاصه‌بندی همه موارد، در زیر مثالی از چگونگی شکل‌گیری معمولی پارامترهای تابع وجود دارد:
+در مجموع، در ادامه نمونه‌ای از نحوه تشکیل پارامترهای تابع آورده شده است:
+
+```mermaid
+flowchart LR
+    U["ProcessedUpdate<br/>(and typed subclasses)"] --> R[Parameter resolver]
+    PC[ProcessingContext] --> R
+    User[User from update] --> R
+    Chat[Chat from update] --> R
+    Bot[TelegramBot] --> R
+    Sess["Session<br/>(opt. @SessionQualifier)"] --> R
+    Inj["@Injectable Autowiring&lt;T&gt;"] --> R
+    Parsed["Parsed text params<br/>(String / Int / Long / Short / Float / Double)"] --> R
+    R --> Fn[Handler function call]
+```
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="نمودار فرآیند فراخوانی" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
 </p>
 
-### همچنین ببینید
+### See also
 
-* [تجزیه آپدیت](Update-parsing.md)
-* [فعالیت‌ها و پردازنده‌ها](Activites-and-Processors.md)
+* [Update parsing](Update-parsing.md)
+* [Activities & Processors](Activites-and-Processors.md)
 ---

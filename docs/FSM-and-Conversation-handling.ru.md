@@ -1,46 +1,59 @@
 ---
 ---
-title: FSM и обработка диалогов
+title: Fsm And Conversation Handling
 ---
 
-Библиотека также поддерживает механизм FSM, который представляет собой механизм пошаговой обработки пользовательского ввода с обработкой некорректного ввода.
+The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
 > [!NOTE]
-> TL;DR: См. пример [тут](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### В теории
+### In theory
 
-Представим ситуацию, когда вам нужно собрать опрос у пользователя, можно запросить все данные человека за один шаг, но при некорректном вводе одного из параметров, это будет сложно и для пользователя, и для нас, и каждый шаг может отличаться в зависимости от определенных входных данных.
+Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
 
-Теперь представим пошаговый ввод данных, когда бот переходит в режим диалога с пользователем.
+Now let's imagine step-by-step input of data, where the bot enters dialogue mode with the user.
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Схема процесса обработки" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-Зеленые стрелки указывают процесс перехода через шаги без ошибок, синие стрелки означают сохранение текущего состояния и ожидание повторного ввода (например, если пользователь указал, что ему -100 лет, нужно снова спросить возраст), а красные показывают выход из всего процесса из-за любой команды или отмены по любому другому значению.
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
 
-### На практике
+Forward arrows (`Transition.Next`, `Transition.JumpTo`) advance the wizard, `Transition.Retry` keeps the user on the same step until input is valid (for example, when the user types `-100` for their age), and `Transition.Finish` (or an external command) ends the flow entirely.
 
-Система Wizard (волшебник) обеспечивает многошаговые взаимодействия с пользователем в ботах Telegram. Она проводит пользователей через последовательность шагов, проверяет ввод, сохраняет состояние и переходит между шагами.
+### In practice
 
-**Основные преимущества:**
-- **Type-safe**: Проверка типов на этапе компиляции для доступа к состоянию
-- **Декларативный**: Определение шагов как вложенных классов/объектов
-- **Гибкий**: Поддержка условных переходов, переходов и повторных попыток
-- **Сохраняющий состояние**: Автоматическое сохранение состояния с подключаемыми бэкендами хранения
-- **Интегрированный**: Работает с существующей системой Activity
+The Wizard system enables multi-step user interactions in Telegram bots. It guides users through a sequence of steps, validates input, stores state, and transitions between steps.
 
-### Основные концепции
+**Key Benefits:**
+- **Type-safe**: Compile-time type checking for state access
+- **Declarative**: Define steps as nested classes/objects
+- **Flexible**: Support for conditional transitions, jumps, and retries
+- **Stateful**: Automatic state persistence with pluggable storage backends
+- **Integrated**: Works with the existing Activity system
+
+### Core Concepts
 
 #### WizardStep
 
-`WizardStep` представляет собой отдельный шаг в потоке волшебника. Каждый шаг должен реализовывать:
+A `WizardStep` represents a single step in the wizard flow. Each step must implement:
 
-- **`onEntry(ctx: WizardContext)`**: Вызывается, когда пользователь входит на этот шаг. Используйте это для запроса у пользователя.
-- **`onRetry(ctx: WizardContext)`**: Вызывается при сбое валидации и необходимости повторной попытки. Используйте это для показа сообщений об ошибках.
-- **`validate(ctx: WizardContext): Transition`**: Проверяет текущий ввод и возвращает `Transition`, указывающий, что происходит дальше.
-- **`store(ctx: WizardContext): Any?`** (опционально): Возвращает значение для сохранения для этого шага. Верните `null`, если шаг не сохраняет состояние.
+- **`onEntry(ctx: WizardContext)`**: Called when the user enters this step. Use this to prompt the user.
+- **`onRetry(ctx: WizardContext)`**: Called when validation fails and the step should retry. Use this to show error messages.
+- **`validate(ctx: WizardContext): Transition`**: Validates the current input and returns a `Transition` indicating what happens next.
+- **`store(ctx: WizardContext): Any?`** (optional): Returns the value to persist for this step. Return `null` if the step doesn't store state.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -67,19 +80,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> Если какой-то шаг не помечен как начальный -> первый объявленный шаг считается таковым.
+> If some step is not marked as initial -> first declared step is considered as.
 
 #### Transition
 
-`Transition` определяет, что происходит после валидации:
+A `Transition` determines what happens after validation:
 
-- **`Transition.Next`**: Переход к следующему шагу в последовательности
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Переход к конкретному шагу
-- **`Transition.Retry`**: Повторная попытка текущего шага (валидация не прошла)
-- **`Transition.Finish`**: Завершение волшебника
+- **`Transition.Next`**: Move to the next step in sequence
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Jump to a specific step
+- **`Transition.Retry`**: Retry the current step (validation failed)
+- **`Transition.Finish`**: Finish the wizard
 
 ```kotlin
-// Условный переход на основе ввода
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +105,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext` предоставляет доступ к:
-- **`user: User`**: Текущий пользователь
-- **`update: ProcessedUpdate`**: Текущее обновление
-- **`bot: TelegramBot`**: Экземпляр бота
-- **`userReference: UserChatReference`**: Ссылка на ID пользователя и чата для хранения состояния
+`WizardContext` provides access to:
+- **`user: User`**: The current user
+- **`update: ProcessedUpdate`**: The current update
+- **`bot: TelegramBot`**: The bot instance
+- **`userReference: UserChatReference`**: User and chat ID reference for state storage
 
-Плюс методы типа-безопасного доступа к состоянию (генерируются KSP).
+Plus type-safe state access methods (generated by KSP).
 
 ---
 
-### Определение волшебника
+### Defining a Wizard
 
-#### Базовая структура
+#### Basic Structure
 
-Волшебник определяется как класс или объект, аннотированный `@WizardHandler`:
+A wizard is defined as a class or object annotated with `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... реализация шага
+        // ... step implementation
     }
     
     object AgeStep : WizardStep {
-        // ... реализация шага
+        // ... step implementation
     }
     
     object FinishStep : WizardStep {
-        // ... реализация шага
+        // ... step implementation
     }
 }
 ```
 
-#### Параметры аннотации
+#### Annotation Parameters
 
-**`@WizardHandler`** принимает:
-- **`trigger: Array<String>`**: Команды, запускающие волшебника (например, `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: Типы обновлений для прослушивания (по умолчанию: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Классы менеджеров состояния для хранения данных шагов
+**`@WizardHandler`** accepts:
+- **`trigger: Array<String>`**: Commands that start the wizard (e.g., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Update types to listen for (default: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: State manager classes for storing step data
 
 ---
 
-### Управление состоянием
+### State Management
 
 #### WizardStateManager
 
-Состояние хранится с использованием реализаций `WizardStateManager<T>`. Каждый менеджер обрабатывает определенный тип:
+State is stored using `WizardStateManager<T>` implementations. Each manager handles a specific type:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +161,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-См. также: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
+See also: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### Автоматическое сопоставление
+#### Automatic Matching
 
-KSP сопоставляет шаги с менеджерами состояния на основе возвращаемого типа `store()`:
+KSP matches steps to state managers based on the `store()` return type:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +175,21 @@ KSP сопоставляет шаги с менеджерами состояни
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // Соответствует StringStateManager
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
     
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // Соответствует IntStateManager
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### Переопределение на уровне шага
+#### Per-Step Override
 
-Переопределите менеджер состояния для конкретного шага, используя `@WizardHandler.StateManager`:
+Override the state manager for a specific step using `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,42 +198,42 @@ object SurveyWizard {
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // Использует DefaultStateManager
+        // Uses DefaultStateManager
     }
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // Использует CustomStateManager вместо
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### Тип-безопасный доступ к состоянию
+### Type-Safe State Access
 
-KSP генерирует тип-безопасные функции расширения на `WizardContext` для каждого шага, который сохраняет состояние.
+KSP generates type-safe extension functions on `WizardContext` for each step that stores state.
 
-#### Сгенерированные функции
+#### Generated Functions
 
-Для шага, сохраняющего `String`:
+For a step that stores a `String`:
 
 ```kotlin
-// Генерируется автоматически KSP
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### Использование
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Тип-безопасный доступ - возвращает String? (nullable)
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
         
-        // Тип-безопасный доступ - возвращает Int? (nullable)
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
@@ -239,24 +252,24 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### Методы резервного доступа
+#### Fallback Methods
 
-Если тип-безопасные методы недоступны, используйте методы резервного доступа:
+If type-safe methods aren't available, use the fallback methods:
 
 ```kotlin
-// Резервный метод - возвращает Any?
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// Резервный метод - принимает Any?
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### Полный пример
+### Complete Example
 
-#### Волшебник регистрации пользователя
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -327,7 +340,7 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // Тип-безопасный доступ к состоянию
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
@@ -350,7 +363,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // Начать заново
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
@@ -361,7 +374,7 @@ object RegistrationWizard {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
-            // Сохранить в базу данных, отправить подтверждение и т.д.
+            // Save to database, send confirmation, etc.
             message { 
                 "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
@@ -378,11 +391,11 @@ object RegistrationWizard {
 
 ---
 
-### Продвинутые возможности
+### Advanced Features
 
-#### Условные переходы
+#### Conditional Transitions
 
-Используйте `Transition.JumpTo` для условных потоков:
+Use `Transition.JumpTo` for conditional flows:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,20 +408,20 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### Шаги без состояния
+#### Stateless Steps
 
-Шаги не обязаны сохранять состояние. Просто верните `null` из `store()` (или оставьте как есть):
+Steps don't need to store state. Simply return `null` from `store()` (or keep as is):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... остальная реализация
+    // ... rest of implementation
 }
 ```
 
-#### Кастомные менеджеры состояния
+#### Custom State Managers
 
-Реализуйте `WizardStateManager<T>` для кастомного хранения (база данных, Redis и т.д.):
+Implement `WizardStateManager<T>` for custom storage (database, Redis, etc.):
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -416,7 +429,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // Загрузить из базы данных
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
     
@@ -425,7 +438,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         reference: UserChatReference,
         value: String
     ) {
-        // Сохранить в базу данных
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
     
@@ -433,7 +446,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // Удалить из базы данных
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,38 +454,38 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### Как это работает внутри
+### How It Works Internally
 
-#### Генерация кода
+#### Code Generation
 
-KSP генерирует:
+KSP generates:
 
-1. **WizardActivity**: Конкретная реализация, расширяющая `WizardActivity` с захардкоженными шагами
-2. **Start Activity**: Обрабатывает команду-триггер и запускает волшебника
-3. **Input Activity**: Обрабатывает пользовательский ввод во время потока волшебника
-4. **State Accessors**: Тип-безопасные функции расширения для доступа к состоянию
+1. **WizardActivity**: A concrete implementation extending `WizardActivity` with hardcoded steps
+2. **Start Activity**: Handles the command trigger and starts the wizard
+3. **Input Activity**: Handles user input during the wizard flow
+4. **State Accessors**: Type-safe extension functions for state access
 
-#### Поток
+#### Flow
 
-1. Пользователь отправляет `/register` → вызывается Start Activity
-2. Start Activity создает `WizardContext` и вызывает `wizardActivity.start(ctx)`
-3. `start()` входит на начальный шаг и устанавливает `inputListener` для отслеживания текущего шага
-4. Пользователь отправляет сообщение → вызывается Input Activity
-5. Input Activity вызывает `wizardActivity.handleInput(ctx)`
-6. `handleInput()` проверяет ввод, сохраняет состояние и переходит к следующему шагу
-7. Процесс повторяется до возврата `Transition.Finish`
+1. User sends `/register` → Start Activity is invoked
+2. Start Activity creates `WizardContext` and calls `wizardActivity.start(ctx)`
+3. `start()` enters the initial step and sets `inputListener` to track the current step
+4. User sends a message → Input Activity is invoked
+5. Input Activity calls `wizardActivity.handleInput(ctx)`
+6. `handleInput()` validates input, persists state, and transitions to the next step
+7. Process repeats until `Transition.Finish` is returned
 
-#### Сохранение состояния
+#### State Persistence
 
-- Состояние сохраняется после успешной валидации (перед переходом)
-- Возвращаемое значение `store()` каждого шага сохраняется с использованием соответствующего `WizardStateManager`
-- Состояние ограничено по пользователю и чату (`UserChatReference`)
+- State is persisted after successful validation (before transition)
+- Each step's `store()` return value is saved using the matching `WizardStateManager`
+- State is scoped per user and chat (`UserChatReference`)
 
 ---
 
-### Рекомендации
+### Best Practices
 
-#### 1. Всегда предоставляйте понятные подсказки
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
@@ -483,7 +496,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. Обрабатывайте ошибки валидации корректно
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,52 +507,52 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. Используйте тип-безопасный доступ к состоянию
+#### 3. Use Type-Safe State Access
 
-Предпочитайте сгенерированные тип-безопасные методы:
+Prefer generated type-safe methods:
 
 ```kotlin
-// ✅ Хорошо - тип-безопасный
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ Избегайте - теряется тип-безопасность
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. Делайте шаги сфокусированными
+#### 4. Keep Steps Focused
 
-Каждый шаг должен иметь единственную ответственность:
+Each step should have a single responsibility:
 
 ```kotlin
-// ✅ Хорошо - сфокусированный шаг
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // Только обрабатывает сбор email
+    // Only handles email collection
 }
 
-// ❌ Избегайте - слишком много логики
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // Обрабатывает имя, email, телефон, адрес...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. Используйте осмысленные имена шагов
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ Хорошо
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ Избегайте
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. Очищайте состояние при необходимости
+#### 6. Clean Up State When Needed
 
-Если нужно очистить состояние вручную:
+If you need to clear state manually:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Очистить все состояние волшебника
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
@@ -550,16 +563,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### Резюме
+### Summary
 
-Система Wizard предоставляет:
-- ✅ **Тип-безопасное** управление состоянием с проверкой на этапе компиляции
-- ✅ **Декларативное** определение шагов как вложенных классов
-- ✅ **Гибкие** переходы с условной логикой
-- ✅ **Автоматическую** генерацию кода через KSP
-- ✅ **Интеграцию** с существующей системой Activity
-- ✅ **Подключаемые** бэкенды хранения состояния
+The Wizard system provides:
+- ✅ **Type-safe** state management with compile-time checking
+- ✅ **Declarative** step definitions as nested classes
+- ✅ **Flexible** transitions with conditional logic
+- ✅ **Automatic** code generation via KSP
+- ✅ **Integrated** with the existing Activity system
+- ✅ **Pluggable** state storage backends
 
-Начните создавать волшебников, аннотируя класс с помощью `@WizardHandler` и определяя шаги как вложенные объекты `WizardStep`!
-если у вас есть вопросы, свяжитесь с нами в чате, мы будем рады помочь :)
+Start building wizards by annotating a class with `@WizardHandler` and defining your steps as nested `WizardStep` objects!
+if you have any questions contact us in chat, we will be glad to help :)
 ---

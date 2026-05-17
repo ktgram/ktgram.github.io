@@ -1,27 +1,34 @@
 ---
 ---
-title: Konteks Bot
+title: Bot Context
 ---
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Diagram konteks bot" />
-</p>
+```mermaid
+flowchart LR
+    H[Handler function] --> UD["UserData (per-user)"]
+    H --> CD["ClassData (per-class scope)"]
+    UD --> Impl1["ConcurrentHashMap (default)"]
+    UD --> Impl2["Custom impl via @CtxProvider<br/>(Redis, JDBC, ...)"]
+    CD --> Impl1
+    CD --> Impl2
+```
 
-Bot juga dapat memberikan kemampuan untuk mengingat beberapa data melalui antarmuka `UserData` dan `ClassData`.
 
-- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) adalah data level pengguna.
-- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) adalah data level kelas, yaitu data akan disimpan hingga pengguna berpindah ke perintah atau input yang berada di
-  kelas berbeda. (dalam mode fungsi akan bekerja seperti data pengguna)
+Bot juga dapat menyediakan kemampuan untuk mengingat beberapa data melalui antarmuka `UserData` dan `ClassData`.
 
-Secara default, implementasi disediakan melalui [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) tetapi dapat diubah ke milik Anda sendiri melalui antarmuka [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) dan [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) menggunakan
+- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) adalah data pada tingkat pengguna.
+- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) adalah data pada tingkat kelas, yaitu data akan disimpan sampai pengguna beralih ke perintah atau input yang berada di
+  kelas yang berbeda. (dalam mode fungsi akan berfungsi seperti data pengguna)
+
+Secara default, implementasi disediakan melalui [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) tetapi dapat diubah ke implementasi Anda sendiri melalui antarmuka [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) dan [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) menggunakan
 alat penyimpanan data pilihan Anda.
 
 
 > [!CAUTION]
-> Jangan lupa menjalankan gradle `kspKotlin`/atau tugas ksp yang relevan untuk membuat binding codegen yang diperlukan tersedia.
+> Jangan lupa menjalankan gradle `kspKotlin`/atau tugas ksp yang relevan untuk membuat binding codegen yang diperlukan tersedia. 
 
 
-Untuk mengubah, yang perlu Anda lakukan adalah meletakkan di bawah implementasi Anda anotasi `@CtxProvider` dan menjalankan tugas gradle ksp (atau build).
+Untuk mengubahnya, yang perlu Anda lakukan adalah menambahkan anotasi `@CtxProvider` pada implementasi Anda dan menjalankan tugas gradle ksp (atau build).
 
 ```kotlin
 @CtxProvider
@@ -30,8 +37,8 @@ class MyRedis : UserData<String> {
 }
 ```
 
-### Lihat juga
+### See also
 
-* [Beranda](https://github.com/vendelieu/telegram-bot/wiki)
+* [Home](https://github.com/vendelieu/telegram-bot/wiki)
 * [Update parsing](Update-parsing.md)
 ---

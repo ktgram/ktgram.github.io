@@ -3,32 +3,34 @@
 title: Bot Context
 ---
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Bot context diagram" />
-</p>
+```mermaid
+flowchart LR
+    H[Handler function] --> UD["UserData (per-user)"]
+    H --> CD["ClassData (per-class scope)"]
+    UD --> Impl1["ConcurrentHashMap (default)"]
+    UD --> Impl2["Custom impl via @CtxProvider<br/>(Redis, JDBC, ...)"]
+    CD --> Impl1
+    CD --> Impl2
+```
 
-The bot can also provide the ability to remember some data through the `UserData` and `ClassData` interfaces.
 
-- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) is a user-level data.
-- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) is a class-level data, i.e. the data will be stored until the user moves to a command or input that is in a
-  different class. (in function mode it will work like as user data)
+Bot 也可以通过 `UserData` 和 `ClassData` 接口提供记忆一些数据的能力。
 
-By default, implementation is provided through [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) but can be changed to your own through [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) and [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) interfaces using
-the data storage tools of your choice.
+- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) 是用户级别的数据。
+- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) 是类级别的数据，即数据会一直保存，直到用户切换到属于不同类的命令或输入。（在函数模式下，它的行为类似于用户数据）
 
+默认实现通过 [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) 提供，但可以使用 [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) 和 [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) 接口，结合您选择的数据存储工具自行更换。
 
 > [!CAUTION]
-> Don't forget to hit gradle `kspKotlin`/or any relevant ksp task to make required codegen bindings available. 
+> 别忘了运行 Gradle `kspKotlin` 或其他相关的 ksp 任务，以生成所需的代码绑定。
 
-
-To change, all you need to do is put under your implementation `@CtxProvider` annotation and run gradle ksp task (or build).
+要更改，只需在实现上添加 `@CtxProvider` 注解并运行 Gradle ksp 任务（或构建）。
 
 ```kotlin
 @CtxProvider
 class MyRedis : UserData<String> {
     // ...
 }
-
 ```
 
 ### See also

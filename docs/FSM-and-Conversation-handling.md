@@ -17,7 +17,20 @@ Now let's imagine step-by-step input of data, where the bot enters dialogue mode
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-Green arrows indicate the process of transitioning through steps without errors, blue arrows mean saving the current state and waiting for re-input (for example, if the user indicated that he is -100 years old, it should ask for age again), and red ones show exit from the entire process due to any command or any other meaning cancellation.
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
+
+Forward arrows (`Transition.Next`, `Transition.JumpTo`) advance the wizard, `Transition.Retry` keeps the user on the same step until input is valid (for example, when the user types `-100` for their age), and `Transition.Finish` (or an external command) ends the flow entirely.
 
 ### In practice
 

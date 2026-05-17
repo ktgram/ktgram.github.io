@@ -355,5 +355,6 @@ Use interceptors to keep your handlers focused on business logic while handling 
 
 ### See also
 
-* [Functional Handling DSL](Functional-handling-DSL.md) - Functional update processing
+* [Handlers (incl. Functional DSL)](Handlers.md) - Annotation- and DSL-based handler definition
+* [Sessions](Sessions.md) - Per-chat / per-user state &amp; message tracking
 * [Guards](Guards.md) - Handler-level permission checks

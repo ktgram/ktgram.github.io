@@ -1,13 +1,13 @@
 ---
 ---
-title: 봇 설정
+title: Bot Configuration
 ---
 
-라이브러리는 다양한 설정 옵션을 제공하며, [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) 클래스 설명에서 API 참조를 확인할 수 있습니다.
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
-봇을 설정하는 두 가지 접근 방식도 있습니다:
+There are also two approaches to configuring the bot:
 
-### Configurator 람다
+### Configurator lambda
 
 ```kotlin
 // ...
@@ -21,101 +21,121 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-### ConfigLoader 인터페이스
+### ConfigLoader interface
 
-특별한 [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) 인터페이스를 통해 설정할 수 있는 기능도 제공합니다.<br/> 이를 사용하여 외부 소스(`properties`, `command line args` 등)에서 설정을 로드할 수 있습니다.
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
-이 인터페이스의 구현체는 보조 생성자를 통해 전달할 수 있으며, 인스턴스는 그에 따라 설정됩니다.
+The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 
 ```kotlin
 val bot = TelegramBot(ConfigLoaderImpl)
 ```
 
-현재 `ktgram-config-env`, `ktgram-config-toml`과 같이 이 인터페이스를 구현하는 여러 모듈이 제공됩니다.
+Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
-### BotConfiguration 개요
+### BotConfiguration Overview
 
 #### BotConfiguration
 
-`BotConfiguration` 클래스는 봇 설정을 위한 중앙 허브입니다. 봇 식별, API 호스트 설정, 테스트 환경에서 봇이 작동하는지 여부 결정, 입력 처리, 클래스 관리, 입력 자동 제거 제어 등의 속성을 포함합니다. 또한 속도 제한, HTTP 클라이언트 설정, 로깅, 업데이트 수신, 명령 구문 분석을 위한 내부 속성도 제공합니다.
+The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
-##### 속성
+##### Properties
 
-- `identifier`: 다중 봇 처리 중 다른 봇 인스턴스를 식별합니다.
-- `apiHost`: Telegram API의 호스트입니다.
-- `isTestEnv`: 봇이 테스트 환경에서 작동하는지 여부를 나타내는 플래그입니다.
-- `inputListener`: 입력 처리 클래스의 인스턴스입니다.
-- `classManager`: 클래스를 가져오는 데 사용되는 관리자입니다.
-- `inputAutoRemoval`: 처리 중 입력 지점의 자동 삭제를 조절하는 플래그입니다.
-- `exceptionHandlingStrategy`: 예외 처리 전략을 정의합니다.
-    * `CollectToChannel` - `TgUpdateHandler.caughtExceptions`로 수집합니다.
-    * `Throw` - `TgException`으로 다시 래핑하여 던집니다.
-    * `DoNothing` - 아무것도 하지 않습니다 :)
-    * `Handle` - 커스텀 핸들러를 설정합니다.
-- `throwExOnActionsFailure`: 봇 요청이 실패할 때 예외를 던집니다.
+- `identifier`: Identifies different bot instances during multi-bot processing.
+- `apiHost`: Host of the Telegram API.
+- `isTestEnv`: Flag indicating whether the bot operates in a test environment.
+- `inputListener`: Instance of the input handling class.
+- `classManager`: Manager used to get classes.
+- `inputAutoRemoval`: Flag regulating the auto-deletion of the input point during processing.
+- `exceptionHandlingStrategy`: Defines the strategy for handling exceptions.
+    * `CollectToChannel` - Collect to `TgUpdateHandler.caughtExceptions`.
+    * `Throw` - Throw again wrapped with `TgException`.
+    * `DoNothing` - Do nothing :)
+    * `Handle` - Set custom handler.
+- `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
-##### 설정 블록
+##### Configuration Blocks
 
-`BotConfiguration`은 내부 구성 요소를 설정하는 함수를 제공합니다:
+`BotConfiguration` also offers functions to configure its internal components:
 
-- `httpClient(block: HttpConfiguration.() -> Unit)`: HTTP 클라이언트를 설정합니다.
-- `logging(block: LoggingConfiguration.() -> Unit)`: 로깅을 설정합니다.
-- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: 요청 제한을 설정합니다.
-- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: 업데이트 수신기를 설정합니다.
-- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: 명령 구문 분석 패턴을 지정합니다.
+- `httpClient(block: HttpConfiguration.() -> Unit)`: Configures the HTTP client.
+- `logging(block: LoggingConfiguration.() -> Unit)`: Configures logging.
+- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
+- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
+- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
-### 관련 설정 클래스
+### Associated Configuration Classes
 
 #### RateLimiterConfiguration
 
-전역 속도 제한을 설정합니다.
+Configures global rate limiting.
 
-- `limits`: 전역 속도 제한입니다.
-- `mechanism`: 속도 제한에 사용되는 메커니즘, 기본값은 TokenBucket 알고리즘입니다.
-- `exceededAction`: 제한을 초과했을 때 적용되는 작업입니다.
+- `limits`: Global rate limits.
+- `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
+- `exceededAction`: Action applied when the limit is exceeded.
 
 #### HttpConfiguration
 
-봇의 HTTP 클라이언트 설정을 포함합니다.
+Contains configuration for the bot's HTTP client.
 
-- `requestTimeoutMillis`: 요청 제한 시간(밀리초 단위).
-- `connectTimeoutMillis`: 연결 제한 시간(밀리초 단위).
-- `socketTimeoutMillis`: 소켓 제한 시간(밀리초 단위).
-- `maxRequestRetry`: HTTP 요청의 최대 재시도 횟수입니다.
-- `retryStrategy`: 재시도 전략, 커스터마이징 가능합니다.
-- `retryDelay`: 각 재시도 시 제한 시간 배수입니다.
-- `proxy`: HTTP 호출을 위한 프록시 설정입니다.
-- `additionalHeaders`: 모든 요청에 적용되는 헤더입니다.
+- `requestTimeoutMillis`: Request timeout in milliseconds.
+- `connectTimeoutMillis`: Connection timeout in milliseconds.
+- `socketTimeoutMillis`: Socket timeout in milliseconds.
+- `maxRequestRetry`: Maximum retry for HTTP requests.
+- `retryStrategy`: Strategy for retries, customizable.
+- `retryDelay`: Multiplier for timeout at each retry.
+- `proxy`: Proxy settings for HTTP calls.
+- `additionalHeaders`: Headers applied to every request.
 
 #### LoggingConfiguration
 
-봇 작업 및 HTTP 요청에 대한 로깅 수준을 관리합니다.
+Manages logging levels for bot actions and HTTP requests.
 
-- `botLogLevel`: 봇 작업에 대한 로그 수준입니다.
-- `httpLogLevel`: HTTP 요청에 대한 로그 수준입니다.
+- `botLogLevel`: Level of logs for bot actions.
+- `httpLogLevel`: Level of logs for HTTP requests.
 
 #### UpdatesListenerConfiguration
 
-풀링 업데이트와 관련된 매개변수를 설정합니다.
+Configures parameters related to pulling updates.
 
-- `dispatcher`: 들어오는 업데이트를 수집하는 디스패처입니다.
-- `processingDispatcher`: 업데이트를 처리하는 디스패처입니다.
-- `pullingDelay`: 각 풀링 요청 후 지연 시간입니다.
-- `updatesPollingTimeout`: 장기 폴링 메커니즘을 위한 제한 시간 옵션입니다.
+- `dispatcher`: Dispatcher for collecting incoming updates.
+- `processingDispatcher`: Dispatcher for processing updates.
+- `pullingDelay`: Delay after each pulling request.
+- `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
 #### CommandParsingConfiguration
 
-명령 구문 분석을 위한 매개변수를 지정합니다.
+Specifies parameters for command parsing.
 
-- `commandDelimiter`: 명령과 매개변수 사이의 구분자입니다.
-- `parametersDelimiter`: 매개변수 사이의 구분자입니다.
-- `parameterValueDelimiter`: 매개변수의 키와 값 사이의 구분자입니다.
-- `restrictSpacesInCommands`: 명령의 공백을 명령의 끝으로 처리할지 여부를 나타내는 플래그입니다.
-- `useIdentifierInGroupCommands`: 명령에 @가 포함된 명령을 일치시키기 위해 봇의 식별자를 사용합니다.
+- `commandDelimiter`: Separator between command and parameters.
+- `parametersDelimiter`: Separator between parameters.
+- `parameterValueDelimiter`: Separator between key and value of parameter.
+- `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
+- `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-### 예제 설정
+#### SessionConfiguration *(added in 9.5)*
 
-다음은 이러한 클래스를 사용하여 봇을 설정하는 방법의 예시입니다:
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
+
+### Example Configuration
+
+Here's an example of how to configure a bot using these classes:
 
 ```kotlin
 val bot = TelegramBot("TOKEN") {
@@ -147,7 +167,7 @@ val bot = TelegramBot("TOKEN") {
 }
 ```
 
-이 설정은 특정 식별자로 봇을 설정하고, 테스트 환경 모드를 활성화하며, 속도 제한, HTTP 클라이언트 설정, 로깅 수준, 업데이트 수신기 매개변수, 명령 구문 분석 규칙을 구성합니다.
+This configuration sets up a bot with specific identifiers, enables test environment mode, configures rate limiting, HTTP client settings, logging levels, update listener parameters, and command parsing rules.
 
-개발자는 이러한 설정 옵션을 활용하여 특정 요구사항을 충족하고 다양한 운영 시나리오에서 성능을 최적화하도록 봇을 세밀하게 조정할 수 있습니다.
+By leveraging these configuration options, developers can fine-tune their bots to meet specific requirements and optimize performance across various operational scenarios.
 ---

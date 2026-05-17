@@ -1,19 +1,19 @@
 ---
 ---
-title: Atividades e Processadores
+title: Activites And Processors
 ---
 
-### Introdução
+### Introduction
 
-`Activity` nos termos desta biblioteca é a entidade abstrata que é uma generalização de entidades como `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler` e `@CommonHandler`.
+`Activity` nos termos desta biblioteca é a entidade abstrata que generaliza entidades como `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler` e `@WizardHandler`.
 
-Além disso, dê uma olhada no [artigo sobre handlers](Handlers.md).
+Também dê uma olhada no [artigo sobre handlers](Handlers.md).
 
-### Coletando atividades
+### Collecting activities
 
-As atividades são coletadas e preparadas todo o contexto em tempo de compilação (exceto aquelas definidas através de DSL funcional).
+As activities são descobertas e conectadas em **tempo de compilação** pelo processador KSP **ktnip**. O [Functional DSL](Handlers#functional-dsl.md) é a única exceção — handlers definidos através de `bot.setFunctionality { ... }` são registrados em tempo de execução.
 
-Se você quiser limitar a área na qual o pacote será pesquisado, você pode passar um parâmetro para o plugin:
+Se você quiser limitar a área em que o pacote será pesquisado, pode passar um parâmetro ao plugin:
 
 ```gradle
 ktGram {
@@ -29,18 +29,18 @@ ksp {
 }
 ```
 
-note que nesse caso, para que as ações coletadas sejam processadas corretamente, você também deve especificar o pacote na própria instância.
+note que, nesse caso, para que as ações coletadas sejam processadas corretamente, você também deve especificar o pacote na própria instância.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // inicia o listener de long-polling
+    // start long-polling listener
 }
 ```
 
-esta opção foi adicionada para poder executar múltiplas instâncias de bot:
+essa opção foi adicionada para permitir a execução de múltiplas instâncias de bot:
 
 ```gradle
 ktGram {
@@ -49,7 +49,7 @@ ktGram {
 ```
 
 
-ou se você não estiver usando plugin para especificar pacotes diferentes, você precisa especificá-los com o separador `;`:
+ou, se você não estiver usando o plugin, para especificar pacotes diferentes você precisa declará-los com o separador `;`:
 
 ```gradle
 ksp {
@@ -57,21 +57,21 @@ ksp {
 }
 ```
 
-### Processamento
+### Processing
 
 #### Webhooks
 
-No seu controlador (ou outro lugar onde o `webhook` é processado), você chama: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+No seu controller (ou outro local onde o `webhook` é processado), você chama: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
 #### Long polling
 
 Chame: `bot.handleUpdates()` ou através de `bot.update.setListener { handle(it) }`
 
 
-### Veja também
+### See also
 
-* [Parsing de atualizações](Update-parsing.md)
-* [Invocação de atividade](Activity-invocation.md)
-* [Ações](Actions.md)
+* [Update parsing](Update-parsing.md)
+* [Activity invocation](Activity-invocation.md)
+* [Actions](Actions.md)
 
 ---

@@ -1,72 +1,89 @@
 ---
 ---
-title: कार्रवाइयाँ
+title: Actions
 ---
 
-### सभी अनुरोध कार्रवाइयाँ हैं
-सभी टेलीग्राम API अनुरोध विभिन्न प्रकार के [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) इंटरफेस हैं जो विभिन्न विधियों को लागू करते हैं जैसे [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>जो [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - प्रकार के फ़ंक्शन के रूप में लपेटे गए हैं लाइब्रेरी इंटरफ़ेस की सुविधा के लिए।
+### All requests is Actions
+All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
 
-<p align="center">
-    <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram" />
-</p>
+```mermaid
+classDiagram
+    class TgAction~T~
+    class SimpleAction~T~
+    class Action~T~
+    class MediaAction~T~
+    TgAction <|-- SimpleAction
+    TgAction <|-- Action
+    Action <|-- MediaAction
+    class OptionsFeature
+    class MarkupFeature
+    class EntitiesFeature
+    class CaptionFeature
+    Action ..|> OptionsFeature
+    Action ..|> MarkupFeature
+    Action ..|> EntitiesFeature
+    MediaAction ..|> CaptionFeature
+```
 
-प्रत्येक `कार्रवाई` की अपनी संभावित विधियाँ हो सकती हैं, उपलब्ध [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) पर निर्भर करता है।
 
-### सुविधाएँ
 
-विभिन्न कार्रवाइयों में विभिन्न [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) हो सकते हैं टेलीग्राम बॉट API पर निर्भर करता है, जैसे:
+Each `Action` may be able of having its own possible methods, depending on the available [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html).
+
+### Features
+
+Different actions may have different [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) depending on the Telegram Bot Api, such as:
 [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html),
 [`MarkupFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-markup-feature/index.html)
 [`EntitiesFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-entities-feature/index.html)
 [`CaptionFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-caption-feature/index.html).
 
-आइए उन्हें करीब से देखें:
+Let's take a closer look at them:
 
-### विकल्प
-उदाहरण के लिए, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) का उपयोग वैकल्पिक पैरामीटर पास करने के लिए किया जाता है।
+### Options
+For example, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) is used to pass optional parameters.
 
-प्रत्येक कार्रवाई के अपने विकल्पों का प्रकार होता है, संबंधित आप `कार्रवाई` में स्वयं `विकल्प` पैरामीटर में गुण अनुभाग में देख सकते हैं। <br/>उदाहरण के लिए, `sendMessage` जिसमें विभिन्न पैरामीटर विकल्पों के साथ [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-message-options/index.html) डेटा क्लास होता है।
+Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-message-options/index.html) data class with different parameters as options.
 
-उपयोग का उदाहरण:
+Example usage:
 
 ```kotlin
 message{ "*Test*" }.options {
     parseMode = ParseMode.Markdown
 }.send(user, bot)
 ```
-### मार्कअप
+### Markup
 
-कीबोर्ड के सभी प्रकार के [कीबोर्ड](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html) भेजने के लिए एक विधि भी है: <br/>[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
+There is also a method for sending markups that supports all kind of [keyboards](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html): <br/>[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
 
-#### इनलाइन कीबोर्ड मार्कअप
+#### Inline Keyboard Markup
 
-यह बिल्डर आपको किसी भी पैरामीटर संयोजन के साथ इनलाइन बटन बनाने की अनुमति देता है।
+This builder allows you to construct inline buttons with any combination of parameters.
 
 ```kotlin
 message{ "Test" }.inlineKeyboardMarkup {
     "name" callback "callbackData"         //
-    "buttonName" url "https://google.com"  //--- ये दो बटन एक ही पंक्ति में होंगे।
-    newLine() // या br()
-    "otherButton" webAppInfo "data"       // यह अन्य पंक्ति में होगा
+    "buttonName" url "https://google.com"  //--- these two buttons will be in the same row.
+    newLine() // or br()
+    "otherButton" webAppInfo "data"       // this will be in other row
 
-    // आप बिल्डर के भीतर विभिन्न शैलियों का भी उपयोग कर सकते हैं:
+    // you can also use a different style within the builder:
     callbackData("buttonName") { "callbackData" }
 }.send(user, bot)
 
 ```
 
-अधिक विवरण बिल्डर [दस्तावेज़ीकरण](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html) में देखा जा सकता है।
+More details can be seen in the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html).
 
-#### रिप्लाई कीबोर्ड मार्कअप
+#### Reply Keyboard Markup
 
-यह बिल्डर मेनू बटन बनाने की अनुमति देता है।
+This builder allows you to construct menu buttons.
 
 ```kotlin
 message{ "Test" }.replyKeyboardMarkup {
-  + "Menu button"     // आप यूनरी प्लस ऑपरेटर का उपयोग करके बटन जोड़ सकते हैं
+  + "Menu button"     // you can add buttons by using unary plus operator
   + "Menu button 2"
-  br() // दूसरी पंक्ति पर जाएं
-  "Send polls 👀" requestPoll true   // पैरामीटर के साथ बटन
+  br() // go to second row
+  "Send polls 👀" requestPoll true   // button with parameter
 
   options {
     resizeKeyboard = true
@@ -74,11 +91,11 @@ message{ "Test" }.replyKeyboardMarkup {
 }.send(user, bot)
 ```
 
-कीबोर्ड पर लागू होने वाले अतिरिक्त विकल्प [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html) में देखे जा सकते हैं।
+Additional options applicable to the keyboard can be seen in [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html).
 
-विधियों के बारे में अधिक विवरण के लिए बिल्डर [दस्तावेज़ीकरण](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) देखें।
+See the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) for more details about the methods.
 
-कीबोर्ड मार्कअप एकत्र करने के लिए डीएसएल का उपयोग करना अधिकतर सुविधाजनक है, लेकिन यदि आवश्यक हो, तो आप मार्कअप को मैन्युअल रूप से भी जोड़ सकते हैं।
+It's mostly convenient to use dsl for collecting keyboard markup, but if needed, you can also add markup manually.
 
 ```kotlin
 message{ "*Test*" }.markup {
@@ -97,44 +114,46 @@ message{ "*Test*" }.markup {
 }.send(user, bot)
 ```
 
-### इकाइयाँ
-[`MessageEntity`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-message-entity/index.html) भेजने के लिए एक विधि भी है।
+### Entities
+There is also a method for sending [`MessageEntity`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-message-entity/index.html).
 
-उपयोग का उदाहरण:
+Example usage:
 
 ```kotlin
 message{ "Test \$hello" }.replyKeyboardMarkup {
     +"Test menu button"
 }.entities {
-    5 to 15 url "https://google.com" // TextLink जोड़ें
+    5 to 15 url "https://google.com" // add TextLink
     entity(EntityType.Bold, 0, 4)
-    entity(EntityType.Cashtag, 5, 5) // बैकस्लैश गिनती में नहीं आता (क्योंकि इसका उपयोग कंपाइलर के लिए किया जाता है)
+    entity(EntityType.Cashtag, 5, 5) // backslash doesn't count (because it's used for compiler)
 }.send(user, bot)
 ```
 
-#### संदर्भात्मक इकाइयाँ।
+#### Contextual entities.
 
-इकाइयाँ कुछ निर्माणों के संदर्भ के माध्यम से भी जोड़ी जा सकती हैं, उन्हें विशिष्ट [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) इंटरफ़ेस द्वारा लेबल किया जाता है, यह कैप्शन सुविधा में भी मौजूद है।
+Entities can also be added through the context of some constructs, they are labeled with a specific [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) interface, it is also present in the caption feature.
 
-उपयोग का उदाहरण:
+Example usage:
 
 ```kotlin
 message { "usual text " - bold { "this is bold text" } - " continue usual" }.send(user, bot)
 ```
 
-सभी प्रकार की [इकाई प्रकार](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-entity-type/index.html) समर्थित हैं।
+All kinds of [entity types](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-entity-type/index.html) are supported.
 
-### कैप्शन
-इसके अलावा, मीडिया फ़ाइलों के लिए कैप्शन जोड़ने के लिए `caption` विधि का उपयोग किया जा सकता है।
+### Caption
+Also, the `caption` method can be used to add captions to media files.
 
-उपयोग का उदाहरण:
+Example usage:
 
 ```kotlin
 photo { "FILE_ID" }.caption { "Test caption" }.send(user, bot)
 ```
 
 
-### भी देखें
+### See also
 
-* [बॉट संदर्भ](Bot-Context.md)
-* [FSM | संवाद संभालना](FSM-and-Conversation-handling.md)
+* [Bot context](Bot-Context.md)
+* [FSM | Conversation handling](FSM-and-Conversation-handling.md)
+
+---

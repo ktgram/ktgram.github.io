@@ -1,19 +1,19 @@
 ---
 ---
-title: Действия и Процессоры
+title: Activites And Processors
 ---
 
-### Введение
+### Introduction
 
-`Activity` в терминах этой библиотеки - это абстрактная сущность, которая является обобщением таких сущностей, как `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler` и `@CommonHandler`.
+`Activity` в терминах этой библиотеки — это абстрактная сущность, обобщающая такие сущности, как `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler` и `@WizardHandler`.
 
-Также взгляните на [статью о хэндлерах](Handlers.md).
+Также посмотрите статью о [handlers](Handlers.md).
 
-### Сбор действий
+### Collecting activities
 
-Действия собираются и подготавливают весь контекст во время компиляции (за исключением тех, которые определены через функциональный dsl).
+Activities обнаруживаются и связываются **во время компиляции** процессором **ktnip** KSP. Исключением является [Functional DSL](Handlers#functional-dsl.md) — обработчики, определённые через `bot.setFunctionality { ... }`, регистрируются во время выполнения.
 
-Если вы хотите ограничить область, в которой будет производиться поиск пакета, вы можете передать параметр в плагин:
+Если вы хотите ограничить область, в которой будет происходить поиск пакетов, вы можете передать параметр плагину:
 
 ```gradle
 ktGram {
@@ -23,24 +23,24 @@ ktGram {
 
 или без плагина через ksp:
 
-```kotlin
+```gradle
 ksp {
     arg("package", "com.example.mybot")
 }
 ```
 
-обратите внимание, что в таком случае, для того чтобы собранные действия обрабатывались корректно, вы также должны указать пакет в самом экземпляре.
+обратите внимание, что в таком случае, чтобы собранные действия корректно обрабатывались, вы также должны указать пакет в самом экземпляре.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // запуск long-polling слушателя
+    // start long-polling listener
 }
 ```
 
-эта опция добавлена для возможности запуска множественных экземпляров бота:
+эта опция добавлена, чтобы можно было запускать несколько экземпляров бота:
 
 ```gradle
 ktGram {
@@ -48,7 +48,8 @@ ktGram {
 }
 ```
 
-или если вы не используете плагин для указания разных пакетов, вам нужно указать их через разделитель `;`:
+
+или, если вы не используете плагин, для указания разных пакетов необходимо перечислить их через разделитель `;`:
 
 ```gradle
 ksp {
@@ -56,19 +57,21 @@ ksp {
 }
 ```
 
-### Обработка
+### Processing
 
-#### Вебхуки
+#### Webhooks
 
-В вашем контроллере (или другом месте, где обрабатывается `webhook`), вы вызываете: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+В вашем контроллере (или другом месте, где обрабатывается `webhook`) вы вызываете: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
 #### Long polling
 
-Вызывайте: `bot.handleUpdates()` или через `bot.update.setListener { handle(it) }`
+Вызовите: `bot.handleUpdates()` или через `bot.update.setListener { handle(it) }`
 
 
-### См. также
+### See also
 
-* [Парсинг обновлений](Update-parsing.md)
-* [Вызов действия](Activity-invocation.md)
-* [Действия](Actions.md)
+* [Update parsing](Update-parsing.md)
+* [Activity invocation](Activity-invocation.md)
+* [Actions](Actions.md)
+
+---

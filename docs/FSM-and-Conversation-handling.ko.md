@@ -3,44 +3,57 @@
 title: Fsm And Conversation Handling
 ---
 
-라이브러리는 FSM(유한 상태 기계) 메커니즘도 지원합니다. 이는 잘못된 입력 처리를 통해 사용자 입력을 점진적으로 처리하는 메커니즘입니다.
+The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
 > [!NOTE]
-> TL;DR: 예제는 [여기](https://github.com/vendelieu/telegram-bot_template/tree/conversation)에서 확인하세요.
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### 이론상
+### In theory
 
-설문 조사를 위해 사용자 데이터를 수집해야 하는 상황을 상상해보세요. 모든 데이터를 한 단계에서 요청할 수 있지만, 매개변수 중 하나의 입력이 잘못되면 사용자와 우리 모두에게 어려움이 있으며, 각 단계는 특정 입력 데이터에 따라 차이가 있을 수 있습니다.
+Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
 
-이제 단계별로 데이터를 입력하는 상황을 상상해보세요. 봇이 사용자와 대화 모드로 진입합니다.
+Now let's imagine step-by-step input of data, where the bot enters dialogue mode with the user.
 
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-녹색 화살표는 오류 없이 단계를 전환하는 과정을 나타내며, 파란색 화살표는 현재 상태를 저장하고 재입력을 기다리는 것을 의미합니다(예: 사용자가 -100세라고 입력하면 다시 나이를 묻습니다). 빨간색 화살표는 모든 명령이나 기타 취소 의미로 인해 전체 프로세스를 종료하는 것을 보여줍니다.
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
 
-### 실제 사용
+Forward arrows (`Transition.Next`, `Transition.JumpTo`) advance the wizard, `Transition.Retry` keeps the user on the same step until input is valid (for example, when the user types `-100` for their age), and `Transition.Finish` (or an external command) ends the flow entirely.
 
-Wizard 시스템은 Telegram 봇에서 다단계 사용자 상호작용을 가능하게 합니다. 사용자를 일련의 단계를 통해 안내하고, 입력을 검증하며, 상태를 저장하고, 단계 간 전환을 수행합니다.
+### In practice
 
-**주요 이점:**
-- **타입 안전**: 상태 접근을 위한 컴파일 타임 타입 검사
-- **선언적**: 중첩 클래스/객체로 단계 정의
-- **유연성**: 조건부 전환, 점프, 재시도 지원
-- **상태 유지**: 플러그형 저장소 백엔드를 통한 자동 상태 지속성
-- **통합**: 기존 Activity 시스템과 연동
+The Wizard system enables multi-step user interactions in Telegram bots. It guides users through a sequence of steps, validates input, stores state, and transitions between steps.
 
-### 핵심 개념
+**Key Benefits:**
+- **Type-safe**: Compile-time type checking for state access
+- **Declarative**: Define steps as nested classes/objects
+- **Flexible**: Support for conditional transitions, jumps, and retries
+- **Stateful**: Automatic state persistence with pluggable storage backends
+- **Integrated**: Works with the existing Activity system
+
+### Core Concepts
 
 #### WizardStep
 
-`WizardStep`은 Wizard 흐름의 단일 단계를 나타냅니다. 각 단계는 다음을 구현해야 합니다:
+A `WizardStep` represents a single step in the wizard flow. Each step must implement:
 
-- **`onEntry(ctx: WizardContext)`**: 사용자가 이 단계에 진입할 때 호출됩니다. 사용자에게 프롬프트를 표시하는 데 사용하세요.
-- **`onRetry(ctx: WizardContext)`**: 검증이 실패하고 단계를 재시도해야 할 때 호출됩니다. 오류 메시지를 표시하는 데 사용하세요.
-- **`validate(ctx: WizardContext): Transition`**: 현재 입력을 검증하고 다음에 발생할 일을 나타내는 `Transition`을 반환합니다.
-- **`store(ctx: WizardContext): Any?`** (선택사항): 이 단계에 대해 지속할 값을 반환합니다. 단계가 상태를 저장하지 않으면 `null`을 반환하세요.
+- **`onEntry(ctx: WizardContext)`**: Called when the user enters this step. Use this to prompt the user.
+- **`onRetry(ctx: WizardContext)`**: Called when validation fails and the step should retry. Use this to show error messages.
+- **`validate(ctx: WizardContext): Transition`**: Validates the current input and returns a `Transition` indicating what happens next.
+- **`store(ctx: WizardContext): Any?`** (optional): Returns the value to persist for this step. Return `null` if the step doesn't store state.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -67,19 +80,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> 어떤 단계가 초기 단계로 표시되지 않으면 -> 첫 번째로 선언된 단계가 고려됩니다.
+> If some step is not marked as initial -> first declared step is considered as.
 
 #### Transition
 
-`Transition`은 검증 후 발생하는 일을 결정합니다:
+A `Transition` determines what happens after validation:
 
-- **`Transition.Next`**: 시퀀스의 다음 단계로 이동
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: 특정 단계로 점프
-- **`Transition.Retry`**: 현재 단계를 재시도(검증 실패)
-- **`Transition.Finish`**: Wizard 종료
+- **`Transition.Next`**: Move to the next step in sequence
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Jump to a specific step
+- **`Transition.Retry`**: Retry the current step (validation failed)
+- **`Transition.Finish`**: Finish the wizard
 
 ```kotlin
-// 입력에 따라 조건부 점프
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +105,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext`는 다음에 대한 접근을 제공합니다:
-- **`user: User`**: 현재 사용자
-- **`update: ProcessedUpdate`**: 현재 업데이트
-- **`bot: TelegramBot`**: 봇 인스턴스
-- **`userReference: UserChatReference`**: 상태 저장을 위한 사용자 및 채팅 ID 참조
+`WizardContext` provides access to:
+- **`user: User`**: The current user
+- **`update: ProcessedUpdate`**: The current update
+- **`bot: TelegramBot`**: The bot instance
+- **`userReference: UserChatReference`**: User and chat ID reference for state storage
 
-KSP가 생성한 타입 안전 상태 접근 메서드도 추가됩니다.
+Plus type-safe state access methods (generated by KSP).
 
 ---
 
-### Wizard 정의
+### Defining a Wizard
 
-#### 기본 구조
+#### Basic Structure
 
-Wizard는 `@WizardHandler` 어노테이션이 달린 클래스나 객체로 정의됩니다:
+A wizard is defined as a class or object annotated with `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... 단계 구현
+        // ... step implementation
     }
     
     object AgeStep : WizardStep {
-        // ... 단계 구현
+        // ... step implementation
     }
     
     object FinishStep : WizardStep {
-        // ... 단계 구현
+        // ... step implementation
     }
 }
 ```
 
-#### 어노테이션 매개변수
+#### Annotation Parameters
 
-**`@WizardHandler`**는 다음을 허용합니다:
-- **`trigger: Array<String>`**: Wizard를 시작하는 명령(예: `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: 수신할 업데이트 유형(기본값: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: 단계 데이터를 저장할 상태 관리자 클래스
+**`@WizardHandler`** accepts:
+- **`trigger: Array<String>`**: Commands that start the wizard (e.g., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Update types to listen for (default: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: State manager classes for storing step data
 
 ---
 
-### 상태 관리
+### State Management
 
 #### WizardStateManager
 
-상태는 `WizardStateManager<T>` 구현을 사용하여 저장됩니다. 각 관리자는 특정 타입을 처리합니다:
+State is stored using `WizardStateManager<T>` implementations. Each manager handles a specific type:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +161,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-다음도 참조하세요: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
+See also: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### 자동 매칭
+#### Automatic Matching
 
-KSP는 `store()` 반환 타입에 따라 단계를 상태 관리자에 매칭합니다:
+KSP matches steps to state managers based on the `store()` return type:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +175,21 @@ KSP는 `store()` 반환 타입에 따라 단계를 상태 관리자에 매칭합
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // StringStateManager와 매칭
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
     
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // IntStateManager와 매칭
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### 단계별 재정의
+#### Per-Step Override
 
-`@WizardHandler.StateManager`를 사용하여 특정 단계에 대한 상태 관리자를 재정의합니다:
+Override the state manager for a specific step using `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,42 +198,42 @@ object SurveyWizard {
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // DefaultStateManager 사용
+        // Uses DefaultStateManager
     }
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // CustomStateManager 사용
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### 타입 안전 상태 접근
+### Type-Safe State Access
 
-KSP는 상태를 저장하는 각 단계에 대해 `WizardContext`에 타입 안전 확장 함수를 생성합니다.
+KSP generates type-safe extension functions on `WizardContext` for each step that stores state.
 
-#### 생성된 함수
+#### Generated Functions
 
-`String`을 저장하는 단계의 경우:
+For a step that stores a `String`:
 
 ```kotlin
-// KSP가 자동으로 생성
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### 사용법
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // 타입 안전 접근 - String? (널 가능) 반환
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
         
-        // 타입 안전 접근 - Int? (널 가능) 반환
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
@@ -239,24 +252,24 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### 대체 메서드
+#### Fallback Methods
 
-타입 안전 메서드를 사용할 수 없는 경우 대체 메서드를 사용하세요:
+If type-safe methods aren't available, use the fallback methods:
 
 ```kotlin
-// 대체 - Any? 반환
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// 대체 - Any? 허용
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### 완전한 예제
+### Complete Example
 
-#### 사용자 등록 Wizard
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -327,7 +340,7 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // 타입 안전 상태 접근
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
@@ -350,7 +363,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // 다시 시작
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
@@ -361,7 +374,7 @@ object RegistrationWizard {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
-            // 데이터베이스에 저장, 확인 메시지 전송 등
+            // Save to database, send confirmation, etc.
             message { 
                 "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
@@ -378,11 +391,11 @@ object RegistrationWizard {
 
 ---
 
-### 고급 기능
+### Advanced Features
 
-#### 조건부 전환
+#### Conditional Transitions
 
-조건부 흐름에 `Transition.JumpTo`를 사용하세요:
+Use `Transition.JumpTo` for conditional flows:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,20 +408,20 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### 상태 저장 없는 단계
+#### Stateless Steps
 
-단계가 상태를 저장할 필요가 없습니다. 단순히 `store()`에서 `null`을 반환하세요(또는 그대로 유지):
+Steps don't need to store state. Simply return `null` from `store()` (or keep as is):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... 나머지 구현
+    // ... rest of implementation
 }
 ```
 
-#### 커스텀 상태 관리자
+#### Custom State Managers
 
-커스텀 저장소(데이터베이스, Redis 등)를 위해 `WizardStateManager<T>`를 구현하세요:
+Implement `WizardStateManager<T>` for custom storage (database, Redis, etc.):
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -416,7 +429,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // 데이터베이스에서 로드
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
     
@@ -425,7 +438,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         reference: UserChatReference,
         value: String
     ) {
-        // 데이터베이스에 저장
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
     
@@ -433,7 +446,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // 데이터베이스에서 삭제
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,38 +454,38 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### 내부 동작 방식
+### How It Works Internally
 
-#### 코드 생성
+#### Code Generation
 
-KSP가 생성합니다:
+KSP generates:
 
-1. **WizardActivity**: `WizardActivity`를 확장하는 구체적인 구현체와 하드코딩된 단계
-2. **시작 Activity**: 명령 트리거를 처리하고 Wizard를 시작
-3. **입력 Activity**: Wizard 흐름 중 사용자 입력 처리
-4. **상태 접근자**: 상태 접근을 위한 타입 안전 확장 함수
+1. **WizardActivity**: A concrete implementation extending `WizardActivity` with hardcoded steps
+2. **Start Activity**: Handles the command trigger and starts the wizard
+3. **Input Activity**: Handles user input during the wizard flow
+4. **State Accessors**: Type-safe extension functions for state access
 
-#### 흐름
+#### Flow
 
-1. 사용자가 `/register` 전송 → 시작 Activity 호출
-2. 시작 Activity가 `WizardContext`를 생성하고 `wizardActivity.start(ctx)` 호출
-3. `start()`가 초기 단계에 진입하고 현재 단계를 추적하기 위해 `inputListener` 설정
-4. 사용자가 메시지 전송 → 입력 Activity 호출
-5. 입력 Activity가 `wizardActivity.handleInput(ctx)` 호출
-6. `handleInput()`이 입력 검증, 상태 저장, 다음 단계로 전환
-7. `Transition.Finish`가 반환될 때까지 반복
+1. User sends `/register` → Start Activity is invoked
+2. Start Activity creates `WizardContext` and calls `wizardActivity.start(ctx)`
+3. `start()` enters the initial step and sets `inputListener` to track the current step
+4. User sends a message → Input Activity is invoked
+5. Input Activity calls `wizardActivity.handleInput(ctx)`
+6. `handleInput()` validates input, persists state, and transitions to the next step
+7. Process repeats until `Transition.Finish` is returned
 
-#### 상태 지속성
+#### State Persistence
 
-- 검증 성공 후 상태 저장(전환 전)
-- 각 단계의 `store()` 반환 값이 일치하는 `WizardStateManager`를 사용하여 저장
-- 상태는 사용자 및 채팅별로 범위가 지정됨(`UserChatReference`)
+- State is persisted after successful validation (before transition)
+- Each step's `store()` return value is saved using the matching `WizardStateManager`
+- State is scoped per user and chat (`UserChatReference`)
 
 ---
 
-### 모범 사례
+### Best Practices
 
-#### 1. 명확한 프롬프트 항상 제공
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
@@ -483,7 +496,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. 검증 오류를 우아하게 처리
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,52 +507,52 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. 타입 안전 상태 접근 사용
+#### 3. Use Type-Safe State Access
 
-생성된 타입 안전 메서드를 선호하세요:
+Prefer generated type-safe methods:
 
 ```kotlin
-// ✅ 좋음 - 타입 안전
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ 피하세요 - 타입 안전성 상실
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. 단계를 집중적으로 유지
+#### 4. Keep Steps Focused
 
-각 단계는 단일 책임을 가져야 합니다:
+Each step should have a single responsibility:
 
 ```kotlin
-// ✅ 좋음 - 집중된 단계
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // 이메일 수집만 처리
+    // Only handles email collection
 }
 
-// ❌ 피하세요 - 로직이 너무 많음
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // 이름, 이메일, 전화번호, 주소 처리...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. 의미 있는 단계 이름 사용
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ 좋음
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ 피하세요
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. 필요할 때 상태 정리
+#### 6. Clean Up State When Needed
 
-필요할 경우 수동으로 상태를 지우세요:
+If you need to clear state manually:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // 모든 Wizard 상태 지우기
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
@@ -550,16 +563,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### 요약
+### Summary
 
-Wizard 시스템은 다음을 제공합니다:
-- ✅ **타입 안전** 상태 관리와 컴파일 타임 검사
-- ✅ **선언적** 중첩 클래스로 단계 정의
-- ✅ **유연한** 조건부 논리로 전환
-- ✅ **자동** KSP를 통한 코드 생성
-- ✅ **통합** 기존 Activity 시스템과 연동
-- ✅ **플러그형** 상태 저장소 백엔드
+The Wizard system provides:
+- ✅ **Type-safe** state management with compile-time checking
+- ✅ **Declarative** step definitions as nested classes
+- ✅ **Flexible** transitions with conditional logic
+- ✅ **Automatic** code generation via KSP
+- ✅ **Integrated** with the existing Activity system
+- ✅ **Pluggable** state storage backends
 
-`@WizardHandler` 어노테이션이 달린 클래스를 정의하고 중첩된 `WizardStep` 객체로 단계를 정의하여 Wizard 구축을 시작하세요!
-궁금한 점이 있으면 채팅으로 문의하세요. 도와드리겠습니다 :)
+Start building wizards by annotating a class with `@WizardHandler` and defining your steps as nested `WizardStep` objects!
+if you have any questions contact us in chat, we will be glad to help :)
 ---

@@ -1,46 +1,59 @@
 ---
 ---
-title: FSM 与对话处理
+title: Fsm And Conversation Handling
 ---
 
-该库还支持 FSM 机制，这是一种用于逐步处理用户输入并处理错误输入的功能机制。
+The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
 > [!NOTE]
-> TL;DR: 参见示例[此处](https://github.com/vendelieu/telegram-bot_template/tree/conversation)。
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### 理论
+### In theory
 
-让我们设想一种情况，你需要收集用户调查，你可以在一个步骤中请求所有人的数据，但如果其中一个参数输入错误，这对用户和我们来说都很困难，并且每个步骤可能因特定输入数据而有所不同。
+Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
 
-现在让我们设想逐步输入数据，机器人与用户进入对话模式。
+Now let's imagine step-by-step input of data, where the bot enters dialogue mode with the user.
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="处理过程图" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-绿色箭头表示无错误地通过步骤的转换过程，蓝色箭头表示保存当前状态并等待重新输入（例如，如果用户表示他是-100岁，应该重新询问年龄），红色箭头显示由于任何命令或任何其他有意义的取消而退出整个过程。
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
 
-### 实践
+Forward arrows (`Transition.Next`, `Transition.JumpTo`) advance the wizard, `Transition.Retry` keeps the user on the same step until input is valid (for example, when the user types `-100` for their age), and `Transition.Finish` (or an external command) ends the flow entirely.
 
-Wizard 系统支持 Telegram 机器人的多步骤用户交互。它引导用户完成一系列步骤，验证输入，存储状态，并在步骤之间转换。
+### In practice
 
-**主要优势：**
-- **类型安全**: 编译时类型检查状态访问
-- **声明式**: 将步骤定义为嵌套类/对象
-- **灵活**: 支持条件转换、跳转和重试
-- **有状态**: 使用可插拔存储后端自动状态持久化
-- **集成**: 与现有的 Activity 系统配合工作
+The Wizard system enables multi-step user interactions in Telegram bots. It guides users through a sequence of steps, validates input, stores state, and transitions between steps.
 
-### 核心概念
+**Key Benefits:**
+- **Type-safe**: Compile-time type checking for state access
+- **Declarative**: Define steps as nested classes/objects
+- **Flexible**: Support for conditional transitions, jumps, and retries
+- **Stateful**: Automatic state persistence with pluggable storage backends
+- **Integrated**: Works with the existing Activity system
+
+### Core Concepts
 
 #### WizardStep
 
-`WizardStep` 表示向导流程中的单个步骤。每个步骤必须实现：
+A `WizardStep` represents a single step in the wizard flow. Each step must implement:
 
-- **`onEntry(ctx: WizardContext)`**: 当用户进入此步骤时调用。用于提示用户。
-- **`onRetry(ctx: WizardContext)`**: 验证失败且步骤应重试时调用。用于显示错误消息。
-- **`validate(ctx: WizardContext): Transition`**: 验证当前输入并返回 `Transition` 指示接下来发生什么。
-- **`store(ctx: WizardContext): Any?`** (可选): 返回要为此步骤持久化的数值。如果步骤不存储状态则返回 `null`。
+- **`onEntry(ctx: WizardContext)`**: Called when the user enters this step. Use this to prompt the user.
+- **`onRetry(ctx: WizardContext)`**: Called when validation fails and the step should retry. Use this to show error messages.
+- **`validate(ctx: WizardContext): Transition`**: Validates the current input and returns a `Transition` indicating what happens next.
+- **`store(ctx: WizardContext): Any?`** (optional): Returns the value to persist for this step. Return `null` if the step doesn't store state.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -67,19 +80,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> 如果某个步骤未标记为初始 -> 第一个声明的步骤被视为初始。
+> If some step is not marked as initial -> first declared step is considered as.
 
 #### Transition
 
-`Transition` 决定验证后发生什么：
+A `Transition` determines what happens after validation:
 
-- **`Transition.Next`**: 按顺序移动到下一个步骤
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: 跳转到特定步骤
-- **`Transition.Retry`**: 重试当前步骤（验证失败）
-- **`Transition.Finish`**: 完成向导
+- **`Transition.Next`**: Move to the next step in sequence
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Jump to a specific step
+- **`Transition.Retry`**: Retry the current step (validation failed)
+- **`Transition.Finish`**: Finish the wizard
 
 ```kotlin
-// 基于输入的条件跳转
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +105,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext` 提供以下访问：
-- **`user: User`**: 当前用户
-- **`update: ProcessedUpdate`**: 当前更新
-- **`bot: TelegramBot`**: 机器人实例
-- **`userReference: UserChatReference`**: 用于状态存储的用户和聊天 ID 引用
+`WizardContext` provides access to:
+- **`user: User`**: The current user
+- **`update: ProcessedUpdate`**: The current update
+- **`bot: TelegramBot`**: The bot instance
+- **`userReference: UserChatReference`**: User and chat ID reference for state storage
 
-加上类型安全的每个步骤状态访问方法（由 KSP 生成）。
+Plus type-safe state access methods (generated by KSP).
 
 ---
 
-### 定义向导
+### Defining a Wizard
 
-#### 基本结构
+#### Basic Structure
 
-向导被定义为使用 `@WizardHandler` 注解的类或对象：
+A wizard is defined as a class or object annotated with `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... 步骤实现
+        // ... step implementation
     }
     
     object AgeStep : WizardStep {
-        // ... 步骤实现
+        // ... step implementation
     }
     
     object FinishStep : WizardStep {
-        // ... 步骤实现
+        // ... step implementation
     }
 }
 ```
 
-#### 注解参数
+#### Annotation Parameters
 
-**`@WizardHandler`** 接受：
-- **`trigger: Array<String>`**: 启动向导的命令（例如 `["/start", "/survey"]`）
-- **`scope: Array<UpdateType>`**: 监听的更新类型（默认值：`[UpdateType.MESSAGE]`）
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: 用于存储步骤数据的状态管理器类
+**`@WizardHandler`** accepts:
+- **`trigger: Array<String>`**: Commands that start the wizard (e.g., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Update types to listen for (default: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: State manager classes for storing step data
 
 ---
 
-### 状态管理
+### State Management
 
 #### WizardStateManager
 
-状态使用 `WizardStateManager<T>` 实现存储。每个管理器处理特定类型：
+State is stored using `WizardStateManager<T>` implementations. Each manager handles a specific type:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +161,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-另请参阅：[MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html)。
+See also: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### 自动匹配
+#### Automatic Matching
 
-KSP 根据 `store()` 返回值类型匹配步骤到状态管理器：
+KSP matches steps to state managers based on the `store()` return type:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +175,21 @@ KSP 根据 `store()` 返回值类型匹配步骤到状态管理器：
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // 匹配 StringStateManager
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
     
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // 匹配 IntStateManager
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### 每个步骤覆盖
+#### Per-Step Override
 
-使用 `@WizardHandler.StateManager` 覆盖特定步骤的状态管理器：
+Override the state manager for a specific step using `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,42 +198,42 @@ object SurveyWizard {
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // 使用 DefaultStateManager
+        // Uses DefaultStateManager
     }
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // 使用 CustomStateManager 替代
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### 类型安全状态访问
+### Type-Safe State Access
 
-KSP 为每个存储状态的步骤生成类型安全的扩展函数到 `WizardContext`。
+KSP generates type-safe extension functions on `WizardContext` for each step that stores state.
 
-#### 生成的函数
+#### Generated Functions
 
-对于存储 `String` 的步骤：
+For a step that stores a `String`:
 
 ```kotlin
-// KSP 自动生成
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### 使用
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // 类型安全访问 - 返回 String? (可空)
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
         
-        // 类型安全访问 - 返回 Int? (可空)
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
@@ -239,24 +252,24 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### 回退方法
+#### Fallback Methods
 
-如果类型安全方法不可用，使用回退方法：
+If type-safe methods aren't available, use the fallback methods:
 
 ```kotlin
-// 回退 - 返回 Any?
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// 回退 - 接受 Any?
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### 完整示例
+### Complete Example
 
-#### 用户注册向导
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -327,7 +340,7 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // 类型安全状态访问
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
@@ -350,7 +363,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // 重新开始
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
@@ -361,7 +374,7 @@ object RegistrationWizard {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
-            // 保存到数据库、发送确认等
+            // Save to database, send confirmation, etc.
             message { 
                 "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
@@ -378,11 +391,11 @@ object RegistrationWizard {
 
 ---
 
-### 高级功能
+### Advanced Features
 
-#### 条件转换
+#### Conditional Transitions
 
-使用 `Transition.JumpTo` 实现条件流程：
+Use `Transition.JumpTo` for conditional flows:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,20 +408,20 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### 无状态步骤
+#### Stateless Steps
 
-步骤不需要存储状态。简单地从 `store()` 返回 `null` (或保持原样)：
+Steps don't need to store state. Simply return `null` from `store()` (or keep as is):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... 其余实现
+    // ... rest of implementation
 }
 ```
 
-#### 自定义状态管理器
+#### Custom State Managers
 
-为自定义存储实现 `WizardStateManager<T>` (数据库、Redis 等)：
+Implement `WizardStateManager<T>` for custom storage (database, Redis, etc.):
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -416,7 +429,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // 从数据库加载
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
     
@@ -425,7 +438,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         reference: UserChatReference,
         value: String
     ) {
-        // 保存到数据库
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
     
@@ -433,7 +446,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // 从数据库删除
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,38 +454,38 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### 内部工作原理
+### How It Works Internally
 
-#### 代码生成
+#### Code Generation
 
-KSP 生成：
+KSP generates:
 
-1. **WizardActivity**: 扩展 `WizardActivity` 的具体实现，包含硬编码步骤
-2. **启动 Activity**: 处理命令触发并启动向导
-3. **输入 Activity**: 处理向导流程中的用户输入
-4. **状态访问器**: 类型安全的扩展函数用于状态访问
+1. **WizardActivity**: A concrete implementation extending `WizardActivity` with hardcoded steps
+2. **Start Activity**: Handles the command trigger and starts the wizard
+3. **Input Activity**: Handles user input during the wizard flow
+4. **State Accessors**: Type-safe extension functions for state access
 
-#### 流程
+#### Flow
 
-1. 用户发送 `/register` → 启动 Activity 被调用
-2. 启动 Activity 创建 `WizardContext` 并调用 `wizardActivity.start(ctx)`
-3. `start()` 进入初始步骤并设置 `inputListener` 跟踪当前步骤
-4. 用户发送消息 → 输入 Activity 被调用
-5. 输入 Activity 调用 `wizardActivity.handleInput(ctx)`
-6. `handleInput()` 验证输入、持久化状态并转换到下一步
-7. 过程重复直到返回 `Transition.Finish`
+1. User sends `/register` → Start Activity is invoked
+2. Start Activity creates `WizardContext` and calls `wizardActivity.start(ctx)`
+3. `start()` enters the initial step and sets `inputListener` to track the current step
+4. User sends a message → Input Activity is invoked
+5. Input Activity calls `wizardActivity.handleInput(ctx)`
+6. `handleInput()` validates input, persists state, and transitions to the next step
+7. Process repeats until `Transition.Finish` is returned
 
-#### 状态持久化
+#### State Persistence
 
-- 状态在成功验证后持久化（转换之前）
-- 每个步骤的 `store()` 返回值使用匹配的 `WizardStateManager` 保存
-- 状态按用户和聊天范围 (`UserChatReference`)
+- State is persisted after successful validation (before transition)
+- Each step's `store()` return value is saved using the matching `WizardStateManager`
+- State is scoped per user and chat (`UserChatReference`)
 
 ---
 
-### 最佳实践
+### Best Practices
 
-#### 1. 始终提供清晰的提示
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
@@ -483,7 +496,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. 优雅处理验证错误
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,52 +507,52 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. 使用类型安全状态访问
+#### 3. Use Type-Safe State Access
 
-优先使用生成的类型安全方法：
+Prefer generated type-safe methods:
 
 ```kotlin
-// ✅ 好 - 类型安全
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ 避免 - 失去类型安全
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. 保持步骤专注
+#### 4. Keep Steps Focused
 
-每个步骤应该有单一职责：
+Each step should have a single responsibility:
 
 ```kotlin
-// ✅ 好 - 专注的步骤
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // 只处理电子邮件收集
+    // Only handles email collection
 }
 
-// ❌ 避免 - 逻辑过多
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // 处理姓名、电子邮件、电话、地址...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. 使用有意义的步骤名称
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ 好
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ 避免
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. 需要时清理状态
+#### 6. Clean Up State When Needed
 
-如果需要手动清除状态：
+If you need to clear state manually:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // 清除所有向导状态
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
@@ -550,16 +563,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### 总结
+### Summary
 
-Wizard 系统提供：
-- ✅ **类型安全** 的状态管理与编译时检查
-- ✅ **声明式** 的步骤定义作为嵌套类
-- ✅ **灵活** 的转换与条件逻辑
-- ✅ **自动** 的代码生成 via KSP
-- ✅ **集成** 与现有的 Activity 系统
-- ✅ **可插拔** 的状态存储后端
+The Wizard system provides:
+- ✅ **Type-safe** state management with compile-time checking
+- ✅ **Declarative** step definitions as nested classes
+- ✅ **Flexible** transitions with conditional logic
+- ✅ **Automatic** code generation via KSP
+- ✅ **Integrated** with the existing Activity system
+- ✅ **Pluggable** state storage backends
 
-通过使用 `@WizardHandler` 注解类并定义嵌套的 `WizardStep` 对象开始构建向导！
-如果你有任何问题，请联系我们的聊天室，我们将很乐意帮助你 :)
+Start building wizards by annotating a class with `@WizardHandler` and defining your steps as nested `WizardStep` objects!
+if you have any questions contact us in chat, we will be glad to help :)
 ---

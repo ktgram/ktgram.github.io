@@ -1,26 +1,26 @@
 ---
 ---
-title: Web Starters (Spring Dan Ktor)
+title: Web Starters (Spring And Ktor)
 ---
 
 ### Spring starter
 
-Modul Spring Starter untuk library adalah modul auto-configuration yang mengintegrasikan fungsionalitas bot Telegram ke dalam aplikasi Spring Boot. Modul ini memanfaatkan kekuatan dependency injection dan configuration properties dari Spring Boot untuk mengonfigurasi bot Telegram secara otomatis berdasarkan konfigurasi yang diberikan. Library ini sangat berguna bagi developer yang ingin membangun bot Telegram menggunakan Kotlin dan Spring Boot, menawarkan pendekatan yang terstruktur untuk pengembangan dan manajemen bot.
+Modul Spring Starter untuk library adalah modul auto‑configuration yang mengintegrasikan fungsionalitas bot Telegram ke dalam aplikasi Spring Boot. Modul ini memanfaatkan kekuatan dependency injection dan properti konfigurasi Spring Boot untuk secara otomatis mengonfigurasi bot Telegram berdasarkan konfigurasi yang diberikan. Library ini sangat berguna bagi pengembang yang ingin membangun bot Telegram menggunakan Kotlin dan Spring Boot, menawarkan pendekatan yang terstruktur untuk pengembangan dan manajemen bot.
 
-### Fitur Utama
+### Key Features
 
-- **Auto-Configuration**: Library secara otomatis mengonfigurasi bot Telegram berdasarkan configuration properties yang diberikan, menghilangkan kebutuhan setup manual.
-- **Configuration Properties**: Mendukung configuration properties untuk kustomisasi mudah pengaturan bot, seperti bot tokens, package names, dan identifiers.
-- **Spring Integration**: Terintegrasi secara mulus dengan ekosistem Spring, memanfaatkan dependency injection dan application context dari Spring untuk mengelola bot instances.
-- **Coroutine Support**: Memanfaatkan Kotlin coroutines untuk operasi bot asynchronous, memastikan eksekusi yang efisien dan non-blocking.
+- **Auto-Configuration**: Library secara otomatis mengonfigurasi bot Telegram berdasarkan properti konfigurasi yang diberikan, menghilangkan kebutuhan penyiapan manual.
+- **Configuration Properties**: Mendukung properti konfigurasi untuk memudahkan kustomisasi pengaturan bot, seperti token bot, nama paket, dan identifier.
+- **Spring Integration**: Terintegrasi mulus dengan ekosistem Spring, memanfaatkan dependency injection dan konteks aplikasi Spring untuk mengelola instance bot.
+- **Coroutine Support**: Memanfaatkan coroutine Kotlin untuk operasi bot asynchronous, memastikan eksekusi yang efisien dan non‑blocking.
 
-### Memulai
+### Getting Started
 
-Untuk menggunakan Spring Starter Library untuk Telegram Bots, Anda perlu menyertakannya sebagai dependency di proyek Spring Boot Anda. Library didesain untuk bekerja dengan aplikasi Spring Boot dan memerlukan framework Spring Boot untuk berfungsi.
+Untuk menggunakan Spring Starter Library untuk Telegram Bots, Anda perlu menambahkannya sebagai dependensi dalam proyek Spring Boot Anda. Library ini dirancang untuk bekerja dengan aplikasi Spring Boot dan memerlukan kerangka kerja Spring Boot untuk berfungsi.
 
 #### Dependency
 
-Tambahkan dependency berikut ke file `build.gradle` atau `pom.xml` Anda:
+Tambahkan dependensi berikut ke file `build.gradle` atau `pom.xml` Anda:
 
 ```gradle
 dependencies {
@@ -28,11 +28,11 @@ dependencies {
 }
 ```
 
-Ganti `<version>` dengan versi terbaru dari library.
+Ganti `<version>` dengan versi terbaru library.
 
 #### Configuration
 
-Library menggunakan `@ConfigurationProperties` dari Spring Boot untuk binding configuration properties. Anda dapat mendefinisikan konfigurasi bot Anda di file `application.properties` atau `application.yml` dari aplikasi Spring Boot Anda.
+Library menggunakan `@ConfigurationProperties` Spring Boot untuk mengikat properti konfigurasi. Anda dapat mendefinisikan konfigurasi bot Anda dalam file `application.properties` atau `application.yml` aplikasi Spring Boot Anda.
 
 ```yaml
 ktgram:
@@ -44,11 +44,11 @@ ktgram:
       identifier: MyBot
 ```
 
-#### Penggunaan
+#### Usage
 
-Setelah library disertakan dan dikonfigurasi, library secara otomatis membuat dan mengonfigurasi instances bot Telegram berdasarkan konfigurasi yang diberikan.
+Setelah library termasuk dan dikonfigurasi, ia secara otomatis membuat dan mengonfigurasi instance bot Telegram berdasarkan konfigurasi yang diberikan.
 
-Library juga mendukung multiple bot instances, untuk menginisialisasi beberapa instance cukup deklarasikan sebagai entry baru di bagian bot:
+Ia juga mendukung banyak instance bot; untuk menginisialisasi beberapa bot cukup deklarasikan sebagai entri baru di bagian bot:
 
 ```yaml
 ktgram:
@@ -59,18 +59,18 @@ ktgram:
 
 ### Advanced Configuration
 
-Untuk konfigurasi yang lebih advanced, seperti menyesuaikan perilaku bot atau integrasi dengan komponen Spring lainnya, Anda dapat memperluas kelas `BotConfiguration` dan mengubah konfigurasi bot melalui method `applyCfg` nya, Anda dapat melihat contoh [di sana](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
+Untuk konfigurasi lebih lanjut, seperti menyesuaikan perilaku bot atau mengintegrasikan dengan komponen Spring lainnya, Anda dapat memperluas kelas `BotConfiguration` dan mengubah konfigurasi bot melalui metode `applyCfg`, contoh dapat dilihat [di sana](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
 
 > [!TIP]
-> Untuk mengonfigurasi setiap instance yang diinisialisasi dengan custom configuration, bedakan mereka dengan identifier mereka (kelas BotConfiguration juga memiliki identifier).
+> Untuk mengkonfigurasi setiap instance yang diinisialisasi dengan konfigurasi khusus, bedakan mereka berdasarkan identifier‑nya (kelas BotConfiguration juga memiliki identifier).
 
 ### Ktor
 
-Modul ini didesain untuk memfasilitasi pembuatan webhook server untuk Telegram bots. Modul ini memungkinkan developer untuk mengonfigurasi server, termasuk SSL/TLS settings, dan mendeklarasikan multiple Telegram bots dengan custom configurations. Proses setup fleksibel, memungkinkan developer untuk menyesuaikan server sesuai kebutuhan spesifik mereka.
+Modul ini dirancang untuk memfasilitasi pembuatan server webhook untuk bot Telegram. Ia memungkinkan pengembang mengkonfigurasi server, termasuk pengaturan SSL/TLS, dan mendeklarasikan banyak bot Telegram dengan konfigurasi khusus. Proses penyiapan fleksibel, memungkinkan pengembang menyesuaikan server sesuai kebutuhan mereka.
 
 ### Installation
 
-Untuk menginstall ktor starter tambahkan tambahan ke main dependency:
+Untuk menginstal ktor starter tambahkan tambahan ke dependensi utama:
 
 ```gradle
 dependencies {
@@ -79,59 +79,59 @@ dependencies {
 }
 ```
 
-### Komponen Utama
+### Key Components
 
-Fungsi `serveWebhook`
+`serveWebhook` Function
 
-Fungsi serveWebhook adalah inti dari library. Fungsi ini men-setup dan memulai webhook server untuk Telegram bots. Fungsi ini menerima dua parameter:
+Fungsi `serveWebhook` adalah inti dari library. Ia menyiapkan dan memulai server webhook untuk bot Telegram. Fungsi ini menerima dua parameter:
 
-- `wait`: Sebuah boolean yang menunjukkan apakah server harus menunggu aplikasi berhenti sebelum shutdown. Defaults ke true.
-- `serverBuilder`: Sebuah lambda function yang mengonfigurasi server. Defaults ke empty lambda.
+- `wait`: Boolean yang menunjukkan apakah server harus menunggu aplikasi berhenti sebelum dimatikan. Nilai default true.
+- `serverBuilder`: Lambda yang mengkonfigurasi server. Nilai default lambda kosong.
 
 ### Configuration
 
-* `WEBHOOK_PREFIX`: ini adalah parameter yang akan digunakan untuk address prefix untuk webhook listener route. (defaults ke "/")
+* `WEBHOOK_PREFIX`: parameter yang akan digunakan sebagai prefiks alamat untuk rute listener webhook. (defaultnya "/")
 
 #### Server Setup
 
-- `server`: Sebuah method untuk mengatur server configuration menggunakan EnvConfiguration atau ManualConfiguration.
-- `engine`: Sebuah method untuk mengonfigurasi Netty application engine.
-- `ktorModule`: Sebuah method untuk menambahkan Ktor modules ke aplikasi.
+- `server`: Metode untuk mengatur konfigurasi server menggunakan `EnvConfiguration` atau `ManualConfiguration`.
+- `engine`: Metode untuk mengkonfigurasi engine aplikasi Netty.
+- `ktorModule`: Metode untuk menambahkan modul Ktor ke aplikasi.
 
-Library menyediakan wide range dari configurable parameters untuk server, termasuk host, port, SSL settings, dan lainnya. Ada dua concrete options untuk mengonfigurasi:
+Library menyediakan beragam parameter yang dapat dikonfigurasi untuk server, termasuk host, port, pengaturan SSL, dan lainnya. Ada dua opsi konkret untuk konfigurasi:
 
-* `EnvConfiguration`: Membaca configuration values dari environment dengan prefix `KTGRAM_`.
-* `ManualConfiguration`: Memungkinkan manual setting dari configuration values, set parameter Anda di dalam function `server {}`.
+* `EnvConfiguration`: Membaca nilai konfigurasi dari environment dengan prefiks `KTGRAM_`.
+* `ManualConfiguration`: Memungkinkan penetapan nilai konfigurasi secara manual, atur parameter Anda dalam fungsi `server {}`.
 
-Ada list dari parameters yang dapat di-set:
+Berikut daftar parameter yang dapat diatur:
 
-- `HOST`: Hostname atau IP address dari server.
-- `PORT`: Port number untuk server.
-- `SSL_PORT`: Port number untuk SSL/TLS connections.
-- `PEM_PRIVATE_KEY_PATH`: Path ke PEM private key file.
-- `PEM_CHAIN_PATH`: Path ke PEM certificate chain file.
-- `PEM_PRIVATE_KEY`: PEM private key PASSWORD sebagai character array.
-- `KEYSTORE_PATH`: Path ke Java KeyStore file.
+- `HOST`: Nama host atau alamat IP server.
+- `PORT`: Nomor port server.
+- `SSL_PORT`: Nomor port untuk koneksi SSL/TLS.
+- `PEM_PRIVATE_KEY_PATH`: Path ke file kunci pribadi PEM.
+- `PEM_CHAIN_PATH`: Path ke file rantai sertifikat PEM.
+- `PEM_PRIVATE_KEY`: PASSWORD kunci pribadi PEM sebagai array karakter.
+- `KEYSTORE_PATH`: Path ke file Java KeyStore.
 - `KEYSTORE_PASSWORD`: Password untuk KeyStore.
-- `KEY_ALIAS`: Alias untuk key di KeyStore.
-- `SSL_ON`: Sebuah boolean yang menunjukkan apakah SSL/TLS harus di-enable. Defaults ke true.
+- `KEY_ALIAS`: Alias untuk kunci dalam KeyStore.
+- `SSL_ON`: Boolean yang menunjukkan apakah SSL/TLS harus diaktifkan. Default true.
 
 > [!TIP]
-> Jika pem certificates ada, modul itu sendiri akan membuat jks storage dari mereka di path yang ditentukan.
+> Jika sertifikat pem ada, modul itu sendiri akan membuat penyimpanan jks dari mereka pada path yang ditentukan.
 
 #### Bot Configuration:
 
-Untuk mengonfigurasi bot panggil `declareBot {}` yang memiliki parameter sebagai berikut:
+Untuk mengkonfigurasi bot panggil `declareBot {}` yang memiliki parameter berikut:
 
-- `token`: Bot token.
-- `pckg`: Package name untuk bot.
-- `configuration`: Sebuah lambda function untuk mengonfigurasi bot.
-- `handlingBehaviour`: Sebuah lambda function untuk mengatur handling behavior dari bot.
-- `onInit`: Sebuah lambda function yang dieksekusi ketika bot diinisialisasi.
+- `token`: Token bot.
+- `pckg`: Nama paket bot.
+- `configuration`: Lambda untuk mengkonfigurasi bot.
+- `handlingBehaviour`: Lambda untuk mengatur perilaku penanganan bot.
+- `onInit`: Lambda yang dijalankan saat bot diinisialisasi.
 
 ### Example Usage
 
-Untuk menggunakan modul ini, panggil fungsi `serveWebhook`, konfigurasikan dengan settings yang Anda inginkan, deklarasikan bot Anda. Berikut adalah contoh simplified:
+Untuk menggunakan modul ini, panggil fungsi `serveWebhook`, konfigurasikan dengan pengaturan yang diinginkan, deklarasikan bot Anda. Berikut contoh sederhana:
 
 ```kotlin
 fun main() = runBlocking {
@@ -159,9 +159,9 @@ fun main() = runBlocking {
 ```
 
 > [!CAUTION]
-> Jangan lupa untuk set webhook untuk membuat semuanya bekerja. :)
+> Jangan lupa mengatur webhook agar semuanya berfungsi. :)
 
-Secara default modul akan serve webhook listenening endpoints sebagai `host/BOT_TOKEN`
+Secara default modul akan menyajikan endpoint webhook sebagai `host/BOT_TOKEN`
 
 
 ---

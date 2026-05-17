@@ -4,110 +4,133 @@ title: Home
 ---
 
 ### Intro
-بیایید ایده‌ای از اینکه چگونه کتابخانه به‌طور کلی به‌روزرسانی‌ها را مدیریت می‌کند به‌دست آوریم:
+بیایید نگاهی کلی به نحوهٔ پردازش به‌روزرسانی‌ها توسط کتابخانه داشته باشیم:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/442cc5f1-0256-425a-9f25-185fdd49fe0a" alt="نمودار فرآیند مدیریت" />
-</p>
+```mermaid
+flowchart LR
+    U["Telegram Update"] --> P["Processing<br/>repackage to ProcessedUpdate"]
+    P --> H["Handling<br/>match against activities"]
+    H --> I["Invocation<br/>call handler with injected params"]
+```
 
-پس از دریافت به‌روزرسانی، کتابخانه سه مرحله اصلی را انجام می‌دهد، همانطور که می‌توانیم ببینیم.
+پس از دریافت یک به‌روزرسانی، کتابخانه سه مرحلهٔ اصلی را اجرا می‌کند، همان‌طور که می‌بینیم.
 
 ### Processing
 
-پردازش یعنی بسته‌بندی مجدد به‌روزرسانی دریافتی شده به زیرکلاس مناسب [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) بسته به حامل بارگذاری.
+پردازش به معنای بازبسته‌بندی به‌روزرسانی دریافت‌شده به زیرکلاس مناسب [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) بسته به محتوای حامل آن است.
 
-این مرحله برای این نیاز است که کار با به‌روزرسانی آسان‌تر شود و توانایی‌های پردازش را گسترش دهد.
+این مرحله برای ساده‌تر کردن کار با به‌روزرسانی و گسترش قابلیت‌های پردازشی لازم است.
 
 ### Handling
 
-مرحله بعدی، مرحله اصلی است، در اینجا به خود پردازش می‌رسیم.
+در ادامه مرحلهٔ اصلی می‌آید، اینجا به خود پردازش می‌پردازیم.
 
 ### Global RateLimiter
 
-اگر کاربری در به‌روزرسانی وجود دارد، محدودیت سرعت سراسری را بررسی می‌کنیم.
+اگر در به‌روزرسانی کاربری وجود داشته باشد، برای عبور از محدودیت‌ساز سراسری بررسی می‌کنیم.
 
 ### Parse text
 
-بعد از آن، بسته به حامل، یک کامپوننت خاص به‌روزرسانی حاوی متن انتخاب شده و متن مطابق تنظیمات پردازش می‌شود.
+سپس، بسته به محتوای حامل، یک مؤلفه خاص از به‌روزرسانی حاوی متن را می‌گیریم و مطابق پیکربندی آن را تجزیه می‌کنیم.
 
-جزئیات بیشتر را می‌توانید در [مقاله parse کردن به‌روزرسانی](Update-parsing.md) ببینید.
+جزییات بیشتر را می‌توانید در [مقالهٔ تجزیه به‌روزرسانی](Update-parsing.md) ببینید.
 
 ### Find Activity
 
-بعد از آن، مطابق با اولویت پردازش:
+سپس، بر اساس اولویت پردازش:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/6178c410-9b9e-4045-9f03-4791b3f49894" alt="نمودار اولویت مدیریت" />
-</p>
+```mermaid
+flowchart TD
+    Start(["Parsed update"]) --> Cmd{"matches a @CommandHandler?"}
+    Cmd -- yes --> CmdDone["Invoke command"]
+    Cmd -- no --> Inp{"user has pending input?"}
+    Inp -- yes --> InpDone["Invoke @InputHandler"]
+    Inp -- no --> Com{"matches any @CommonHandler?"}
+    Com -- yes --> ComDone["Invoke common handler"]
+    Com -- no --> Unp["Invoke @UnprocessedHandler"]
+    Start -. parallel .-> UH["@UpdateHandler — always runs"]
+```
 
-در حال جستجوی تطبیق بین داده‌های پردازش شده و فعالیت‌هایی هستیم که با آن‌ها کار می‌کنیم.
-همانطور که در نمودار اولویت می‌بینیم، `Commands` همیشه اول می‌آیند.
+ما به دنبال مطابقت بین داده‌های تجزیه‌شده و فعالیت‌هایی که بر روی آن‌ها کار می‌کنیم، هستیم.
+همان‌طور که در نمودار اولویت می‌بینید، `Commands` همیشه نخستین هستند.
 
-یعنی اگر بار متنی در به‌روزرسانی با هر دستوری مطابقت داشته باشد، جستجوی بیشتر برای `Inputs`، `Common` و البته اجرای عمل `Unprocessed` انجام نمی‌شود.
+به‌عبارت دیگر، اگر محتوای متنی در به‌روزرسانی با هر دستوری منطبق باشد، جستجوی بعدی برای `Inputs`، `Common` و اجرای عمل `Unprocessed` انجام نخواهد شد.
 
-تنها چیزی این است که اگر `UpdateHandlers` وجود داشته باشد، بدون درنظر گرفتن موارد قبلی، به‌طور موازی فعال می‌شود.
+تنها موردی که باقی می‌ماند این است که `UpdateHandlers` به‌صورت موازی فعال می‌شوند.
 
 #### Commands
 
-بیایید به دستورات و پردازش آن‌ها نزدیک‌تر نگاه کنیم.
+بیایید نگاهی دقیق‌تر به دستورات و پردازش آن‌ها داشته باشیم.
 
-همانطور که ممکن است متوجه شده باشید، اگرچه آنوتاسیون برای پردازش دستورات [`CommandHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-command-handler/index.html) نامیده می‌شود، اما کاربرد آن از مفهوم کلاسیک در ربات‌های تلگرام وسیع‌تر است.
+همان‌طور که ممکن است متوجه شده باشید، اگرچه انوتیشنی که برای پردازش دستورات استفاده می‌شود [`CommandHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-command-handler/index.html) نام دارد، نسبت به مفهوم کلاسیک در ربات‌های تلگرام انعطاف‌پذیرتر است.
 
 ##### Scopes
 
-این به این دلیل است که آن محدوده‌ای گسترده‌تر از امکانات پردازش را دارد، یعنی تابع هدف می‌تواند نه تنها بر اساس تطبیق متن، بلکه بر اساس نوع یک به‌روزرسانی مناسب نیز تعریف شود، این مفهوم scopes است.
+این به این دلیل است که دامنهٔ پردازشی وسیع‌تری دارد؛ یعنی تابع هدف نه تنها می‌تواند بر اساس تطبیق متن، بلکه بر اساس نوع به‌روزرسانی مناسب نیز تعریف شود؛ این مفهوم «قالب‌ها» (scopes) است.
 
-به همین ترتیب، هر دستور می‌تواند دستگیره‌های متفاوتی برای لیست متفاوتی از scopes داشته باشد، یا بالعکس، یک دستور برای چند مورد.
+به‌این ترتیب، هر دستور می‌تواند برای فهرست متفاوتی از قالب‌ها پردازشگرهای مختلفی داشته باشد یا بالعکس، یک دستور برای چندین قالب.
 
-در زیر می‌توانید ببینید که چگونه نگاشت بر اساس حامل متن و scope انجام می‌شود:
+در ادامه می‌توانید ببینید که نگاشت بر پایهٔ محتوای متنی و قالب چگونه انجام می‌شود:
+
+```mermaid
+flowchart LR
+    Text["text payload<br/>(e.g. /start)"] --> Match["CommandHandler lookup"]
+    UpdType["update type<br/>(MESSAGE, CALLBACK_QUERY, ...)"] --> Match
+    Match --> Handler["Best-matching<br/>@CommandHandler function"]
+```
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="نمودار scope دستور" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="Command scope diagram" />
 </p>
 
 #### Inputs
 
-بعد از آن، اگر بار متنی با هیچ دستوری مطابقت نداشته باشد، نقاط ورودی جستجو می‌شوند.
+در ادامه، اگر محتوای متنی با هیچ دستوری مطابقت نداشته باشد، نقاط ورودی (input points) جستجو می‌شوند.
 
-مفهوم بسیار شبیه به انتظار ورودی در برنامه‌های خط فرمان است، شما نقطه‌ای را در متن بات برای یک کاربر خاص قرار می‌دهید که ورودی بعدی او را مدیریت می‌کند، مهم نیست حاوی چیست، مهم این است که به‌روزرسانی بعدی یک `User` داشته باشد تا بتوان آن را به نقطه انتظار ورودی تنظیم شده ارتباط داد.
+این مفهوم شباهت زیادی به انتظار ورودی در برنامه‌های خط فرمان دارد؛ شما برای یک کاربر خاص در زمینهٔ ربات نقطه‌ای تعریف می‌کنید که ورودی بعدی او را پردازش کند، مهم نیست محتوا چیست، نکتهٔ اصلی این است که به‌روزرسانی بعدی دارای `User` باشد تا بتوان آن را به نقطهٔ انتظار ورودی مرتبط کرد.
 
-در زیر می‌توانید مثالی از پردازش یک به‌روزرسانی را ببینید که با `Commands` تطبیق نداشته باشد.
+در ادامه یک مثال از پردازش به‌روزرسانی زمانی که هیچ دستوری یافت نشد را می‌توانید ببینید:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/925d3e05-0985-43d5-8d6f-b3f2786ff212" alt="نمودار مثال اولویت" />
-</p>
+```mermaid
+flowchart LR
+    Upd["Update arrives"] --> Cmd{"matches a command?"}
+    Cmd -- no --> InpPoint{"user has<br/>an input-waiting point?"}
+    InpPoint -- yes --> Hit["Invoke matching @InputHandler<br/>(input is consumed)"]
+    InpPoint -- no --> Fallback["Fall through to Common / Unprocessed"]
+```
 
 #### Commons
 
-اگر handler هیچ `commands` یا `inputs` پیدا نکند، بار متنی را در مقابل دستگیره‌های `common` بررسی می‌کند.
+اگر پردازشگر هیچ `command` یا `input`‌ای پیدا نکند، محتوای متنی را در برابر پردازشگرهای `common` بررسی می‌کند.
 
-ما توصیه می‌کنیم بدون سوء استفاده از آن استفاده کنید، زیرا بررسی آن با تکرار روی تمام ورودی‌ها انجام می‌شود.
+توصیه می‌کنیم بدون بیش از حد استفاده از آن استفاده کنید، زیرا شامل تکرار بر روی تمام ورودی‌ها می‌شود.
 
 #### Unprocessed
 
-و مرحله نهایی، اگر handler هیچ فعالیتی مطابق پیدا نکند ([`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) کاملاً به‌طور موازی کار می‌کند و به عنوان فعالیت معمولی محسوب نمی‌شود)، سپس [`UnprocessedHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html) وارد عمل می‌شود، اگر تنظیم شده باشد، این مورد را مدیریت می‌کند، ممکن است برای هشدر به کاربر که چیزی اشتباه شده است مفید باشد.
+و در قدم نهایی، اگر پردازشگر هیچ فعالیت مطابقتی نبیند ([`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) به‌صورت کامل موازی کار می‌کند و به‌عنوان فعالیت معمولی محسوب نمی‌شود)، `UnprocessedHandler` وارد عمل می‌شود؛ اگر تنظیم شده باشد، این مورد را مدیریت می‌کند و می‌تواند برای هشدار دادن به کاربر مبنی بر بروز خطا مفید باشد.
 
-جزئیات بیشتر را در [مقاله Handlers](Handlers.md) بخوانید.
+جزئیات بیشتر را می‌توانید در [مقالهٔ Handlers](Handlers.md) مطالعه کنید.
 
 ### Activity RateLimiter
 
-پس از یافتن یک فعالیت، محدودیت سرعت کاربر را بر آن نیز بر اساس پارامترهای مشخص شده در پارامترهای فعالیت بررسی می‌کند.
+پس از پیدا کردن یک فعالیت، محدودیت‌های نرخ کاربر برای آن نیز بررسی می‌شود، بر اساس پارامترهای مشخص‌شده در پارامترهای فعالیت.
 
 ### Activity
 
-Activity به انواع مختلف دستگیره‌هایی اشاره دارد که کتابخانه ربات تلگرام می‌تواند مدیریت کند، شامل Commands، Inputs، Regexes و دستگیره Unprocessed.
+Activity به انواع مختلفی از پردازشگرهایی که کتابخانهٔ ربات تلگرام می‌تواند مدیریت کند، اشاره دارد؛ شامل Commands، Inputs، Regexes و پردازشگر Unprocessed.
 
 ### Invocation
 
-مرحله نهایی پردازش، فراخوانی فعالیت یافت شده است.
+مرحلهٔ نهایی پردازش، فراخوانی فعالیت یافت‌شده است.
 
-جزئیات بیشتر را می‌توانید در [مقاله invocation](Activity-invocation.md) بیابید.
+جزئیات بیشتر را می‌توانید در [مقالهٔ invocation](Activity-invocation.md) بیابید.
 
 ### See also
 
-* [Parse کردن به‌روزرسانی](Update-parsing.md)
-* [Invocation فعالیت](Activity-invocation.md)
+* [Update parsing](Update-parsing.md)
+* [Activity invocation](Activity-invocation.md)
 * [Handlers](Handlers.md)
+* [Sessions](Sessions.md)
 * [Bot configuration](Bot-configuration.md)
 * [Web starters (Spring, Ktor)](Web-starters-(Spring-and-Ktor.md))
 ---

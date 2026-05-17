@@ -1,46 +1,59 @@
 ---
 ---
-title: Xử lý FSM và Hội thoại
+title: Fsm And Conversation Handling
 ---
 
-Thư viện cũng hỗ trợ cơ chế FSM, đây là cơ chế xử lý tiến bộ đầu vào của người dùng với xử lý đầu vào không chính xác.
+Thư viện cũng hỗ trợ cơ chế FSM, là một cơ chế để xử lý dần đầu vào của người dùng cùng với việc xử lý lỗi đầu vào.
 
 > [!NOTE]
 > TL;DR: Xem ví dụ [tại đây](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### Về mặt lý thuyết
+### In theory
 
-Hãy tưởng tượng một tình huống nơi bạn cần thu thập khảo sát người dùng, bạn có thể yêu cầu tất cả dữ liệu của một người trong một bước, nhưng với đầu vào không chính xác của một trong các tham số, nó sẽ khó khăn cả cho người dùng và cho chúng ta, và mỗi bước có thể khác nhau tùy thuộc vào dữ liệu đầu vào nhất định.
+Hãy tưởng tượng một trường hợp bạn cần thu thập khảo sát người dùng, bạn có thể hỏi tất cả dữ liệu của một người trong một bước, nhưng nếu có đầu vào sai của một trong các tham số, sẽ gây khó khăn cho cả người dùng và chúng ta, và mỗi bước có thể có sự khác biệt tùy thuộc vào một số dữ liệu đầu vào.
 
-Bây giờ hãy tưởng tượng đầu vào từng bước của dữ liệu, nơi bot bước vào chế độ hội thoại với người dùng.
+Bây giờ hãy tưởng tượng việc nhập dữ liệu theo từng bước, nơi bot chuyển sang chế độ đối thoại với người dùng.
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Sơ đồ xử lý quá trình" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-Mũi tên màu xanh lá cây chỉ ra quá trình chuyển qua các bước không có lỗi, mũi tên màu xanh dương có nghĩa là lưu trạng thái hiện tại và chờ nhập lại (ví dụ: nếu người dùng chỉ ra rằng anh ta -100 tuổi, nó nên yêu cầu tuổi lại), và mũi tên màu đỏ hiển thị thoát khỏi toàn bộ quá trình do bất kỳ lệnh nào hoặc bất kỳ hủy bỏ có ý nghĩa nào khác.
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
 
-### Trong thực tế
+Các mũi tên tiến (`Transition.Next`, `Transition.JumpTo`) tiến hành wizard, `Transition.Retry` giữ người dùng ở cùng bước cho đến khi đầu vào hợp lệ (ví dụ, khi người dùng nhập `-100` cho tuổi), và `Transition.Finish` (hoặc một lệnh bên ngoài) kết thúc toàn bộ luồng.
 
-Hệ thống Wizard cho phép tương tác nhiều bước với người dùng trong các bot Telegram. Nó hướng dẫn người dùng qua một chuỗi các bước, xác thực đầu vào, lưu trữ trạng thái, và chuyển đổi giữa các bước.
+### In practice
 
-**Lợi ích chính:**
-- **An toàn kiểu**: Kiểm tra kiểu ở thời gian biên dịch cho truy cập trạng thái
-- **Khai báo**: Định nghĩa các bước dưới dạng lớp/nhóm lồng nhau
-- **Linh hoạt**: Hỗ trợ chuyển đổi có điều kiện, nhảy và thử lại
-- **Có trạng thái**: Tự động lưu trữ trạng thái với bộ lưu trữ backend có thể cắm ghép
-- **Tích hợp**: Hoạt động với hệ thống Activity hiện có
+Hệ thống Wizard cho phép tương tác nhiều bước với người dùng trong bot Telegram. Nó hướng dẫn người dùng qua một chuỗi các bước, xác thực đầu vào, lưu trữ trạng thái và chuyển đổi giữa các bước.
 
-### Các khái niệm cốt lõi
+**Lợi ích Chính:**
+- **Type-safe**: Kiểm tra kiểu tại thời điểm biên dịch cho việc truy cập trạng thái
+- **Declarative**: Định nghĩa các bước dưới dạng lớp/đối tượng lồng nhau
+- **Flexible**: Hỗ trợ chuyển tiếp có điều kiện, nhảy và thử lại
+- **Stateful**: Tự động lưu trữ trạng thái với các backend lưu trữ có thể cắm vào
+- **Integrated**: Hoạt động cùng hệ thống Activity hiện có
+
+### Core Concepts
 
 #### WizardStep
 
-`WizardStep` đại diện cho một bước đơn trong luồng wizard. Mỗi bước phải triển khai:
+Một `WizardStep` đại diện cho một bước duy nhất trong luồng wizard. Mỗi bước phải triển khai:
 
-- **`onEntry(ctx: WizardContext)`**: Được gọi khi người dùng vào bước này. Sử dụng để nhắc người dùng.
-- **`onRetry(ctx: WizardContext)`**: Được gọi khi xác thực thất bại và bước nên thử lại. Sử dụng để hiển thị thông báo lỗi.
-- **`validate(ctx: WizardContext): Transition`**: Xác thực đầu vào hiện tại và trả về `Transition` chỉ ra điều gì xảy ra tiếp theo.
-- **`store(ctx: WizardContext): Any?`** (tùy chọn): Trả về giá trị để lưu trữ cho bước này. Trả về `null` nếu bước không lưu trữ trạng thái.
+- **`onEntry(ctx: WizardContext)`**: Được gọi khi người dùng vào bước này. Dùng để nhắc người dùng.
+- **`onRetry(ctx: WizardContext)`**: Được gọi khi xác thực thất bại và bước cần thử lại. Dùng để hiển thị thông báo lỗi.
+- **`validate(ctx: WizardContext): Transition`**: Xác thực đầu vào hiện tại và trả về `Transition` chỉ ra những gì sẽ xảy ra tiếp theo.
+- **`store(ctx: WizardContext): Any?`** (tùy chọn): Trả về giá trị cần lưu cho bước này. Trả về `null` nếu bước không lưu trạng thái.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
@@ -67,19 +80,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> Nếu một số bước không được đánh dấu là ban đầu -> bước được khai báo đầu tiên được coi là.
+> Nếu một bước không được đánh dấu là initial -> bước khai báo đầu tiên sẽ được coi là như vậy.
 
 #### Transition
 
-`Transition` xác định điều gì xảy ra sau khi xác thực:
+Một `Transition` xác định những gì sẽ xảy ra sau khi xác thực:
 
-- **`Transition.Next`**: Chuyển đến bước tiếp theo trong thứ tự
+- **`Transition.Next`**: Chuyển sang bước tiếp theo trong chuỗi
 - **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Nhảy đến một bước cụ thể
 - **`Transition.Retry`**: Thử lại bước hiện tại (xác thực thất bại)
 - **`Transition.Finish`**: Kết thúc wizard
 
 ```kotlin
-// Nhảy có điều kiện dựa trên đầu vào
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +105,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext` cung cấp truy cập đến:
+`WizardContext` cung cấp quyền truy cập tới:
 - **`user: User`**: Người dùng hiện tại
 - **`update: ProcessedUpdate`**: Cập nhật hiện tại
-- **`bot: TelegramBot`**: Bot instance
-- **`userReference: UserChatReference`**: Tham chiếu ID người dùng và chat cho lưu trữ trạng thái
+- **`bot: TelegramBot`**: Thực thể bot
+- **`userReference: UserChatReference`**: Tham chiếu ID người dùng và chat để lưu trữ trạng thái
 
-Cộng với các phương thức truy cập trạng thái an toàn kiểu (được tạo bởi KSP).
+Cộng với các phương thức truy cập trạng thái an toàn kiểu (được KSP sinh ra).
 
 ---
 
-### Định nghĩa một Wizard
+### Defining a Wizard
 
-#### Cấu trúc cơ bản
+#### Basic Structure
 
-Một wizard được định nghĩa dưới dạng lớp hoặc đối tượng được chú thích với `@WizardHandler`:
+Một wizard được định nghĩa dưới dạng lớp hoặc đối tượng được chú thích bằng `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... triển khai bước
+        // ... step implementation
     }
     
     object AgeStep : WizardStep {
-        // ... triển khai bước
+        // ... step implementation
     }
     
     object FinishStep : WizardStep {
-        // ... triển khai bước
+        // ... step implementation
     }
 }
 ```
 
-#### Tham số chú thích
+#### Annotation Parameters
 
 **`@WizardHandler`** chấp nhận:
-- **`trigger: Array<String>`**: Lệnh bắt đầu wizard (ví dụ: `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: Loại cập nhật để lắng nghe (mặc định: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Các lớp quản lý trạng thái cho lưu trữ dữ liệu bước
+- **`trigger: Array<String>`**: Các lệnh khởi động wizard (vd., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Các loại cập nhật để lắng nghe (mặc định: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Các lớp quản lý trạng thái để lưu dữ liệu bước
 
 ---
 
-### Quản lý trạng thái
+### State Management
 
 #### WizardStateManager
 
-Trạng thái được lưu trữ bằng cách sử dụng các triển khai `WizardStateManager<T>`. Mỗi trình quản lý xử lý một kiểu cụ thể:
+Trạng thái được lưu bằng các triển khai `WizardStateManager<T>`. Mỗi manager xử lý một kiểu cụ thể:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -150,9 +163,9 @@ interface WizardStateManager<T : Any> {
 
 Xem thêm: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### Ghép đôi tự động
+#### Automatic Matching
 
-KSP ghép đôi các bước với trình quản lý trạng thái dựa trên kiểu trả về của `store()`:
+KSP khớp các bước với các manager dựa trên kiểu trả về của `store()`:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +175,21 @@ KSP ghép đôi các bước với trình quản lý trạng thái dựa trên k
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // Trùng với StringStateManager
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
     
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // Trùng với IntStateManager
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### Ghi đè từng bước
+#### Per-Step Override
 
-Ghi đè trình quản lý trạng thái cho một bước cụ thể bằng cách sử dụng `@WizardHandler.StateManager`:
+Ghi đè quản lý trạng thái cho một bước cụ thể bằng `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,42 +198,42 @@ Ghi đè trình quản lý trạng thái cho một bước cụ thể bằng cá
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // Sử dụng DefaultStateManager
+        // Uses DefaultStateManager
     }
     
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // Sử dụng CustomStateManager thay thế
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### Truy cập trạng thái an toàn kiểu
+### Type-Safe State Access
 
-KSP tạo các hàm mở rộng an toàn kiểu trên `WizardContext` cho mỗi bước lưu trữ trạng thái.
+KSP sinh ra các hàm mở rộng an toàn kiểu trên `WizardContext` cho mỗi bước lưu trạng thái.
 
-#### Các hàm được tạo
+#### Generated Functions
 
-Đối với một bước lưu trữ `String`:
+Đối với một bước lưu `String`:
 
 ```kotlin
-// Được tạo tự động bởi KSP
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### Sử dụng
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Truy cập an toàn kiểu - trả về String? (có thể null)
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
         
-        // Truy cập an toàn kiểu - trả về Int? (có thể null)
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
         
         val summary = buildString {
@@ -239,24 +252,24 @@ object FinishStep : WizardStep {
 }
 ```
 
-#### Phương thức dự phòng
+#### Fallback Methods
 
-Nếu các phương thức an toàn kiểu không có sẵn, sử dụng các phương thức dự phòng:
+Nếu các phương thức an toàn kiểu không có, dùng các phương thức dự phòng:
 
 ```kotlin
-// Dự phòng - trả về Any?
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// Dự phòng - chấp nhận Any?
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### Ví dụ hoàn chỉnh
+### Complete Example
 
-#### Wizard đăng ký người dùng
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -327,7 +340,7 @@ object RegistrationWizard {
     
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // Truy cập trạng thái an toàn kiểu
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
@@ -350,7 +363,7 @@ object RegistrationWizard {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // Bắt đầu lại
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
@@ -361,7 +374,7 @@ object RegistrationWizard {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
             
-            // Lưu vào cơ sở dữ liệu, gửi xác nhận, v.v.
+            // Save to database, send confirmation, etc.
             message { 
                 "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
@@ -378,11 +391,11 @@ object RegistrationWizard {
 
 ---
 
-### Tính năng nâng cao
+### Advanced Features
 
-#### Chuyển đổi có điều kiện
+#### Conditional Transitions
 
-Sử dụng `Transition.JumpTo` cho luồng có điều kiện:
+Sử dụng `Transition.JumpTo` cho các luồng có điều kiện:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,18 +408,18 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### Các bước không trạng thái
+#### Stateless Steps
 
-Các bước không cần lưu trữ trạng thái. Đơn giản trả về `null` từ `store()` (hoặc giữ nguyên):
+Các bước không cần lưu trạng thái. Chỉ cần trả về `null` từ `store()` (hoặc giữ nguyên):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... phần còn lại của triển khai
+    // ... rest of implementation
 }
 ```
 
-#### Trình quản lý trạng thái tùy chỉnh
+#### Custom State Managers
 
 Triển khai `WizardStateManager<T>` cho lưu trữ tùy chỉnh (cơ sở dữ liệu, Redis, v.v.):
 
@@ -416,7 +429,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // Tải từ cơ sở dữ liệu
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
     
@@ -425,7 +438,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         reference: UserChatReference,
         value: String
     ) {
-        // Lưu vào cơ sở dữ liệu
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
     
@@ -433,7 +446,7 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // Xóa khỏi cơ sở dữ liệu
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,38 +454,38 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### Cách nó hoạt động bên trong
+### How It Works Internally
 
-#### Tạo mã
+#### Code Generation
 
-KSP tạo:
+KSP sinh ra:
 
 1. **WizardActivity**: Một triển khai cụ thể mở rộng `WizardActivity` với các bước được mã hóa cứng
-2. **Start Activity**: Xử lý lệnh trigger và bắt đầu wizard
-3. **Input Activity**: Xử lý đầu vào người dùng trong luồng wizard
-4. **State Accessors**: Các hàm mở rộng truy cập trạng thái an toàn kiểu
+2. **Start Activity**: Xử lý lệnh kích hoạt và khởi động wizard
+3. **Input Activity**: Xử lý đầu vào người dùng trong quá trình wizard
+4. **State Accessors**: Các hàm mở rộng an toàn kiểu cho việc truy cập trạng thái
 
-#### Luồng
+#### Flow
 
 1. Người dùng gửi `/register` → Start Activity được gọi
 2. Start Activity tạo `WizardContext` và gọi `wizardActivity.start(ctx)`
 3. `start()` vào bước ban đầu và đặt `inputListener` để theo dõi bước hiện tại
 4. Người dùng gửi tin nhắn → Input Activity được gọi
 5. Input Activity gọi `wizardActivity.handleInput(ctx)`
-6. `handleInput()` xác thực đầu vào, lưu trữ trạng thái, và chuyển đến bước tiếp theo
-7. Quá trình lặp lại cho đến khi `Transition.Finish` được trả về
+6. `handleInput()` xác thực đầu vào, lưu trạng thái và chuyển sang bước tiếp theo
+7. Quá trình lặp lại cho tới khi `Transition.Finish` được trả về
 
-#### Lưu trữ trạng thái
+#### State Persistence
 
-- Trạng thái được lưu trữ sau khi xác thực thành công (trước khi chuyển đổi)
-- Giá trị trả về `store()` của mỗi bước được lưu trữ bằng `WizardStateManager` trùng khớp
-- Trạng thái được giới hạn cho mỗi người dùng và chat (`UserChatReference`)
+- Trạng thái được lưu sau khi xác thực thành công (trước khi chuyển tiếp)
+- Giá trị trả về của `store()` của mỗi bước được lưu bằng `WizardStateManager` phù hợp
+- Trạng thái được phân vùng theo người dùng và chat (`UserChatReference`)
 
 ---
 
-### Các thực hành tốt nhất
+### Best Practices
 
-#### 1. Luôn cung cấp lời nhắc rõ ràng
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
@@ -483,7 +496,7 @@ override suspend fun onEntry(ctx: WizardContext) {
 }
 ```
 
-#### 2. Xử lý lỗi xác thực một cách lịch sự
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
@@ -494,52 +507,52 @@ override suspend fun onRetry(ctx: WizardContext) {
 }
 ```
 
-#### 3. Sử dụng truy cập trạng thái an toàn kiểu
+#### 3. Use Type-Safe State Access
 
-Ưu tiên các phương thức an toàn kiểu được tạo:
+Ưu tiên các phương thức an toàn kiểu được sinh:
 
 ```kotlin
-// ✅ Tốt - an toàn kiểu
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ Tránh - mất an toàn kiểu
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. Giữ các bước tập trung
+#### 4. Keep Steps Focused
 
 Mỗi bước nên có một trách nhiệm duy nhất:
 
 ```kotlin
-// ✅ Tốt - bước tập trung
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // Chỉ xử lý thu thập email
+    // Only handles email collection
 }
 
-// ❌ Tránh - quá nhiều logic
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // Xử lý tên, email, điện thoại, địa chỉ...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. Sử dụng tên bước có ý nghĩa
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ Tốt
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ Tránh
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. Dọn dẹp trạng thái khi cần
+#### 6. Clean Up State When Needed
 
-Nếu bạn cần xóa trạng thái thủ công:
+Nếu cần xóa trạng thái thủ công:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Xóa tất cả trạng thái wizard
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
         
@@ -550,16 +563,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### Tóm tắt
+### Summary
 
 Hệ thống Wizard cung cấp:
-- ✅ **Quản lý trạng thái an toàn kiểu** với kiểm tra thời gian biên dịch
-- ✅ **Định nghĩa khai báo** các bước dưới dạng lớp lồng nhau
-- ✅ **Chuyển đổi linh hoạt** với logic có điều kiện
-- ✅ **Tạo mã tự động** qua KSP
-- ✅ **Tích hợp** với hệ thống Activity hiện có
-- ✅ **Lưu trữ trạng thái có thể cắm ghép** backend
+- ✅ **Type-safe** quản lý trạng thái với kiểm tra kiểu tại thời điểm biên dịch
+- ✅ **Declarative** định nghĩa bước dưới dạng lớp lồng nhau
+- ✅ **Flexible** chuyển tiếp với logic có điều kiện
+- ✅ **Automatic** sinh mã qua KSP
+- ✅ **Integrated** với hệ thống Activity hiện có
+- ✅ **Pluggable** backend lưu trữ trạng thái
 
-Bắt đầu xây dựng wizards bằng cách chú thích một lớp với `@WizardHandler` và định nghĩa các bước của bạn dưới dạng các đối tượng `WizardStep` lồng nhau!
-nếu bạn có bất kỳ câu hỏi nào liên hệ chúng tôi trong chat, chúng tôi sẽ rất vui được giúp đỡ :)
+Bắt đầu xây dựng wizard bằng cách chú thích lớp bằng `@WizardHandler` và định nghĩa các bước dưới dạng đối tượng `WizardStep` lồng nhau!
+if you have any questions contact us in chat, we will be glad to help :)
 ---

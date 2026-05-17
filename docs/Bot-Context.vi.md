@@ -3,32 +3,36 @@
 title: Bot Context
 ---
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Bot context diagram" />
-</p>
+```mermaid
+flowchart LR
+    H[Handler function] --> UD["UserData (per-user)"]
+    H --> CD["ClassData (per-class scope)"]
+    UD --> Impl1["ConcurrentHashMap (default)"]
+    UD --> Impl2["Custom impl via @CtxProvider<br/>(Redis, JDBC, ...)"]
+    CD --> Impl1
+    CD --> Impl2
+```
 
-The bot can also provide the ability to remember some data through the `UserData` and `ClassData` interfaces.
 
-- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) is a user-level data.
-- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) is a class-level data, i.e. the data will be stored until the user moves to a command or input that is in a
-  different class. (in function mode it will work like as user data)
+Bot cũng có thể cung cấp khả năng ghi nhớ một số dữ liệu thông qua các giao diện `UserData` và `ClassData`.
 
-By default, implementation is provided through [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) but can be changed to your own through [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) and [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) interfaces using
-the data storage tools of your choice.
+- [`userData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) là dữ liệu mức người dùng.
+- [`classData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) là dữ liệu mức lớp, tức là dữ liệu sẽ được lưu cho tới khi người dùng chuyển sang lệnh hoặc đầu vào thuộc một
+  lớp khác. (trong chế độ hàm nó sẽ hoạt động như dữ liệu người dùng)
 
+Mặc định, việc cài đặt được cung cấp thông qua [`ConcurrentHashMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/java.util.concurrent.-concurrent-map/) nhưng có thể được thay đổi sang thực thi riêng của bạn thông qua các giao diện [`UserData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-user-data/index.html) và [`ClassData`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-data/index.html) sử dụng
+công cụ lưu trữ dữ liệu mà bạn chọn.
 
 > [!CAUTION]
-> Đừng quên chạy gradle `kspKotlin`/hoặc bất kỳ task ksp liên quan nào để làm cho các codegen bindings cần thiết có sẵn. 
+> Đừng quên chạy lệnh gradle `kspKotlin`/hoặc bất kỳ task ksp nào liên quan để tạo các ràng buộc codegen cần thiết. 
 
-
-Để thay đổi, tất cả những gì bạn cần làm là đặt annotation `@CtxProvider` dưới implementation của bạn và chạy gradle ksp task (hoặc build).
+Để thay đổi, tất cả những gì bạn cần làm là đặt annotation `@CtxProvider` dưới lớp thực thi của bạn và chạy task ksp của gradle (hoặc build).
 
 ```kotlin
 @CtxProvider
 class MyRedis : UserData<String> {
     // ...
 }
-
 ```
 
 ### See also

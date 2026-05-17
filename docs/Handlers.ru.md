@@ -1,20 +1,20 @@
 ---
 ---
-title: Обработчики
+title: Handlers
 ---
 
 
-### Разнообразие обработчиков
+### Variety of Handlers
 
-В разработке ботов, особенно в системах, включающих взаимодействие с пользователями, крайне важно эффективно управлять и обрабатывать команды и события.
+При разработке ботов, особенно в системах, где взаимодействуют пользователи, важно эффективно управлять и обрабатывать команды и события.
 
-Эти аннотации помечают функции, предназначенные для обработки конкретных команд, входных данных или обновлений и предоставляют метаданные, такие как ключевые слова команд, области действия и защиты.
+Эти аннотации помечают функции, предназначенные для обработки конкретных команд, входных данных или обновлений, и предоставляют метаданные, такие как ключевые слова команд, области действия и охранники.
 
-### Обзор аннотаций
+### Annotations Overview
 
 #### CommandHandler
 
-Аннотация `CommandHandler` используется для пометки функций, которые обрабатывают конкретные команды. Эта аннотация включает свойства, которые определяют ключевые слова команды и области действия.
+Аннотация `CommandHandler` используется для пометки функций, обрабатывающих конкретные команды. Эта аннотация включает свойства, определяющие ключевые слова и области действия команды.
 
 -   **value**: Указывает ключевые слова, связанные с командой.
 -   **scope**: Определяет контекст или область, в которой будет проверяться команда.
@@ -28,12 +28,12 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 ##### CommandHandler.CallbackQuery
 
-Специализированная версия аннотации `CommandHandler`, предназначенная специально для обработки callback-запросов. Она включает аналогичные свойства как `CommandHandler`, с фокусом на команды, связанные с callback-запросами.
+Специализированная версия аннотации `CommandHandler`, предназначенная специально для обработки callback‑запросов. Она содержит те же свойства, что и `CommandHandler`, с акцентом на команды, связанные с callback.
 
-_На самом деле это то же самое, что и просто `@CommandHandler` с предустановленной областью действия `UpdateType.CALLBACK_QUERY`_.
+_На самом деле это то же самое, что просто `@CommandHandler` с предустановленной областью `UpdateType.CALLBACK_QUERY`_.
 
 -   **value**: Указывает ключевые слова, связанные с командой.
--   **autoAnswer**: Отвечать на `callbackQuery` автоматически (вызвать `answerCallbackQuery` перед обработкой).
+-   **autoAnswer**: Автоматически отвечать на `callbackQuery` (вызвать `answerCallbackQuery` перед обработкой).
 
 
 ```kotlin
@@ -45,18 +45,18 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 #### CommonHandler
 
-Аннотация `CommonHandler` предназначена для функций, которые обрабатывают команды с более низким приоритетом по сравнению с `CommandHandler` и `InputHandler`. Она используется на уровне источника и предоставляет гибкий способ определения общих обработчиков команд.
+Аннотация `CommonHandler` предназначена для функций, обрабатывающих команды с более низким приоритетом по сравнению с `CommandHandler` и `InputHandler`. Она используется на уровне исходного кода и предоставляет гибкий способ определения общих обработчиков команд.
 
-**Имейте в виду, что приоритет работает только в рамках `@CommonHandler` самого по себе (то есть не влияет на другие обработчики).**
+**Имейте в виду, приоритет работает только внутри `@CommonHandler` (т.е. не влияет на другие обработчики).**
 
 ##### CommonHandler.Text
 
-Эта аннотация определяет совпадение текста с обновлениями. Она включает свойства для определения совпадающего текста, условий фильтрации, приоритета и области действия.
+Эта аннотация задаёт сопоставление текста с обновлениями. Она включает свойства для определения текста сопоставления, условий фильтрации, приоритета и области действия.
 
--   **value**: Текст для сравнения с входящими обновлениями.
--   **filter**: Класс, который определяет условия, используемые в процессе сравнения.
--   **priority**: Уровень приоритета обработчика, где 0 - наивысший приоритет.
--   **scope**: Контекст или область, в которой будет проверяться совпадение текста.
+-   **value**: Текст, с которым будет сравниваться входящее обновление.
+-   **filter**: Класс, определяющий условия, используемые в процессе сопоставления.
+-   **priority**: Уровень приоритета обработчика, где 0 — наивысший приоритет.
+-   **scope**: Контекст или область, в которой будет проверяться сопоставление текста.
 
 ```kotlin
 @CommonHandler.Text(["text"], filter = isNewUserFilter::class, priority = 10)
@@ -67,13 +67,13 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 ##### CommonHandler.Regex
 
-Аналогично `CommonHandler.Text`, эта аннотация используется для сравнения обновлений на основе регулярных выражений. Она включает свойства для определения шаблона regex, опций, условий фильтрации, приоритета и области действия.
+Аналогично `CommonHandler.Text`, эта аннотация используется для сопоставления обновлений по регулярным выражениям. Она включает свойства для определения шаблона regex, опций, условий фильтрации, приоритета и области действия.
 
--   **value**: Шаблон regex, используемый для сравнения.
--   **options**: Опции regex, которые изменяют поведение шаблона regex.
--   **filter**: Класс, который определяет условия, используемые в процессе сравнения.
--   **priority**: Уровень приоритета обработчика, где 0 - наивысший приоритет.
--   **scope**: Контекст или область, в которой будет проверяться совпадение regex.
+-   **value**: Регулярное выражение, используемое для сопоставления.
+-   **options**: Опции regex, изменяющие поведение шаблона.
+-   **filter**: Класс, определяющий условия, используемые в процессе сопоставления.
+-   **priority**: Уровень приоритета обработчика, где 0 — наивысший приоритет.
+-   **scope**: Контекст или область, в которой будет проверяться сопоставление regex.
 
 ```kotlin
 @CommonHandler.Regex("^\d+$", scope = [UpdateType.EDITED_MESSAGE])
@@ -84,7 +84,7 @@ suspend fun test(update: EditedMessageUpdate, user: User, bot: TelegramBot) {
 
 #### InputHandler
 
-Аннотация `InputHandler` помечает функции, которые обрабатывают конкретные события ввода. Она предназначена для функций, которые обрабатывают входные данные во время выполнения и включает свойства для определения ключевых слов ввода и областей действия.
+Аннотация `InputHandler` помечает функции, обрабатывающие конкретные входные события. Она предназначена для функций, обрабатывающих ввод во время выполнения, и включает свойства для определения ключевых слов ввода и областей действия.
 
 -   **value**: Указывает ключевые слова, связанные с событием ввода.
 
@@ -97,7 +97,7 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 
 #### UnprocessedHandler
 
-Аннотация `UnprocessedHandler` используется для пометки функций, которые обрабатывают обновления, не обработанные другими обработчиками. Она гарантирует, что все необработанные обновления управляются соответствующим образом, с возможностью только одной точки обработки для этого типа обработчика.
+Аннотация `UnprocessedHandler` используется для пометки функций, обрабатывающих обновления, не обработанные другими обработчиками. Она гарантирует, что любые необработанные обновления будут управляться корректно, при этом для этого типа обработчика может существовать только одна точка обработки.
 
 ```kotlin
 @UnprocessedHandler
@@ -108,9 +108,10 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 
 #### UpdateHandler
 
-Аннотация `UpdateHandler` помечает функции, которые обрабатывают конкретные типы входящих обновлений. Она предоставляет способ систематической категоризации и обработки различных типов обновлений.
+Аннотация `UpdateHandler` помечает функции, обрабатывающие определённые типы входящих обновлений. Она предоставляет способ систематически классифицировать и обрабатывать разные типы обновлений.
 
--   **type**: Указывает типы обновлений, которые будут обрабатываться функцией обработчика.
+-   **type**: Указывает типы обновлений, которые будет обрабатывать функция‑обработчик.
+-   **messageKind** *(added in 9.5)*: Необязательный набор [`MessageKind`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-kind/index.html)s, сужающий диспетчиризацию до обновлений, содержащих сообщения, чей обнаруженный тип совпадает. Пустой набор (по умолчанию) означает, что подходит любой тип.
 
 ```kotlin
 @UpdateHandler([UpdateType.PRE_CHECKOUT_QUERY])
@@ -118,32 +119,43 @@ suspend fun test(update: PreCheckoutQueryUpdate, user: User, bot: TelegramBot) {
     //...
 }
 ```
-### Сопутствующие аннотации обработчиков
 
-Существуют также дополнительные аннотации, которые являются необязательными для обработчиков, дополняя необязательное поведение самих обработчиков.
+##### Filtering by `MessageKind`
 
-Они могут быть размещены как на функциях, к которым применяется обработчик, так и на классах, в последнем случае они будут автоматически применены ко всем обработчикам в этом классе, но если есть необходимость, можно иметь отдельное поведение для некоторых функций.
+Используйте параметр `messageKind`, чтобы реагировать только на конкретный подмножество обновлений сообщений (фото, текст, сервисные события и т.п.), вместо ручного анализа nullable‑полей:
 
-То есть применение имеет такой приоритет: `Function` > `Class`, где функция имеет более высокий приоритет.
+```kotlin
+@UpdateHandler(type = [UpdateType.MESSAGE], messageKind = [MessageKind.PHOTO])
+suspend fun onPhoto(update: MessageUpdate, bot: TelegramBot) {
+    //...
+}
+```
+### Handler Companion Annotations
 
-#### Ограничение частоты
+Существуют также дополнительные аннотации, являющиеся опциональными для обработчиков и дополняющие их поведение.
 
-Кроме того, давайте также раскроем механизм ограничения частоты, описанный в аннотациях.
+Их можно размещать как на функциях, к которым применяется обработчик, так и на классах; в последнем случае они будут автоматически применены ко всем обработчикам в этом классе, но при необходимости можно задать отдельное поведение для отдельных функций.
 
-Вы можете установить общие ограничения для каждого пользователя:
+Т. е. приоритет применения такой же, `Function` > `Class`, где функция имеет более высокий приоритет.
+
+#### Rate Limiting
+
+Кроме того, раскроем механизм ограничения частоты, описанный в аннотациях.
+
+Вы можете задать общие ограничения для каждого пользователя:
 
 ```kotlin
 // ...
 val bot = TelegramBot("BOT_TOKEN") {
-    rateLimiter { // общие ограничения
+    rateLimiter { // general limits
         limits = RateLimits(period = 10000, rate = 5)
     }
 }
 ```
 
-###### Специфичные для обработчика
+###### Handler specific
 
-Ограничения на определенные действия могут быть определены с помощью аннотации `RateLimits`, поддерживаемой `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`, `@CommonHandler`.
+Ограничения на определённые действия можно определить с помощью аннотации `RateLimits`, поддерживаемой `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`, `@CommonHandler`.
 
 ```kotlin
 @CommandHandler(["/start"])
@@ -153,9 +165,9 @@ suspend fun start(user: User, bot: TelegramBot) {
 }
 ```
 
-#### Защита
+#### Guard
 
-Вы можете определять защиты отдельно для контроля доступа к обработчикам, поддерживается `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler`:
+Вы можете определить guard‑ы отдельно для контроля доступа к обработчикам, поддерживается `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@InputHandler` :
 
 ```kotlin
 @CommandHandler(["text"])
@@ -167,7 +179,7 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 #### ArgParser
 
-Вы можете определять собственный парсер аргументов отдельно для изменения поведения разбора параметров для обработчиков, поддерживается `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@CommonHandler`:
+Вы можете определить пользовательский парсер аргументов отдельно, изменяя поведение разбора параметров для обработчиков, поддерживается `@CommandHandler`, `@CommandHandler.CallbackQuery`, `@CommonHandler`:
 
 ```kotlin
 @CommandHandler(["text"])
@@ -177,15 +189,173 @@ suspend fun test(user: User, bot: TelegramBot) {
 }
 ```
 
-**см. также [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
+**see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
 
-### Заключение
+### Functional DSL
 
-Эти аннотации предоставляют надежные и гибкие инструменты для обработки команд, входных данных и событий, позволяя при этом отдельную конфигурацию ограничений частоты и защит, что улучшает общую структуру и поддерживаемость разработки ботов.
+Каждая из перечисленных аннотаций имеет аналог в **Functional DSL**, альтернативный способ объявления обработчиков во время выполнения через `bot.setFunctionality { … }`. Оба подхода используют один и тот же `ActivityRegistry` и могут свободно комбинироваться в одном боте.
 
-### См. также
+| Annotation | DSL counterpart |
+|------------|-----------------|
+| `@CommandHandler` | `onCommand(...)` |
+| `@CommandHandler.CallbackQuery` | `onCommand(..., scope = [UpdateType.CALLBACK_QUERY])` |
+| `@InputHandler` / input chains | `onInput(...)` / `inputChain(...)` |
+| `@CommonHandler` | `common(...)` |
+| `@UpdateHandler` | `onUpdate(...)` |
+| `@UnprocessedHandler` | `whenNotHandled { ... }` |
 
-* [Активности и процессоры](Activites-and-Processors.md)
-* [Вызов активности](Activity-invocation.md)
-* [FSM и обработка диалогов](FSM-and-Conversation-handling.md)
-* [Разбор обновлений](Update-parsing.md)
+Минимальный пример:
+
+```kotlin
+suspend fun main() {
+    val bot = TelegramBot("BOT_TOKEN")
+
+    bot.setFunctionality {
+        onChosenInlineResult {
+            println("got a result ${update.chosenInlineResult.resultId} from ${update.user}")
+        }
+    }
+}
+```
+
+### Commands
+
+```kotlin
+bot.setFunctionality {
+    // Regular command
+    onCommand("/start") {
+        message { "Hello" }.send(user, bot)
+    }
+
+    // Regex-based command matching
+    onCommand("""(red|green|blue)""".toRegex()) {
+        message { "you typed ${update.text} color" }.send(user, bot)
+    }
+}
+```
+
+Внутри блока `onCommand` разобранные параметры доступны как `Map<String, String>`, сформированный текущей конфигурацией `commandParsing`.
+
+### Inputs
+
+```kotlin
+bot.setFunctionality {
+    onCommand("/start") {
+        message { "Hello, what's your name?" }.send(user, bot)
+        bot.inputListener[user] = "testInput"
+    }
+
+    onInput("testInput") {
+        message { "Hey, nice to meet you, ${update.text}" }.send(user, bot)
+    }
+}
+```
+
+См. [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html) для API хранилища.
+
+#### Input chains
+
+Для многошаговых потоков ввода используйте `inputChain`:
+
+```kotlin
+bot.setFunctionality {
+    inputChain("conversation") {
+        message { "Nice to meet you, ${update.text}" }.send(user, bot)
+        message { "What is your favorite food?" }.send(user, bot)
+    }.breakIf({ update.text == "peanut butter" }) {     // chain break condition
+        message { "Oh, too bad, I'm allergic to it." }.send(user, bot)
+    }.andThen {
+        // next step when the break condition didn't match
+        message { "Great choice!" }.send(user, bot)
+    }
+}
+```
+
+Цепочка автоматически переходит к следующему шагу, если условие прерывания не сработало; при `repeat = true` (по умолчанию) совпадение условия прерывания оставляет пользователя на текущем шаге.
+
+> Для более богатых многошаговых потоков с типизированным состоянием и валидацией предпочтительнее использовать [`@WizardHandler`](FSM-and-Conversation-handling.md).
+
+### Update type handlers
+
+```kotlin
+bot.setFunctionality {
+    onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
+        println("Received update: ${update.type}")
+    }
+}
+```
+
+### Common matchers
+
+```kotlin
+bot.setFunctionality {
+    common("hello") {
+        message { "Hi there!" }.send(user, bot)
+    }
+
+    common("""\d+""".toRegex()) {
+        message { "You sent a number!" }.send(user, bot)
+    }
+}
+```
+
+### Fallback handler
+
+```kotlin
+bot.setFunctionality {
+    whenNotHandled {
+        message { "I didn't understand that." }.send(user, bot)
+    }
+}
+```
+
+### Companion options
+
+Ограничения частоты, guard‑ы и парсеры аргументов передаются напрямую как именованные параметры вместо отдельных аннотаций:
+
+```kotlin
+bot.setFunctionality {
+    onCommand("/expensive", rateLimits = RateLimits(rate = 5, period = 60_000)) {
+        message { "Processing..." }.send(user, bot)
+    }
+
+    onCommand("/admin", guard = AdminGuard::class) {
+        message { "Admin command executed" }.send(user, bot)
+    }
+
+    onCommand("/custom", argParser = CustomArgParser::class) {
+        message { "Parameters: $parameters" }.send(user, bot)
+    }
+}
+```
+
+### Combining DSL and annotations
+
+Оба стиля сосуществуют — регистрируются одинаково, диспетчеризуются одинаково:
+
+```kotlin
+@CommandHandler(["/register"])
+suspend fun register(user: User, bot: TelegramBot) {
+    message { "Registration started" }.send(user, bot)
+}
+
+bot.setFunctionality {
+    onCommand("/help") {
+        message { "Available commands: /register, /help" }.send(user, bot)
+    }
+}
+```
+
+### Conclusion
+
+Эти аннотации предоставляют надёжные и гибкие инструменты для обработки команд, вводов и событий, позволяя одновременно задавать отдельные конфигурации ограничений частоты и guard‑ов, улучшая общую структуру и поддерживаемость разработки ботов.
+
+### See also
+
+* [Activities & Processors](Activites-and-Processors.md)
+* [Activity invocation](Activity-invocation.md)
+* [FSM and Conversation handling](FSM-and-Conversation-handling.md)
+* [Sessions](Sessions.md)
+* [Update parsing](Update-parsing.md)
+
+---

@@ -1,19 +1,19 @@
 ---
 ---
-title: سوالات متداول
+title: F.A.Q
 ---
 
-### استثنا‌ی `AbstractMethodError`
+### `AbstractMethodError` exception
 
-اگر هنگام شروع برنامه‌تان چنین استثنایی دریافت کردید:
+اگر این استثنا را در هنگام راه‌اندازی برنامه خود دریافت می‌کنید:
 
 ```kotlin
 Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 'kotlinx.serialization.KSerializer[] kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()'
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-این مسئله به این دلیل رخ می‌دهد که سیستم ساخت کتابخانه‌ی قدیمی‌تری را که مکانیزم داخلی آن متفاوت است، حل می‌کند.
-برای حل این مشکل باید از نسخه‌ی جدیدتری استفاده کند، به عنوان مثال با اضافه کردن این کد به buildscript:
+به این دلیل رخ می‌دهد که سیستم ساخت شما کتابخانه‌ی قدیمی Serialization را که مکانیک‌های داخلی آن متفاوت است، حل می‌کند.
+برای رفع آن باید نسخه جدیدتری استفاده کنید، برای مثال با افزودن موارد زیر به اسکریپت ساخت خود:
 
 ```kotlin
 configurations.all {
@@ -31,39 +31,39 @@ configurations.all {
 }
 ```
 
-(اگر این موضوع در تاریخچه توضیح داده شده بود، من هرگز ارتقا نمی‌دادم چون من به اندازه‌ی کافی گزارش در مورد این مشکل دریافت می‌کنم)
+(اگر این موضوع به خوبی در changelog توضیح داده می‌شد، هرگز آن را ارتقا نمی‌دادم چون گزارش‌های زیادی در این باره می‌دیدم)
 
-### چگونه پاسخ متد را دریافت کنم؟
+### How do I get the method's response?
 
-برای دریافت پاسخ و قابلیت عمل بر روی آن، باید در انتهای متد به جای `send` از `sendReturning` استفاده کنید.
+برای دریافت پاسخ و امکان کار بر روی آن، باید به‌جای `send` از `sendReturning` در انتهای متد استفاده کنید.
 
-در این حالت کلاس `Response` برگردانده می‌شود که حاوی پاسخ موفق یا شکست است، سپس باید یا شکست را مدیریت کنید یا صرفاً `getOrNull()` را صدا بزنید.
+در این حالت کلاس `Response` برگردانده می‌شود که شامل پاسخ، موفقیت یا شکست است؛ سپس باید یا خطا را مدیریت کنید یا فقط `getOrNull()` را صدا بزنید.
 
-یک بخش در مورد این موضوع وجود دارد: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
+بخش مربوطه: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-### هنگام استفاده از `spring-boot-devtools` خطایی دریافت می‌کنم
+### I'm getting error while using `spring-boot-devtools`
 
-این اتفاق به این دلیل رخ می‌دهد که `spring-boot-devtools` خودش `classloader` دارد و متدها را پیدا نمی‌کند.
+این مشکل به این دلیل است که `spring-boot-devtools` دارای `classloader` اختصاصی خود است و روش‌ها را پیدا نمی‌کند.
 
-باید به `resources/META-INF/spring-devtools.properties` اضافه کنید:
+باید مورد زیر را به `resources/META-INF/spring-devtools.properties` اضافه کنید:
 
 ```properties
 restart.include.generated=/eu.vendeli
 ```
 
-### چگونه موتور ktor را تغییر دهم
+### How to change ktor engine
 
-اگر می‌خواهید موتور مورد استفاده توسط کلاینت را تغییر دهید، می‌توانید ساده‌ترین راه تغییر [پارامتر](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) در [تنظیمات پلاگین](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html) است.
+اگر می‌خواهید موتور استفاده‌شده توسط کلاینت را تغییر دهید، می‌توانید به‌سادگی [پارامتر](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) را در [تنظیمات افزونه](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html) تغییر دهید.
 
-### چگونه از ارائه‌دهنده‌ی ورودی خروجی مورد علاقه‌ام استفاده کنم
+### How to use my favorite logging provider
 
-کتابخانه از `slf4j-api` استفاده می‌کند و برای استفاده از ارائه‌دهنده فقط کافی است آن را به وابستگی‌ها اضافه کنید.
+این کتابخانه از `slf4j-api` استفاده می‌کند و برای استفاده از ارائه‌دهنده کافیست آن را به وابستگی‌ها اضافه کنید.
 
-پلاگین کتابخانه به صورت خودکار استفاده از ارائه‌دهنده را تشخیص می‌دهد، اگر ارائه‌دهنده وجود نداشت، `logback` به صورت پیش‌فرض استفاده خواهد شد.
+افزونه کتابخانه به‌طور خودکار استفاده از ارائه‌دهنده را تشخیص می‌دهد؛ اگر ارائه‌دهنده موجود نباشد، به‌صورت پیش‌فرض `logback` استفاده خواهد شد.
 
-### گرفتن استثنا‌های شبکه درون handler long-polling
+### Catch network exceptions within long-polling handler
 
-برای مثال اگر اتصال ناپایداری دارید و نیاز به گرفتن خطا به دلیل این موضوع دارید، شاید این روش به شما کمک کند:
+به‌عنوان مثال اگر اتصال ناپایداری دارید و نیاز به کشیدن خطا دارید، شاید این رویکرد برای شما مفید باشد:
 
 ```kotlin
 fun main() {
@@ -80,4 +80,6 @@ fun main() {
 }
 ```
 
-همچنین می‌توانید نگاهی به نحوه‌ی اجرای آن در [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53) بیندازید.
+همچنین می‌توانید نگاهی به نحوه پیاده‌سازی آن در [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53) بیندازید.
+
+---

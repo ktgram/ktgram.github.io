@@ -5,15 +5,15 @@ title: Activites And Processors
 
 ### Introduction
 
-`Activity` dalam konteks library ini adalah entitas abstrak yang merupakan generalisasi dari entitas seperti `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, dan `@CommonHandler`.
+`Activity` dalam istilah perpustakaan ini adalah entitas abstrak yang merupakan generalisasi dari entitas seperti `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler`, dan `@WizardHandler`.
 
-Juga lihat [artikel handlers](Handlers.md).
+Juga lihat artikel [handlers article](Handlers.md).
 
-### Mengumpulkan activities
+### Collecting activities
 
-Activities dikumpulkan dan dipersiapkan semua konteks pada waktu kompilasi (kecuali yang didefinisikan melalui functional dsl).
+Activities ditemukan dan di‑wire pada **waktu kompilasi** oleh prosesor KSP **ktnip**. [Functional DSL](Handlers#functional-dsl.md) adalah satu satu‑satunya pengecualian — handler yang didefinisikan melalui `bot.setFunctionality { ... }` didaftarkan pada runtime.
 
-Jika Anda ingin membatasi area di mana package akan dicari, Anda dapat memberikan parameter ke plugin:
+Jika Anda ingin membatasi area di mana paket akan dicari, Anda dapat memberikan parameter ke plugin:
 
 ```gradle
 ktGram {
@@ -29,7 +29,7 @@ ksp {
 }
 ```
 
-catatan dalam kasus seperti itu, agar actions yang dikumpulkan dapat diproses dengan benar, Anda juga harus menentukan package pada instansinya sendiri.
+catatan dalam kasus seperti itu, agar aksi yang dikumpulkan diproses dengan benar, Anda juga harus menentukan paket dalam instance itu sendiri.
 
 ```kotlin
 fun main() = runBlocking {
@@ -40,7 +40,7 @@ fun main() = runBlocking {
 }
 ```
 
-opsi ini ditambahkan untuk dapat menjalankan beberapa instans bot:
+opsi ini ditambahkan agar dapat menjalankan banyak instance bot:
 
 ```gradle
 ktGram {
@@ -49,7 +49,7 @@ ktGram {
 ```
 
 
-atau jika Anda tidak menggunakan plugin untuk menentukan package yang berbeda, Anda perlu menentukannya dengan pemisah `;`:
+atau jika Anda tidak menggunakan plugin untuk menentukan paket yang berbeda, Anda harus menyebutkannya dengan pemisah `;`:
 
 ```gradle
 ksp {
@@ -61,14 +61,14 @@ ksp {
 
 #### Webhooks
 
-Di controller Anda (atau tempat lain di mana `webhook` diproses), Anda panggil: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+Di dalam controller Anda (atau tempat lain dimana `webhook` diproses), Anda memanggil: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
 #### Long polling
 
 Panggil: `bot.handleUpdates()` atau melalui `bot.update.setListener { handle(it) }`
 
 
-### Lihat juga
+### See also
 
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)

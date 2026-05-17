@@ -1,14 +1,14 @@
 ---
 ---
-title: Полезные утилиты и советы
+title: Useful Utilities And Tips
 ---
 
 
-### Работа с ProcessedUpdate
+### Operating with ProcessedUpdate
 
-[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) — это общий класс для обновлений, который в зависимости от исходных данных может предоставляться в разных типах ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) и т. д.)
+`ProcessedUpdate` (<https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html>) — это обобщённый класс для обновлений, который в зависимости от исходных данных может быть представлен в разных типах ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) и т.д.)
 
-Поэтому вы можете проверить тип входящих данных и дальше манипулировать определенными данными с помощью смарткастов, например:
+Таким образом, вы можете проверить тип входящих данных и дальше работать с определёнными данными с помощью умных кастов, например:
 
 ```kotlin
 // ...
@@ -16,26 +16,26 @@ if (update !is MessageUpdate) {
     message { "Only messages are allowed" }.send(user, bot)
     return
 }
-// Далее ProcessedUpdate будет восприниматься как MessageUpdate.
+// Further on, ProcessedUpdate will be perceived as MessageUpdate.
 ```
 
-Также внутри есть интерфейс [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html), который позволяет определить, есть ли внутри ссылка на пользователя, пример использования:
+Также существует интерфейс [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html), который позволяет определить, есть ли ссылка на пользователя внутри, пример использования:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
 
 ```
 
-При необходимости внутри всегда есть оригинальный [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) в параметре update.
+При необходимости внутри всегда доступен оригинальный [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) в параметре обновления.
 
 
-### Внедрение зависимостей
+### Dependency injection
 
-Библиотека использует простой механизм инициализации классов, где ваши методы обработки обновлений аннотированы предоставленными аннотациями.
+Библиотека использует простой механизм инициализации классов, где ваши методы обработки обновлений помечены предоставленными аннотациями.
 
 [`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) используется по умолчанию для вызова аннотированных методов.
 
-Но если вы хотите использовать другие библиотеки для этого, вы можете переопределить интерфейс [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html), <br/>используя ваш предпочтительный механизм и передать его при инициализации бота.
+Но если вы хотите использовать какие‑то другие библиотеки для этого, вы можете переопределить интерфейс [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html), <br/>используя предпочтительный механизм и передать его при инициализации бота.
 
 ```kotlin
 fun main() = runBlocking {
@@ -47,36 +47,36 @@ fun main() = runBlocking {
 }
 ```
 
-### Фильтрация обновлений
+### Filtering updates
 
-Если нет сложных условий, вы можете просто отфильтровать некоторые обновления для обработки:
+Если нет сложных условий, вы можете просто отфильтровать некоторые обновления от дальнейшей обработки:
 
 ```kotlin
-// функция, где определено условие фильтрации обновлений
+// function where updates filtering condition defined
 fun filteringFun(update: Update): Boolean = update.message?.text.isNullOrBlank()
 
 fun main() = runBlocking {
   val bot = TelegramBot("BOT_TOKEN")
 
-  // установка более специфичного потока обработки для обновлений
+  // setting more specific processing flow for updates
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // так просто, если слушатель покинул область до достижения функции обработчика, это фильтрация.
-    // на самом деле вы можете даже написать прямо условие if с return@setListener или расширить фильтрацию до отдельного класса.
+    // so simply, if the listener left the scope before reaching the handler function, that it is filtering.
+    // actually you can even write directly if-condition there with return@setListener or extend filtering to separate class.
 
-    handle(it) // или способ ручной обработки с блоком
+    handle(it) // or manual handling way with block
   }
 }
 ```
 
-Чтобы включить фильтрацию в процесс сопоставления или исключения команд, посмотрите на guards или `@CommonHandler`.
+для включения фильтрации в сопоставление команд или исключения процесса посмотрите на guards или `@CommonHandler`.
 
-### Обобщение параметров для разных методов
+### Generalize options for different methods
 
-Если вам часто приходится применять одинаковые необязательные параметры, вы можете написать похожую функцию, которая подходит вам, и облегчить код-боллерплейт :)
+Если вам часто нужно применять одинаковые необязательные параметры, вы можете написать похожую функцию, которая вам подходит, и уменьшить объем шаблонного кода :)
 
-Некоторые общие свойства разделены на [разные интерфейсы](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
+Некоторые общие свойства вынесены в [разные интерфейсы](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")
@@ -91,8 +91,11 @@ inline fun <T, R, O> T.markdownMode(crossinline block: O.() -> Unit = {}): T
     }
 
 
-// ... и в вашем коде
+// ... and in your code
 
 message { "test" }.markdownMode().send(to, via)
 
 ```
+
+
+---

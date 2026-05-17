@@ -3,31 +3,48 @@
 title: Actions
 ---
 
-### 모든 요청은 Actions입니다
-모든 Telegram API 요청은 다양한 종류의 [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) 인터페이스이며, [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html)와 같은 다른 메서드를 구현합니다.<br/>이는 라이브러리 인터페이스의 편의를 위해 [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) 타입 함수 형태로 래핑되어 있습니다.
+### All requests is Actions
+All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
 
-<p align="center">
-    <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram" />
-</p>
+```mermaid
+classDiagram
+    class TgAction~T~
+    class SimpleAction~T~
+    class Action~T~
+    class MediaAction~T~
+    TgAction <|-- SimpleAction
+    TgAction <|-- Action
+    Action <|-- MediaAction
+    class OptionsFeature
+    class MarkupFeature
+    class EntitiesFeature
+    class CaptionFeature
+    Action ..|> OptionsFeature
+    Action ..|> MarkupFeature
+    Action ..|> EntitiesFeature
+    MediaAction ..|> CaptionFeature
+```
 
-각 `Action`은 사용 가능한 [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html)에 따라 고유의 가능한 메서드를 가질 수 있습니다.
+
+
+Each `Action` may be able of having its own possible methods, depending on the available [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html).
 
 ### Features
 
-다른 Actions는 Telegram Bot API에 따라 다른 [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html)를 가질 수 있습니다. 예를 들어:
+Different actions may have different [`Features`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html) depending on the Telegram Bot Api, such as:
 [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html),
 [`MarkupFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-markup-feature/index.html)
 [`EntitiesFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-entities-feature/index.html)
 [`CaptionFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-caption-feature/index.html).
 
-자세히 살펴보겠습니다:
+Let's take a closer look at them:
 
 ### Options
-예를 들어, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html)는 선택적 매개변수를 전달하는 데 사용됩니다.
+For example, [`OptionsFeature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-options-feature/index.html) is used to pass optional parameters.
 
-각 Action은 고유한 옵션 유형을 가지며, 해당 옵션은 `Action` 자체의 `options` 매개변수, 속성 섹션에서 확인할 수 있습니다.<br/>예를 들어, `sendMessage`는 다양한 매개변수를 옵션으로 포함하는 [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-message-options/index.html) 데이터 클래스를 포함합니다.
+Each action has its own type of options, the corresponding you can see in the `Action` itself in the `options` parameter, in properties section. <br/>For example, `sendMessage` which contains a [`MessageOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-message-options/index.html) data class with different parameters as options.
 
-사용 예시:
+Example usage:
 
 ```kotlin
 message{ "*Test*" }.options {
@@ -36,37 +53,37 @@ message{ "*Test*" }.options {
 ```
 ### Markup
 
-모든 종류의 [키보드](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html)를 지원하는 마크업 전송 메서드도 있습니다:<br/>[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
+There is also a method for sending markups that supports all kind of [keyboards](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-keyboard/index.html): <br/>[`ReplyKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-markup/index.html), [`InlineKeyboardMarkup`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-inline-keyboard-markup/index.html), [`ForceReply`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-force-reply/index.html), [`ReplyKeyboardRemove`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.keyboard/-reply-keyboard-remove/index.html).
 
-#### 인라인 키보드 마크업
+#### Inline Keyboard Markup
 
-이 빌더를 사용하면 매개변수의 모든 조합으로 인라인 버튼을 구성할 수 있습니다.
+This builder allows you to construct inline buttons with any combination of parameters.
 
 ```kotlin
 message{ "Test" }.inlineKeyboardMarkup {
     "name" callback "callbackData"         //
-    "buttonName" url "https://google.com"  //--- 이 두 버튼은 같은 행에 배치됩니다.
-    newLine() // 또는 br()
-    "otherButton" webAppInfo "data"       // 이것은 다른 행에 배치됩니다.
+    "buttonName" url "https://google.com"  //--- these two buttons will be in the same row.
+    newLine() // or br()
+    "otherButton" webAppInfo "data"       // this will be in other row
 
-    // 빌더 내에서 다른 스타일도 사용할 수 있습니다:
+    // you can also use a different style within the builder:
     callbackData("buttonName") { "callbackData" }
 }.send(user, bot)
 
 ```
 
-자세한 내용은 빌더 [문서](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html)에서 확인할 수 있습니다.
+More details can be seen in the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-inline-keyboard-markup-builder/index.html).
 
-#### 답장 키보드 마크업
+#### Reply Keyboard Markup
 
-이 빌더를 사용하면 메뉴 버튼을 구성할 수 있습니다.
+This builder allows you to construct menu buttons.
 
 ```kotlin
 message{ "Test" }.replyKeyboardMarkup {
-  + "Menu button"     // 단항 플러스 연산자를 사용하여 버튼 추가
+  + "Menu button"     // you can add buttons by using unary plus operator
   + "Menu button 2"
-  br() // 두 번째 행으로 이동
-  "Send polls 👀" requestPoll true   // 매개변수가 있는 버튼
+  br() // go to second row
+  "Send polls 👀" requestPoll true   // button with parameter
 
   options {
     resizeKeyboard = true
@@ -74,11 +91,11 @@ message{ "Test" }.replyKeyboardMarkup {
 }.send(user, bot)
 ```
 
-키보드에 적용 가능한 추가 옵션은 [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html)에서 확인할 수 있습니다.
+Additional options applicable to the keyboard can be seen in [`ReplyKeyboardMarkupOptions`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-reply-keyboard-markup-options/index.html).
 
-메서드에 대한 자세한 내용은 빌더 [문서](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html)를 참조하세요.
+See the builder [documentation](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-reply-keyboard-markup-builder/index.html) for more details about the methods.
 
-키보드 마크업을 수집하기 위해 DSL을 사용하는 것이 가장 편리하지만, 필요한 경우 수동으로 마크업을 추가할 수도 있습니다.
+It's mostly convenient to use dsl for collecting keyboard markup, but if needed, you can also add markup manually.
 
 ```kotlin
 message{ "*Test*" }.markup {
@@ -98,45 +115,45 @@ message{ "*Test*" }.markup {
 ```
 
 ### Entities
-[`MessageEntity`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-message-entity/index.html)를 전송하기 위한 메서드도 있습니다.
+There is also a method for sending [`MessageEntity`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-message-entity/index.html).
 
-사용 예시:
+Example usage:
 
 ```kotlin
 message{ "Test \$hello" }.replyKeyboardMarkup {
     +"Test menu button"
 }.entities {
-    5 to 15 url "https://google.com" // TextLink 추가
+    5 to 15 url "https://google.com" // add TextLink
     entity(EntityType.Bold, 0, 4)
-    entity(EntityType.Cashtag, 5, 5) // 백슬래시는 계산되지 않습니다(컴파일러용으로 사용됨)
+    entity(EntityType.Cashtag, 5, 5) // backslash doesn't count (because it's used for compiler)
 }.send(user, bot)
 ```
 
-#### 컨텍스트 엔티티
+#### Contextual entities.
 
-엔티티는 일부 구조의 컨텍스트를 통해 추가할 수도 있으며, 특정 [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) 인터페이스로 표시됩니다. 이는 캡션 기능에서도 사용됩니다.
+Entities can also be added through the context of some constructs, they are labeled with a specific [EntitiesContextBuilder](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.builders/-entities-ctx-builder/index.html) interface, it is also present in the caption feature.
 
-사용 예시:
+Example usage:
 
 ```kotlin
 message { "usual text " - bold { "this is bold text" } - " continue usual" }.send(user, bot)
 ```
 
-모든 종류의 [엔티티 유형](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-entity-type/index.html)이 지원됩니다.
+All kinds of [entity types](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.msg/-entity-type/index.html) are supported.
 
 ### Caption
-또한 `caption` 메서드를 사용하여 미디어 파일에 캡션을 추가할 수 있습니다.
+Also, the `caption` method can be used to add captions to media files.
 
-사용 예시:
+Example usage:
 
 ```kotlin
 photo { "FILE_ID" }.caption { "Test caption" }.send(user, bot)
 ```
 
 
-### 참고 자료
+### See also
 
-* [Bot 컨텍스트](Bot-Context.md)
-* [FSM | 대화 처리](FSM-and-Conversation-handling.md)
+* [Bot context](Bot-Context.md)
+* [FSM | Conversation handling](FSM-and-Conversation-handling.md)
 
 ---

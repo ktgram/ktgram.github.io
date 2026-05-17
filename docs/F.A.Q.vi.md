@@ -3,17 +3,17 @@
 title: F.A.Q
 ---
 
-### Ngoại lệ `AbstractMethodError`
+### `AbstractMethodError` exception
 
-Nếu bạn gặp ngoại lệ này khi khởi động ứng dụng:
+Nếu bạn gặp ngoại lệ này khi khởi động ứng dụng của mình:
 
 ```kotlin
 Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 'kotlinx.serialization.KSerializer[] kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()'
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-Điều này xảy ra vì hệ thống build của bạn đang sử dụng thư viện serialization cũ với cơ chế nội tại khác biệt.
-Để giải quyết, bạn cần buộc nó sử dụng phiên bản mới hơn, ví dụ bằng cách thêm đoạn này vào buildscript:
+Điều này xảy ra vì hệ thống build của bạn đang giải quyết phiên bản cũ của thư viện serialization có cơ chế nội bộ khác nhau.  
+Để giải quyết, bạn nên sử dụng phiên bản mới hơn, ví dụ bằng cách thêm đoạn này vào script build của bạn:
 
 ```kotlin
 configurations.all {
@@ -31,17 +31,17 @@ configurations.all {
 }
 ```
 
-(Nếu điều này được mô tả rõ trong changelog thì tôi đã không bao giờ nâng cấp nó vì tôi nhận được quá nhiều báo cáo về vấn đề này)
+(Nếu nó đã được mô tả chi tiết trong changelog, tôi sẽ không nâng cấp nó vì tôi nhận được quá nhiều báo cáo về vấn đề này)
 
-### Làm thế nào để lấy response của phương thức?
+### How do I get the method's response?
 
-Để lấy response và có thể thao tác với nó, bạn cần sử dụng `sendReturning` ở cuối phương thức thay vì `send`.
+Để nhận phản hồi và có thể thao tác với nó, bạn cần dùng `sendReturning` ở cuối phương thức thay vì `send`.
 
-Trong trường hợp này, lớp `Response` sẽ được trả về, chứa response, thành công hoặc thất bại, sau đó bạn cần hoặc xử lý thất bại hoặc đơn giản gọi `getOrNull()`.
+Trong trường hợp này lớp `Response` sẽ được trả về, chứa phản hồi, thành công hoặc thất bại; sau đó bạn cần xử lý thất bại hoặc chỉ gọi `getOrNull()`.
 
-Có một phần về: [Xử lý responses](https://github.com/vendelieu/telegram-bot#processing-responses).
+Có phần hướng dẫn về: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-### Tôi gặp lỗi khi sử dụng `spring-boot-devtools`
+### I'm getting error while using `spring-boot-devtools`
 
 Điều này xảy ra vì `spring-boot-devtools` có `classloader` riêng và không tìm thấy các phương thức.
 
@@ -51,19 +51,19 @@ Bạn cần thêm vào `resources/META-INF/spring-devtools.properties`:
 restart.include.generated=/eu.vendeli
 ```
 
-### Làm thế nào để thay đổi ktor engine
+### How to change ktor engine
 
-Nếu bạn muốn thay đổi engine được client sử dụng, bạn có thể đơn giản thay đổi [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) trong [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
+Nếu muốn thay đổi engine mà client sử dụng, bạn chỉ cần thay đổi [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) trong [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-### Làm thế nào để sử dụng nhà cung cấp logging yêu thích
+### How to use my favorite logging provider
 
-Thư viện sử dụng `slf4j-api` và để sử dụng nhà cung cấp, bạn chỉ cần thêm nó vào dependencies.
+Thư viện sử dụng `slf4j-api` và để dùng provider bạn chỉ cần thêm nó vào các dependency.
 
-Plugin thư viện tự động phát hiện việc sử dụng nhà cung cấp, nếu nhà cung cấp bị thiếu, `logback` sẽ được sử dụng mặc định.
+Plugin của thư viện tự động phát hiện việc sử dụng provider; nếu thiếu provider, `logback` sẽ được dùng mặc định.
 
-### Bắt ngoại lệ mạng trong long-polling handler
+### Catch network exceptions within long-polling handler
 
-Ví dụ nếu bạn có kết nối không ổn định và cần bắt lỗi do điều này, có lẽ cách tiếp cận này sẽ giúp bạn:
+Ví dụ nếu bạn có kết nối không ổn định và cần bắt lỗi vì lý do này, có thể cách này sẽ hữu ích:
 
 ```kotlin
 fun main() {
@@ -81,3 +81,5 @@ fun main() {
 ```
 
 Bạn cũng có thể xem cách thực hiện trong [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
+
+---

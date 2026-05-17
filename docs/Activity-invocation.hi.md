@@ -1,23 +1,24 @@
 ---
 ---
-title: एक्टिविटी इनवोकेशन
+title: Activity Invocation
 ---
 
-एक्टिविटी इनवोकेशन के दौरान, बॉट कंटेक्स्ट पास करना संभव है, क्योंकि इसे टारगेट फंक्शन्स में पैरामीटर के रूप में घोषित किया गया है।
+During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions. 
 
-जो पैरामीटर पास किए जा सकते हैं:
+The parameters that can be passed are: 
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (और इसके सभी सबक्लास) - वर्तमान प्रोसेसिंग अपडेट।
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - एक्टिविटी हैंडलिंग का निम्न स्तरीय कंटेक्स्ट।
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - यदि उपलब्ध हो।
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - यदि उपलब्ध हो।
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - वर्तमान बॉट इंस्टेंस।
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses, e.g. `MessageUpdate`, `CallbackQueryUpdate`, …) - current processing update.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - low level context of handling activity.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - if present.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance.
+* [`Session`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.session/-session/index.html) *(added in 9.5)* - session for the current chat/user. Annotate the parameter with [`@SessionQualifier("name")`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-session-qualifier/index.html) to inject an independent named session. See the [Sessions article](Sessions.md).
 
-कस्टम प्रकार पास करने के लिए जोड़ना भी संभव है।
+It is also possible to add a custom type for passing. 
 
-ऐसा करने के लिए, [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) को लागू करने वाली क्लास जोड़ें और इसे [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) एनोटेशन से चिह्नित करें।
+To do this, add a class that implements [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) and mark it with the [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) annotation. 
 
-`Autowiring` इंटरफेस को लागू करने के बाद - `T` टारगेट फंक्शन्स में पास करने के लिए उपलब्ध होगा और इंटरफेस में वर्णित विधि के माध्यम से प्राप्त किया जाएगा।
+After implementing the `Autowiring` interface - `T` will be available for passing in target functions and will be obtained through the method described in the interface. 
 
 ```kotlin
 @Injectable
@@ -28,9 +29,10 @@ object UserResolver : Autowiring<UserRecord> {
 }
 ```
 
-फंक्शन्स में घोषित अन्य पैरामीटर **खोजे** जाएंगे पार्स किए गए पैरामीटर में।
 
-इसके अलावा, पास करते समय पार्स किए गए पैरामीटर को कुछ विशिष्ट प्रकारों में कास्ट किया जा सकता है, यहां उनकी सूची है:
+Other parameters declared in functions will be **searched** in parsed parameters. 
+
+Additionally, parsed parameters during passing can be cast to certain types, here is their list: 
 
 - `String`
 - `Integer`
@@ -39,16 +41,29 @@ object UserResolver : Autowiring<UserRecord> {
 - `Float`
 - `Double`
 
-इसके अतिरिक्त, ध्यान दें कि यदि पैरामीटर घोषित हैं और गायब हैं (या पार्स किए गए पैरामीटर में या उदाहरण के लिए `Update` में `User` गायब है) या घोषित प्रकार फंक्शन में प्राप्त पैरामीटर से मेल नहीं खाता, **`null`** पास किया जाएगा इसलिए सावधान रहें।
+Moreover, note that if parameters are declared and missing (or in parsed parameters or for example `User` is missing in `Update`) or the declared type does not fit the received parameter in the function, **`null`** will be passed so be careful.
 
-सब कुछ सारांशित करते हुए, नीचे यहां एक उदाहरण है कि फंक्शन पैरामीटर आमतौर पर कैसे बनते हैं:
+Summarizing everything, below here is an example of how function parameters are usually formed:
+
+```mermaid
+flowchart LR
+    U["ProcessedUpdate<br/>(and typed subclasses)"] --> R[Parameter resolver]
+    PC[ProcessingContext] --> R
+    User[User from update] --> R
+    Chat[Chat from update] --> R
+    Bot[TelegramBot] --> R
+    Sess["Session<br/>(opt. @SessionQualifier)"] --> R
+    Inj["@Injectable Autowiring&lt;T&gt;"] --> R
+    Parsed["Parsed text params<br/>(String / Int / Long / Short / Float / Double)"] --> R
+    R --> Fn[Handler function call]
+```
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="इनवोकेशन प्रोसेस डायग्राम" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
 </p>
 
-### देखें भी
+### See also
 
-* [अपडेट पार्सिंग](Update-parsing.md)
-* [एक्टिविटीज़ और प्रोसेसर्स](Activites-and-Processors.md)
+* [Update parsing](Update-parsing.md)
+* [Activities & Processors](Activites-and-Processors.md)
 ---

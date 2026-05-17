@@ -110,10 +110,22 @@ suspend fun test(update: ProcessedUpdate, user: User, bot: TelegramBot) {
 The `UpdateHandler` annotation marks functions that handle specific types of incoming updates. It provides a way to categorize and process different update types systematically.
 
 -   **type**: Specifies the types of updates the handler function will process.
+-   **messageKind** *(added in 9.5)*: Optional set of [`MessageKind`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-kind/index.html)s that narrow dispatch to message-bearing updates whose detected kind matches. Empty (the default) means any kind matches.
 
 ```kotlin
 @UpdateHandler([UpdateType.PRE_CHECKOUT_QUERY])
 suspend fun test(update: PreCheckoutQueryUpdate, user: User, bot: TelegramBot) {
+    //...
+}
+```
+
+##### Filtering by `MessageKind`
+
+Use the `messageKind` parameter to react only to a specific subset of message updates (photos, text, service events, …) instead of inspecting nullable fields by hand:
+
+```kotlin
+@UpdateHandler(type = [UpdateType.MESSAGE], messageKind = [MessageKind.PHOTO])
+suspend fun onPhoto(update: MessageUpdate, bot: TelegramBot) {
     //...
 }
 ```
@@ -178,6 +190,161 @@ suspend fun test(user: User, bot: TelegramBot) {
 
 **see also [`defaultArgParser`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.utils.common/default-arg-parser.html)**
 
+### Functional DSL
+
+Every annotation above has a counterpart in the **Functional DSL**, an alternative way to declare handlers at runtime via `bot.setFunctionality { … }`. Both approaches share the same `ActivityRegistry` and can be combined freely in the same bot.
+
+| Annotation | DSL counterpart |
+|------------|-----------------|
+| `@CommandHandler` | `onCommand(...)` |
+| `@CommandHandler.CallbackQuery` | `onCommand(..., scope = [UpdateType.CALLBACK_QUERY])` |
+| `@InputHandler` / input chains | `onInput(...)` / `inputChain(...)` |
+| `@CommonHandler` | `common(...)` |
+| `@UpdateHandler` | `onUpdate(...)` |
+| `@UnprocessedHandler` | `whenNotHandled { ... }` |
+
+Minimal example:
+
+```kotlin
+suspend fun main() {
+    val bot = TelegramBot("BOT_TOKEN")
+
+    bot.setFunctionality {
+        onChosenInlineResult {
+            println("got a result ${update.chosenInlineResult.resultId} from ${update.user}")
+        }
+    }
+}
+```
+
+### Commands
+
+```kotlin
+bot.setFunctionality {
+    // Regular command
+    onCommand("/start") {
+        message { "Hello" }.send(user, bot)
+    }
+
+    // Regex-based command matching
+    onCommand("""(red|green|blue)""".toRegex()) {
+        message { "you typed ${update.text} color" }.send(user, bot)
+    }
+}
+```
+
+Inside an `onCommand` block, parsed parameters are available as `Map<String, String>` shaped by the active `commandParsing` configuration.
+
+### Inputs
+
+```kotlin
+bot.setFunctionality {
+    onCommand("/start") {
+        message { "Hello, what's your name?" }.send(user, bot)
+        bot.inputListener[user] = "testInput"
+    }
+
+    onInput("testInput") {
+        message { "Hey, nice to meet you, ${update.text}" }.send(user, bot)
+    }
+}
+```
+
+See [`bot.inputListener`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/input-listener.html) for the storage API.
+
+#### Input chains
+
+For multi-step input flows use `inputChain`:
+
+```kotlin
+bot.setFunctionality {
+    inputChain("conversation") {
+        message { "Nice to meet you, ${update.text}" }.send(user, bot)
+        message { "What is your favorite food?" }.send(user, bot)
+    }.breakIf({ update.text == "peanut butter" }) {     // chain break condition
+        message { "Oh, too bad, I'm allergic to it." }.send(user, bot)
+    }.andThen {
+        // next step when the break condition didn't match
+        message { "Great choice!" }.send(user, bot)
+    }
+}
+```
+
+The chain auto-advances unless a break condition matches; when `repeat = true` (default), a matching break keeps the user on the current step.
+
+> For richer multi-step flows with typed state and validation, prefer the [`@WizardHandler`](FSM-and-Conversation-handling.md) instead.
+
+### Update type handlers
+
+```kotlin
+bot.setFunctionality {
+    onUpdate(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY) {
+        println("Received update: ${update.type}")
+    }
+}
+```
+
+### Common matchers
+
+```kotlin
+bot.setFunctionality {
+    common("hello") {
+        message { "Hi there!" }.send(user, bot)
+    }
+
+    common("""\d+""".toRegex()) {
+        message { "You sent a number!" }.send(user, bot)
+    }
+}
+```
+
+### Fallback handler
+
+```kotlin
+bot.setFunctionality {
+    whenNotHandled {
+        message { "I didn't understand that." }.send(user, bot)
+    }
+}
+```
+
+### Companion options
+
+Rate limits, guards, and argument parsers are passed directly as named parameters instead of separate annotations:
+
+```kotlin
+bot.setFunctionality {
+    onCommand("/expensive", rateLimits = RateLimits(rate = 5, period = 60_000)) {
+        message { "Processing..." }.send(user, bot)
+    }
+
+    onCommand("/admin", guard = AdminGuard::class) {
+        message { "Admin command executed" }.send(user, bot)
+    }
+
+    onCommand("/custom", argParser = CustomArgParser::class) {
+        message { "Parameters: $parameters" }.send(user, bot)
+    }
+}
+```
+
+### Combining DSL and annotations
+
+The two styles coexist — register the same way, dispatch the same way:
+
+```kotlin
+@CommandHandler(["/register"])
+suspend fun register(user: User, bot: TelegramBot) {
+    message { "Registration started" }.send(user, bot)
+}
+
+bot.setFunctionality {
+    onCommand("/help") {
+        message { "Available commands: /register, /help" }.send(user, bot)
+    }
+}
+```
+
 ### Conclusion
 
 These annotations provide robust and flexible tools for handling commands, inputs, and events, while allowing for separate configurations of rate limits and guards, enhancing the overall structure and maintainability of bot development.
@@ -187,4 +354,5 @@ These annotations provide robust and flexible tools for handling commands, input
 * [Activities & Processors](Activites-and-Processors.md)
 * [Activity invocation](Activity-invocation.md)
 * [FSM and Conversation handling](FSM-and-Conversation-handling.md)
+* [Sessions](Sessions.md)
 * [Update parsing](Update-parsing.md)

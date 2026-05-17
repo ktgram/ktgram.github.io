@@ -1,19 +1,19 @@
 ---
 ---
-title: 자주 묻는 질문
+title: F.A.Q
 ---
 
-### `AbstractMethodError` 예외
+### `AbstractMethodError` exception
 
-애플리케이션 시작 시 다음과 같은 예외가 발생하는 경우:
+If you getting such exception on the startup of your application:
 
 ```kotlin
 Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 'kotlinx.serialization.KSerializer[] kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()'
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-이것은 빌드 시스템이 내부 메커니즘이 다른 이전 버전의 직렬화 라이브러리를 참조하기 때문에 발생합니다.
-이를 해결하려면 더 최신 버전을 사용하도록 설정해야 합니다. 예를 들어 빌드스크립트에 다음을 추가할 수 있습니다:
+It happening because your build system resolving old serialization library which internal mechanics differs.
+To solve it you should make it use more newer version, for example by adding this to your buildscript:
 
 ```kotlin
 configurations.all {
@@ -31,39 +31,39 @@ configurations.all {
 }
 ```
 
-(변경사항이 변경 로그에 잘 설명되어 있었다면 이 문제에 대한 보고를 이렇게 많이 받지 않았을 것입니다)
+(If it was well described in changelog I would never upgraded it bc I getting so much reports on this issue)
 
-### 메서드의 응답을 어떻게 얻나요?
+### How do I get the method's response?
 
-응답을 얻고 이를 조작하려면 `send` 대신 메서드 끝에 `sendReturning`을 사용해야 합니다.
+To get a response and be able to operate over, you need to use `sendReturning` at the end of the method instead of `send`.
 
-이 경우 `Response` 클래스가 반환되며, 이 클래스에는 응답, 성공 또는 실패가 포함됩니다. 그 후에는 실패를 처리하거나 단순히 `getOrNull()`을 호출하면 됩니다.
+In this case the `Response` class is returned, which contains the response, success or failure, further you need to either handle the failure or just call `getOrNull()`.
 
-관련 내용은 다음 섹션을 참조하세요: [응답 처리](https://github.com/vendelieu/telegram-bot#processing-responses).
+There's section about: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-### `spring-boot-devtools` 사용 시 오류가 발생합니다
+### I'm getting error while using `spring-boot-devtools`
 
-이 문제는 `spring-boot-devtools`가 자체 `classloader`를 가지고 있고 메서드를 찾지 못하기 때문에 발생합니다.
+This happens because `spring-boot-devtools` has its own `classloader` and it does not find methods.
 
-`resources/META-INF/spring-devtools.properties`에 다음을 추가해야 합니다:
+You need to add to `resources/META-INF/spring-devtools.properties`:
 
 ```properties
 restart.include.generated=/eu.vendeli
 ```
 
-### ktor 엔진 변경 방법
+### How to change ktor engine
 
-클라이언트에서 사용하는 엔진을 변경하려면 [설정](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html)의 [매개변수](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html)를 간단히 변경할 수 있습니다.
+If you want to change the engine used by the client you can simply change the [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) in the [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-### 선호하는 로깅 제공업체 사용 방법
+### How to use my favorite logging provider
 
-라이브러리는 `slf4j-api`를 사용하며, 제공업체를 사용하려면 해당 제공업체를 의존성에 추가하기만 하면 됩니다.
+The library uses `slf4j-api` and to use the provider you just need to add it to the dependencies.
 
-라이브러리 플러그인은 제공업체 사용을 자동으로 감지하며, 제공업체가 누락된 경우 기본값으로 `logback`이 사용됩니다.
+The library plugin automatically detects the use of the provider, if provider is missing, `logback` will be used by default.
 
-### long-polling 핸들러 내에서 네트워크 예외 처리
+### Catch network exceptions within long-polling handler
 
-예를 들어 불안정한 연결이 있고 이로 인해 오류를 잡아야 하는 경우, 다음 접근 방식이 도움이 될 수 있습니다:
+For example if you have an unstable connection and need to catch an error because of this, perhaps this approach will help you:
 
 ```kotlin
 fun main() {
@@ -80,6 +80,6 @@ fun main() {
 }
 ```
 
-또한 [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53)에서 구현된 방식을 확인해볼 수 있습니다.
+Also you can take a look how it's done in [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
 
 ---

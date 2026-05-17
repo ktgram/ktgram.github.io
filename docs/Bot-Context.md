@@ -2,9 +2,16 @@
 title: Bot Context
 ---
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/60bb58ae-1806-4b8d-8550-833b09c2b606" alt="Bot context diagram" />
-</p>
+```mermaid
+flowchart LR
+    H[Handler function] --> UD["UserData (per-user)"]
+    H --> CD["ClassData (per-class scope)"]
+    UD --> Impl1["ConcurrentHashMap (default)"]
+    UD --> Impl2["Custom impl via @CtxProvider<br/>(Redis, JDBC, ...)"]
+    CD --> Impl1
+    CD --> Impl2
+```
+
 
 The bot can also provide the ability to remember some data through the `UserData` and `ClassData` interfaces.
 

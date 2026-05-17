@@ -4,13 +4,13 @@ title: Activites And Processors
 
 ### Introduction
 
-`Activity` in the terms of this library is the abstract entity that is a generalization of entities such as `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, and `@CommonHandler`.
+`Activity` in the terms of this library is the abstract entity that is a generalization of entities such as `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler`, and `@WizardHandler`.
 
-Also take a look at [handlers article](Handlers.md).
+Also take a look at the [handlers article](Handlers.md).
 
 ### Collecting activities
 
-Activities are collected and prepared all context in compile time (except for those defined through functional dsl).
+Activities are discovered and wired up at **compile time** by the **ktnip** KSP processor. The [Functional DSL](Handlers#functional-dsl.md) is the one exception — handlers defined through `bot.setFunctionality { ... }` are registered at runtime.
 
 If you want to limit the area in which the package will be searched, you can pass a parameter to plugin:
 

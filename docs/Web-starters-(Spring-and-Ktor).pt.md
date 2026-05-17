@@ -5,22 +5,22 @@ title: Web Starters (Spring And Ktor)
 
 ### Spring starter
 
-O módulo Spring Starter para biblioteca é um módulo de auto-configuração que integra funcionalidades de bot do Telegram em aplicações Spring Boot. Ele aproveita o poder da injeção de dependência e propriedades de configuração do Spring Boot para configurar automaticamente bots do Telegram com base na configuração fornecida. Esta biblioteca é particularmente útil para desenvolvedores que desejam construir bots do Telegram usando Kotlin e Spring Boot, oferecendo uma abordagem simplificada para desenvolvimento e gerenciamento de bots.
+O módulo Spring Starter para a biblioteca é um módulo de auto‑configuração que integra as funcionalidades de bot do Telegram em aplicações Spring Boot. Ele aproveita o poder da injeção de dependências e das propriedades de configuração do Spring Boot para configurar automaticamente bots do Telegram com base nas configurações fornecidas. Esta biblioteca é particularmente útil para desenvolvedores que desejam criar bots do Telegram usando Kotlin e Spring Boot, oferecendo uma abordagem simplificada para desenvolvimento e gerenciamento de bots.
 
-### Principais Recursos
+### Key Features
 
-- **Auto-Configuração**: A biblioteca configura automaticamente bots do Telegram com base nas propriedades de configuração fornecidas, eliminando a necessidade de configuração manual.
-- **Propriedades de Configuração**: Suporta propriedades de configuração para fácil personalização das configurações do bot, como tokens de bot, nomes de pacotes e identificadores.
-- **Integração Spring**: Integra-se perfeitamente com o ecossistema Spring, utilizando a injeção de dependência e contexto de aplicação do Spring para gerenciar instâncias de bot.
-- **Suporte a Coroutines**: Aproveita coroutines Kotlin para operações assíncronas de bot, garantindo execução eficiente e não bloqueante.
+- **Auto-Configuration**: A biblioteca configura automaticamente bots do Telegram com base nas propriedades de configuração fornecidas, eliminando a necessidade de configuração manual.
+- **Configuration Properties**: Suporta propriedades de configuração para fácil personalização das definições do bot, como tokens, nomes de pacotes e identificadores.
+- **Spring Integration**: Integra-se perfeitamente ao ecossistema Spring, utilizando a injeção de dependências e o contexto de aplicação do Spring para gerenciar instâncias de bot.
+- **Coroutine Support**: Aproveita corrotinas Kotlin para operações assíncronas de bot, garantindo execução eficiente e não bloqueante.
 
-### Primeiros Passos
+### Getting Started
 
-Para usar a Biblioteca Spring Starter para Bots do Telegram, você precisa incluí-la como dependência no seu projeto Spring Boot. A biblioteca é projetada para funcionar com aplicações Spring Boot e requer o framework Spring Boot para funcionar.
+Para usar a Spring Starter Library para Bots do Telegram, você precisa incluí‑la como dependência no seu projeto Spring Boot. A biblioteca foi projetada para funcionar com aplicações Spring Boot e requer o framework Spring Boot para operar.
 
-#### Dependência
+#### Dependency
 
-Adicione a seguinte dependência ao seu arquivo `build.gradle` ou `pom.xml`:
+Adicione a dependência a seguir no seu arquivo `build.gradle` ou `pom.xml`:
 
 ```gradle
 dependencies {
@@ -30,9 +30,9 @@ dependencies {
 
 Substitua `<version>` pela versão mais recente da biblioteca.
 
-#### Configuração
+#### Configuration
 
-A biblioteca usa `@ConfigurationProperties` do Spring Boot para vincular propriedades de configuração. Você pode definir suas configurações de bot no arquivo `application.properties` ou `application.yml` da sua aplicação Spring Boot.
+A biblioteca usa `@ConfigurationProperties` do Spring Boot para fazer o binding das propriedades de configuração. Você pode definir as configurações do seu bot no arquivo `application.properties` ou `application.yml` da sua aplicação Spring Boot.
 
 ```yaml
 ktgram:
@@ -44,11 +44,11 @@ ktgram:
       identifier: MyBot
 ```
 
-#### Uso
+#### Usage
 
-Uma vez que a biblioteca esteja incluída e configurada, ela cria e configura automaticamente instâncias de bot do Telegram com base na configuração fornecida.
+Uma vez que a biblioteca esteja incluída e configurada, ela cria e configura automaticamente instâncias de bot do Telegram com base nas configurações fornecidas.
 
-Ela também suporta múltiplas instâncias de bot, para inicializar várias basta declará-las como nova entrada na seção bot:
+Ela também suporta múltiplas instâncias de bot; para inicializar várias basta declará‑las como novas entradas na seção bot:
 
 ```yaml
 ktgram:
@@ -57,20 +57,20 @@ ktgram:
     - token: SECOND_BOT_TOKEN
 ```
 
-### Configuração Avançada
+### Advanced Configuration
 
-Para configurações mais avançadas, como personalizar o comportamento do bot ou integrar com outros componentes Spring, você pode estender a classe `BotConfiguration` e alterar a configuração do bot através do seu método `applyCfg`, você pode ver um exemplo [aqui](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
+Para configurações mais avançadas, como personalizar o comportamento do bot ou integrar com outros componentes Spring, você pode estender a classe `BotConfiguration` e alterar a configuração do bot através do método `applyCfg`. Veja um exemplo [aqui](https://github.com/vendelieu/telegram-bot_template/blob/spring-bot/src/main/kotlin/com/example/springbot/configuration/BotConfig.kt).
 
 > [!TIP]
-> Para configurar cada instância inicializada com uma configuração personalizada, distinga-as pelo seu identificador (a classe BotConfiguration também possui um identificador).
+> Para configurar cada instância inicializada com uma configuração personalizada, distinga‑as pelo seu identificador (a classe BotConfiguration também possui um identificador).
 
 ### Ktor
 
-O módulo é projetado para facilitar a criação de um servidor webhook para bots do Telegram. Ele permite que desenvolvedores configurem o servidor, incluindo configurações SSL/TLS, e declarem múltiplos bots do Telegram com configurações personalizadas. O processo de configuração é flexível, permitindo que desenvolvedores adaptem o servidor às suas necessidades específicas.
+O módulo foi projetado para facilitar a criação de um servidor webhook para bots do Telegram. Ele permite que desenvolvedores configurem o servidor, incluindo as definições SSL/TLS, e declarem múltiplos bots do Telegram com configurações personalizadas. O processo de configuração é flexível, permitindo que os desenvolvedores adaptem o servidor às suas necessidades específicas.
 
-### Instalação
+### Installation
 
-Para instalar o starter ktor, adicione adicionalmente à dependência principal:
+Para instalar o ktor starter, adicione o seguinte à dependência principal:
 
 ```gradle
 dependencies {
@@ -79,59 +79,59 @@ dependencies {
 }
 ```
 
-### Componentes Principais
+### Key Components
 
-Função `serveWebhook`
+`serveWebhook` Function
 
-A função serveWebhook é o núcleo da biblioteca. Ela configura e inicia o servidor webhook para bots do Telegram. Ela aceita dois parâmetros:
+A função `serveWebhook` é o núcleo da biblioteca. Ela configura e inicia o servidor webhook para bots do Telegram. Aceita dois parâmetros:
 
-- `wait`: Um booleano indicando se o servidor deve esperar o aplicativo parar antes de desligar. Padrão é true.
-- `serverBuilder`: Uma função lambda que configura o servidor. Padrão é uma lambda vazia.
+- `wait`: Um booleano indicando se o servidor deve aguardar a aplicação parar antes de encerrar. O padrão é true.
+- `serverBuilder`: Uma função lambda que configura o servidor. O padrão é uma lambda vazia.
 
-### Configuração
+### Configuration
 
-* `WEBHOOK_PREFIX`: é um parâmetro que será usado como prefixo de endereço para a rota do listener webhook. (padrão é "/")
+* `WEBHOOK_PREFIX`: parâmetro usado como prefixo de endereço para a rota do listener webhook. (padrão “/”)
 
-#### Configuração do Servidor
+#### Server Setup
 
-- `server`: Um método para definir a configuração do servidor usando seja EnvConfiguration ou ManualConfiguration.
-- `engine`: Um método para configurar o engine de aplicação Netty.
-- `ktorModule`: Um método para adicionar módulos Ktor à aplicação.
+- `server`: Método para definir a configuração do servidor usando `EnvConfiguration` ou `ManualConfiguration`.
+- `engine`: Método para configurar o motor de aplicação Netty.
+- `ktorModule`: Método para adicionar módulos Ktor à aplicação.
 
-A biblioteca fornece uma ampla gama de parâmetros configuráveis para o servidor, incluindo host, porta, configurações SSL, e mais. Existem duas opções concretas para sua configuração:
+A biblioteca oferece ampla gama de parâmetros configuráveis para o servidor, incluindo host, porta, configurações SSL e mais. Existem duas opções concretas para sua configuração:
 
 * `EnvConfiguration`: Lê valores de configuração do ambiente com prefixo `KTGRAM_`.
-* `ManualConfiguration`: Permite configuração manual de valores de configuração, defina seus parâmetros na função `server {}`.
+* `ManualConfiguration`: Permite definir manualmente os valores de configuração, configure seus parâmetros na função `server {}`.
 
-Há uma lista de parâmetros que podem ser definidos:
+Segue a lista de parâmetros que podem ser definidos:
 
-- `HOST`: O hostname ou endereço IP do servidor.
-- `PORT`: O número da porta para o servidor.
-- `SSL_PORT`: O número da porta para conexões SSL/TLS.
-- `PEM_PRIVATE_KEY_PATH`: O caminho para o arquivo de chave privada PEM.
-- `PEM_CHAIN_PATH`: O caminho para o arquivo da cadeia de certificados PEM.
-- `PEM_PRIVATE_KEY`: A SENHA da chave privada PEM como um array de caracteres.
-- `KEYSTORE_PATH`: O caminho para o arquivo Java KeyStore.
-- `KEYSTORE_PASSWORD`: A senha para o KeyStore.
-- `KEY_ALIAS`: O alias para a chave no KeyStore.
-- `SSL_ON`: Um booleano indicando se SSL/TLS deve ser habilitado. Padrão é true.
+- `HOST`: Nome do host ou endereço IP do servidor.
+- `PORT`: Número da porta do servidor.
+- `SSL_PORT`: Número da porta para conexões SSL/TLS.
+- `PEM_PRIVATE_KEY_PATH`: Caminho para o arquivo PEM da chave privada.
+- `PEM_CHAIN_PATH`: Caminho para o arquivo PEM da cadeia de certificados.
+- `PEM_PRIVATE_KEY`: SENHA da chave privada PEM como array de caracteres.
+- `KEYSTORE_PATH`: Caminho para o arquivo Java KeyStore.
+- `KEYSTORE_PASSWORD`: Senha do KeyStore.
+- `KEY_ALIAS`: Alias da chave no KeyStore.
+- `SSL_ON`: Booleano indicando se SSL/TLS deve estar habilitado. O padrão é true.
 
 > [!TIP]
-> Se certificados pem estiverem presentes, o módulo criará um armazenamento jks a partir deles no caminho especificado.
+> Se certificados PEM estiverem presentes, o próprio módulo criará um armazenamento jks a partir deles no caminho especificado.
 
-#### Configuração do Bot:
+#### Bot Configuration:
 
-Para configurar o bot, chame `declareBot {}` que possui tais parâmetros:
+Para configurar o bot, chame `declareBot {}` que possui os seguintes parâmetros:
 
 - `token`: O token do bot.
-- `pckg`: O nome do pacote para o bot.
-- `configuration`: Uma função lambda para configurar o bot.
-- `handlingBehaviour`: Uma função lambda para definir o comportamento de manipulação do bot.
-- `onInit`: Uma função lambda a ser executada quando o bot for inicializado.
+- `pckg`: O nome do pacote do bot.
+- `configuration`: Função lambda para configurar o bot.
+- `handlingBehaviour`: Função lambda para definir o comportamento de tratamento do bot.
+- `onInit`: Função lambda a ser executada quando o bot for inicializado.
 
-### Exemplo de Uso
+### Example Usage
 
-Para usar este módulo, chame a função `serveWebhook`, configure-a com suas configurações desejadas, declare seus bots. Aqui está um exemplo simplificado:
+Para usar este módulo, chame a função `serveWebhook`, configure‑a com as definições desejadas e declare seus bots. Veja um exemplo simplificado:
 
 ```kotlin
 fun main() = runBlocking {
@@ -159,6 +159,9 @@ fun main() = runBlocking {
 ```
 
 > [!CAUTION]
-> Não esqueça de configurar o webhook para fazer tudo funcionar. :)
+> Não se esqueça de definir o webhook para que tudo funcione. :)
 
-Por padrão, o módulo servirá endpoints de escuta webhook como `host/BOT_TOKEN`
+Por padrão o módulo servirá endpoints de listener webhook como `host/BOT_TOKEN`
+
+
+---

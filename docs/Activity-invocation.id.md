@@ -3,21 +3,22 @@
 title: Activity Invocation
 ---
 
-Selama aktivasi aktivitas, dimungkinkan untuk melewatkan konteks bot, karena dideklarasikan sebagai parameter dalam fungsi target.
+During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions. 
 
-Parameter yang dapat dilewatkan adalah:
+The parameters that can be passed are: 
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (dan semua subclass-nya) - update pemrosesan saat ini.
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - konteks tingkat rendah dari penanganan aktivitas.
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - jika ada.
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - jika ada.
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - instance bot saat ini.
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses, e.g. `MessageUpdate`, `CallbackQueryUpdate`, …) - current processing update.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - low level context of handling activity.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - if present.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance.
+* [`Session`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.session/-session/index.html) *(added in 9.5)* - session for the current chat/user. Annotate the parameter with [`@SessionQualifier("name")`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-session-qualifier/index.html) to inject an independent named session. See the [Sessions article](Sessions.md).
 
-Juga dimungkinkan untuk menambahkan tipe kustom untuk dilewatkan.
+It is also possible to add a custom type for passing. 
 
-Untuk melakukan ini, tambahkan kelas yang mengimplementasikan [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) dan tandai dengan anotasi [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html).
+To do this, add a class that implements [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) and mark it with the [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) annotation. 
 
-Setelah mengimplementasikan antarmuka `Autowiring` - `T` akan tersedia untuk dilewatkan dalam fungsi target dan akan diperoleh melalui metode yang dijelaskan dalam antarmuka.
+After implementing the `Autowiring` interface - `T` will be available for passing in target functions and will be obtained through the method described in the interface. 
 
 ```kotlin
 @Injectable
@@ -29,9 +30,9 @@ object UserResolver : Autowiring<UserRecord> {
 ```
 
 
-Parameter lain yang dideklarasikan dalam fungsi akan **dicari** dalam parameter yang diparsing.
+Other parameters declared in functions will be **searched** in parsed parameters. 
 
-Selain itu, parameter yang diparsing selama dilewatkan dapat di-cast ke tipe tertentu, berikut daftarnya:
+Additionally, parsed parameters during passing can be cast to certain types, here is their list: 
 
 - `String`
 - `Integer`
@@ -40,15 +41,28 @@ Selain itu, parameter yang diparsing selama dilewatkan dapat di-cast ke tipe ter
 - `Float`
 - `Double`
 
-Selain itu, perhatikan bahwa jika parameter dideklarasikan dan tidak ada (atau dalam parameter yang diparsing atau misalnya `User` tidak ada dalam `Update`) atau tipe yang dideklarasikan tidak sesuai dengan parameter yang diterima dalam fungsi, **`null`** akan dilewatkan jadi berhati-hatilah.
+Moreover, note that if parameters are declared and missing (or in parsed parameters or for example `User` is missing in `Update`) or the declared type does not fit the received parameter in the function, **`null`** will be passed so be careful.
 
-Meringkas semuanya, di bawah ini adalah contoh bagaimana parameter fungsi biasanya dibentuk:
+Summarizing everything, below here is an example of how function parameters are usually formed:
+
+```mermaid
+flowchart LR
+    U["ProcessedUpdate<br/>(and typed subclasses)"] --> R[Parameter resolver]
+    PC[ProcessingContext] --> R
+    User[User from update] --> R
+    Chat[Chat from update] --> R
+    Bot[TelegramBot] --> R
+    Sess["Session<br/>(opt. @SessionQualifier)"] --> R
+    Inj["@Injectable Autowiring&lt;T&gt;"] --> R
+    Parsed["Parsed text params<br/>(String / Int / Long / Short / Float / Double)"] --> R
+    R --> Fn[Handler function call]
+```
 
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />
 </p>
 
-### Lihat juga
+### See also
 
 * [Update parsing](Update-parsing.md)
 * [Activities & Processors](Activites-and-Processors.md)

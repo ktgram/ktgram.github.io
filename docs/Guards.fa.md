@@ -4,47 +4,47 @@ title: Guards
 ---
 
 ### Introduction
-Guards are an essential feature for developers creating bots. These guards function as pre-execution checks that determine whether a particular command should be invoked. By implementing these checks, developers can enhance the functionality, security, and user experience of their bots.
+Guards یک ویژگی اساسی برای توسعه‌دهندگانی هستند که ربات می‌سازند. این گاردها به‌عنوان بررسی‌های پیش از اجرا عمل می‌کنند تا تعیین کنند آیا یک دستور خاص باید فراخوانی شود یا نه. با پیاده‌سازی این بررسی‌ها، توسعه‌دهندگان می‌توانند کارکرد، امنیت و تجربه کاربری ربات‌های خود را بهبود بخشند.
 
 ### Purpose of Activity Guards
-The primary purpose of activity guards is to ensure that only authorized users or specific conditions trigger a activity. 
+هدف اصلی گاردهای فعالیت این است که تنها کاربران مجاز یا شرایط خاصی یک فعالیت را تحریک کنند.
 
-This can prevent misuse, maintain the bot's integrity, and streamline interactions.
+این می‌تواند از سوءاستفاده جلوگیری کند، یکپارچگی ربات را حفظ کند و تعاملات را به‌صورت کارآمدتری مدیریت نماید.
 
 ### Common Use Cases
-1. Authentication and Authorization: Ensuring only certain users can access specific commands.
-2. Pre-condition Checks: Verifying that certain conditions are met before executing a activity (e.g., ensuring a user is in a particular state or context).
-3. Contextual Guards: Making decisions based on the current chat or user state.
+1. Authentication and Authorization: اطمینان از این که تنها کاربران مشخصی می‌توانند به دستورات خاص دسترسی داشته باشند.  
+2. Pre-condition Checks: تأیید اینکه شرایط خاصی پیش از اجرای یک فعالیت برآورده شده‌اند (مثلاً اطمینان از اینکه کاربر در حالت یا زمینه خاصی قرار دارد).  
+3. Contextual Guards: اتخاذ تصمیم بر اساس وضعیت جاری چت یا کاربر.
 
 ### Implementation Strategies
-Implementing Telegram Command Guards typically involves writing functions or methods that encapsulate the logic for each guard. Below are common strategies:
+پیاده‌سازی Guardهای دستور تلگرام معمولاً شامل نوشتن توابع یا روش‌هایی است که منطق هر گارد را در بر می‌گیرد. در زیر برخی استراتژی‌های رایج آمده است:
 
 1. User Role Check:
-   - Ensuring the user has the required role (e.g., admin, moderator) before executing the command.
+   - اطمینان از این که کاربر نقش مورد نیاز (مثلاً admin، moderator) را قبل از اجرای دستور دارد.
       ```kotlin
        override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         // Check if the user is an admin in the given chat
        }
       ```
-
+   
 2. State Verification:
-   - Checking the user's state before allowing command execution.
+   - بررسی وضعیت کاربر قبل از اجازه به اجرای دستور.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         return bot.userData[user.id, "data"] == requiredState
      }
      ```
-
+   
 3. Custom Guards:
-   - Creating custom logic based on specific requirements.
+   - ایجاد منطق سفارشی بر پایه نیازمندی‌های خاص.
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         // Custom logic to determine if the command should be executed
      }
      ```
-
+   
 ### Integrating Guards with Activities
-To integrate these guards with your bot commands, you can create a guard that checks these conditions before the command handler is invoked.
+برای یکپارچه‌سازی این گاردها با دستورات ربات خود، می‌توانید گاردی ایجاد کنید که این شرایط را قبل از فراخوانی هندلر دستور بررسی کند.
 
 ### Implementing Example
 
@@ -67,16 +67,16 @@ fun command(bot: TelegramBot) {
 
 ### Best Practices
 
-- Modularity: Keep guard logic modular and separate from activities.
-- Reusability: Write reusable guard functions that can be easily applied across different commands/inputs.
-- Efficiency: Optimize guard checks to minimize performance overhead.
-- User Feedback: Provide clear feedback to users when a command is blocked by a guard.
+- Modularity: منطق گاردها را ماژولار و جدا از فعالیت‌ها نگه دارید.  
+- Reusability: توابع گارد قابل استفاده مجدد بنویسید تا به‌راحتی در دستورات/ورودی‌های مختلف به کار رود.  
+- Efficiency: بررسی‌های گارد را به‌گونه‌ای بهینه کنید که بار عملکردی کمی داشته باشد.  
+- User Feedback: هنگام مسدود شدن یک دستور توسط گارد، بازخورد واضحی به کاربر ارائه دهید.
 
 ### Conclusion
 
-Activity Guards are a powerful tool for managing bot command/input execution. 
+Guardهای فعالیت ابزار قدرتمندی برای مدیریت اجرای دستورات/ورودی‌های ربات هستند.
 
-By implementing robust guard mechanisms, developers can ensure their bots operate securely and efficiently, providing a better user experience.
+با پیاده‌سازی سازوکارهای گارد قوی، توسعه‌دهندگان می‌توانند اطمینان حاصل کنند ربات‌هایشان به‌صورت ایمن و کارآمد عمل می‌کند و تجربه کاربری بهتری را فراهم می‌آورد.
 
 ### See also
 

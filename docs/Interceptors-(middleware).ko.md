@@ -1,55 +1,55 @@
 ---
 ---
-title: 인터셉터 (미들웨어)
+title: Interceptors (Middleware)
 ---
 
-### 인터셉터: 봇을 위한 횡단 관심사 로직
+### Interceptors: Cross-Cutting Logic for Your Bot
 
-Telegram 봇을 구축할 때, 핸들러 전체에 걸쳐 설정, 검사 또는 정리 작업을 반복하는 경우가 많습니다. 인터셉터를 사용하면 핸들러 주변에 공유 로직을 삽입하여 핸들러를 집중적이고 유지보수하기 쉽게 유지할 수 있습니다.
+When building a Telegram bot, you often repeat setup, checks, or cleanup across handlers. Interceptors let you plug in shared logic around handlers, keeping handlers focused and maintainable.
 
-여기서 *telegram-bot*에서 인터셉터가 작동하는 방식과 사용하는 방법을 알아봅니다.
+Here’s how interceptors work in *telegram-bot* and how to use them.
 
-### 인터셉터란 무엇인가요? (간단한 설명)
+### What Are Interceptors? (Simple Explanation)
 
-인터셉터는 업데이트 처리 파이프라인의 특정 지점에서 실행되는 함수입니다. 다음을 할 수 있습니다:
-- 처리 컨텍스트 검사 및 수정
-- 횡단 관심사 로직 추가 (로깅, 인증, 메트릭)
-- 필요에 따라 처리를 조기 중단
-- 처리 후 리소스 정리
+Interceptors are functions that run at specific points in the update processing pipeline. They let you:
+- Inspect and modify the processing context
+- Add cross-cutting logic (logging, auth, metrics)
+- Stop processing early if needed
+- Clean up resources after processing
 
-인터셉터를 모든 업데이트가 핸들러 실행 전, 중, 후에 통과하는 체크포인트로 생각해보세요.
+Think of interceptors as checkpoints that every update passes through before, during, and after handler execution.
 
 
-### 처리 파이프라인
+### The Processing Pipeline
 
-봇은 7개의 단계를 거치는 파이프라인을 통해 업데이트를 처리합니다:
+The bot processes updates through a pipeline with seven phases:
 
-| 단계 | 실행 시점 | 사용할 수 있는 용도 |
+| Phase | When It Runs | What You Can Use It For |
 |-------|--------------|-------------------------|
-| **설정** | 처리 전 업데이트가 도착하자마자 | ✔ 전역 속도 제한<br>✔ 스팸 또는 잘못된 형식의 업데이트 필터링<br>✔ 초기 로깅<br>✔ 공유 컨텍스트 설정 |
-| **파싱** | 설정 후, 명령어 및 매개변수 추출 | ✔ 사용자 정의 명령어 파싱<br>✔ 파싱된 데이터로 컨텍스트 보강<br>✔ 업데이트 구조 검증 |
-| **매칭** | 적절한 핸들러 (명령어/입력/공통) 찾기 | ✔ 핸들러 선택 재정의<br>✔ 사용자 입력 처리 로직<br>✔ 매칭된 핸들러 로깅 |
-| **검증** | 핸들러를 찾은 후, 호출 전 | ✔ 핸들러별 권한<br>✔ 핸들러별 속도 제한<br>✔ 가드 검사<br>✔ 조건이 충족되지 않을 경우 처리 취소 |
-| **PreInvoke** | 핸들러 실행 직전 | ✔ 마지막 순간 검사<br>✔ 타이머/메트릭 시작<br>✔ 핸들러용 컨텍스트 보강<br>✔ 핸들러 동작 수정 |
-| **Invoke** | 핸들러가 여기서 실행됨 | ✔ 핸들러 실행 감싸기<br>✔ 오류 처리<br>✔ 핸들러 결과 로깅 |
-| **PostInvoke** | 핸들러 완료 후 (성공 또는 실패) | ✔ 리소스 정리<br>✔ 결과 로깅<br>✔ 오류 시 폴백 메시지 전송<br>✔ 반환 전 결과 수정 |
+| **Setup** | As soon as the update arrives, before any processing | ✔ Global rate limiting<br>✔ Filter out spam or malformed updates<br>✔ Initial logging<br>✔ Setup shared context |
+| **Parsing** | After setup, extracts command and parameters | ✔ Custom command parsing<br>✔ Enrich context with parsed data<br>✔ Validate update structure |
+| **Match** | Finds the appropriate handler (Command/Input/Common) | ✔ Override handler selection<br>✔ Custom input handling logic<br>✔ Log matched handlers |
+| **Validation** | After handler is found, before invocation | ✔ Handler-specific permissions<br>✔ Rate limiting per handler<br>✔ Guard checks<br>✔ Cancel processing if conditions aren't met |
+| **PreInvoke** | Immediately before the handler runs | ✔ Last-minute checks<br>✔ Start timers/metrics<br>✔ Enrich context for handler<br>✔ Modify handler behavior |
+| **Invoke** | The handler is executed here | ✔ Wrap handler execution<br>✔ Error handling<br>✔ Logging handler results |
+| **PostInvoke** | After handler completes (success or failure) | ✔ Cleanup resources<br>✔ Log results<br>✔ Send fallback messages on errors<br>✔ Modify results before returning |
 
 
-### 인터셉터 생성하기
+### Creating an Interceptor
 
-인터셉터는 `ProcessingContext`를 받는 간단한 함수입니다:
+An interceptor is a simple function that receives a `ProcessingContext`:
 
 ```kotlin
 import eu.vendeli.tgbot.core.PipelineInterceptor
 import eu.vendeli.tgbot.types.component.ProcessingContext
 
 val myInterceptor: PipelineInterceptor = { context ->
-    // 로직 추가
+    // Your logic here
     println("Processing update: ${context.update.updateId}")
 }
 ```
 
-또는 람다 사용:
+Or using a lambda:
 
 ```kotlin
 val loggingInterceptor = PipelineInterceptor { context ->
@@ -59,84 +59,84 @@ val loggingInterceptor = PipelineInterceptor { context ->
 ```
 
 
-### 인터셉터 등록하기
+### Registering Interceptors
 
-처리 파이프라인에 인터셉터를 등록합니다:
+Register interceptors on the processing pipeline:
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // 설정 단계에 인터셉터 등록
+    
+    // Register an interceptor for the Setup phase
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-        // 사용자 차단 여부 확인
+        // Check if user is banned
         val user = context.update.userOrNull
         if (user != null && isBanned(user.id)) {
-            context.finish() // 처리 중단
+            context.finish() // Stop processing
             return@intercept
         }
     }
-
-    // PreInvoke 단계에 인터셉터 등록
+    
+    // Register an interceptor for the PreInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
-        // 시작 시간 저장
+        // store start time
     }
-
-    // PostInvoke 단계에 인터셉터 등록
+    
+    // Register an interceptor for the PostInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
-        val startTime = // 시작 시간 가져오기
+        val startTime = // get start time
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             println("Handler took ${duration}ms")
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
 
-### 실제 사례: 인증 및 메트릭
+### Real-World Example: Authentication & Metrics
 
-예제: 특정 명령어에 인증이 필요한 봇, 핸들러 실행 시간 측정, 모든 명령어 로깅
+Example: a bot that requires authentication for certain commands, measures handler execution time, and logs all commands.
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // 설정 단계: 사용자 인증 여부 확인
+    
+    // Setup phase: Check if user is authenticated
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
         val user = context.update.userOrNull ?: return@intercept
-
+        
         if (!isAuthenticated(user.id)) {
             message { "Please authenticate first using /login" }
                 .send(user, context.bot)
             context.finish()
         }
     }
-
-    // PreInvoke 단계: 타이머 시작 및 권한 확인
+    
+    // PreInvoke phase: Start timer and check permissions
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
-
-        // 이 핸들러에 대한 사용자 권한 확인
+        
+        // Check if user has permission for this specific handler
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
             context.finish()
             return@intercept
         }
-
-        // 타이머 시작
-        // 시작 시간 저장
+        
+        // Start timer
+        // store start time
     }
-
-    // PostInvoke 단계: 로깅 및 정리
+    
+    // PostInvoke phase: Log and cleanup
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
-        val startTime = // 시작 시간 가져오기
-
+        val startTime = // get start time
+        
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             val logger = context.bot.config.loggerFactory.get("Metrics")
@@ -146,7 +146,7 @@ suspend fun main() {
             )
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
@@ -154,47 +154,46 @@ suspend fun main() {
 
 ### ProcessingContext
 
-`ProcessingContext`는 다음에 대한 접근을 제공합니다:
+The `ProcessingContext` provides access to:
 
-- **`update: ProcessedUpdate`** - 현재 처리 중인 업데이트
-- **`bot: TelegramBot`** - 봇 인스턴스
-- **`registry: ActivityRegistry`** - 액티비티 레지스트리
-- **`parsedInput: String`** - 파싱된 명령어/입력 텍스트
-- **`parameters: Map<String, String>`** - 파싱된 명령어 매개변수
-- **`activity: Activity?`** - 확인된 핸들러 (매칭 단계까지 null)
-- **`shouldProceed: Boolean`** - 처리를 계속해야 하는지 여부
-- **`additionalContext: AdditionalContext`** - 추가 컨텍스트 데이터
-- **`finish()`** - 처리를 조기 중단
+- **`update: ProcessedUpdate`** - The current update being processed
+- **`bot: TelegramBot`** - The bot instance
+- **`registry: ActivityRegistry`** - The activity registry
+- **`parsedInput: String`** - The parsed command/input text
+- **`parameters: Map<String, String>`** - Parsed command parameters
+- **`activity: Activity?`** - The resolved handler (null until Match phase)
+- **`shouldProceed: Boolean`** - Whether processing should continue
+- **`additionalContext: AdditionalContext`** - Additional context data
+- **`finish()`** - Stop processing early
 
+#### Stopping Processing Early
 
-#### 처리 조기 중단
-
-`context.finish()`를 호출하여 처리를 중단합니다:
+Call `context.finish()` to stop processing:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
     if (someCondition) {
-        context.finish() // 이후 단계는 실행되지 않음
+        context.finish() // No further phases will execute
     }
 }
 ```
 
-#### 사용자 데이터 저장
+#### Storing Custom Data
 
-인터셉터 간에 데이터를 전달하려면 `additionalContext`를 사용하세요:
+Use `additionalContext` to pass data between interceptors:
 
 ```kotlin
-// PreInvoke에서
+// In PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// PostInvoke에서
+// In PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
 
-### 다중 인터셉터
+### Multiple Interceptors
 
-같은 단계에 여러 인터셉터를 등록할 수 있습니다. 등록된 순서대로 실행됩니다:
+You can register multiple interceptors for the same phase. They execute in registration order:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
@@ -205,67 +204,67 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     println("Second interceptor")
 }
 
-// 업데이트 처리 시:
-// 출력: "First interceptor"
-// 출력: "Second interceptor"
+// When an update is processed:
+// Output: "First interceptor"
+// Output: "Second interceptor"
 ```
 
-인터셉터가 `context.finish()`를 호출하면 해당 단계의 후속 인터셉터는 건너뛰고, 이후 단계는 실행되지 않습니다.
+If an interceptor calls `context.finish()`, subsequent interceptors in that phase are skipped, and later phases won't execute.
 
 
-### 모범 사례
+### Best Practices
 
-#### 1. 올바른 단계 사용
+#### 1. Use the Right Phase
 
-- 설정: 전역 검사, 필터링, 초기 설정
-- 파싱: 사용자 정의 파싱 로직
-- 매칭: 핸들러 선택 로직
-- 검증: 권한, 속도 제한, 가드
-- PreInvoke: 핸들러별 준비
-- Invoke: 기본적으로 기본 인터셉터가 처리
-- PostInvoke: 정리, 로깅, 오류 처리
+- Setup: Global checks, filtering, initial setup
+- Parsing: Custom parsing logic
+- Match: Handler selection logic
+- Validation: Permissions, rate limits, guards
+- PreInvoke: Handler-specific preparation
+- Invoke: Usually handled by the default interceptor
+- PostInvoke: Cleanup, logging, error handling
 
-#### 2. 인터셉터 집중 유지
+#### 2. Keep Interceptors Focused
 
-각 인터셉터는 하나의 일만 해야 합니다:
+Each interceptor should do one thing:
 
 ```kotlin
-// ✅ 좋은 예 - 집중된 인터셉터
+// ✅ Good - focused interceptor
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     if (isBanned(context.update.userOrNull?.id)) {
         context.finish()
     }
 }
 
-// ❌ 피해야 할 예 - 너무 많은 일 수행
+// ❌ Avoid - doing too much
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-    // 인증
-    // 로깅
-    // 메트릭
-    // 속도 제한
-    // ... 너무 많음!
+    // Authentication
+    // Logging
+    // Metrics
+    // Rate limiting
+    // ... too much!
 }
 ```
 
-#### 3. 오류 우아하게 처리
+#### 3. Handle Errors Gracefully
 
-인터셉터는 봇이 중단되지 않아야 합니다:
+Interceptors should not crash the bot:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     try {
-        // 로직
+        // Your logic
     } catch (e: Exception) {
         val logger = context.bot.config.loggerFactory.get("Interceptor")
         logger.error("Interceptor error", e)
-        // 처리를 중단하려는 경우가 아니면 context.finish() 호출하지 않음
+        // Don't call context.finish() unless you want to stop processing
     }
 }
 ```
 
-#### 4. 리소스 정리
+#### 4. Clean Up Resources
 
-PreInvoke에서 리소스를 열었다면 PostInvoke에서 정리하세요:
+If you open resources in `PreInvoke`, clean them up in `PostInvoke`:
 
 ```kotlin
 var timer: Timer? = null
@@ -281,82 +280,83 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 }
 ```
 
-#### 5. 순서 중요
+#### 5. Order Matters
 
-원하는 순서대로 인터셉터를 등록하세요:
+Register interceptors in the order you want them to run:
 
 ```kotlin
-// 더 일반적인 검사를 먼저
-bot.update.pipeline.intercept(ProcessingPipePhase.Setup) {
-    // 전역 차단 확인
+// More general checks first
+bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { 
+    // Global ban check
 }
 
-// 더 구체적인 검사를 나중에
-bot.update.pipeline.intercept(ProcessingPipePhase.Validation) {
-    // 핸들러별 권한 확인
+// More specific checks later
+bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { 
+    // Handler-specific permission check
 }
 ```
 
-#### 6. 횡단 관심사에 인터셉터 사용
+#### 6. Use Interceptors for Cross-Cutting Concerns
 
-인터셉터는 다음에 적합합니다:
-- ✅ 인증/인가
-- ✅ 로깅
-- ✅ 메트릭/성능 모니터링
-- ✅ 속도 제한
-- ✅ 오류 처리
-- ✅ 요청/응답 변환
+Interceptors are ideal for:
+- ✅ Authentication/authorization
+- ✅ Logging
+- ✅ Metrics/performance monitoring
+- ✅ Rate limiting
+- ✅ Error handling
+- ✅ Request/response transformation
 
-핸들러별 로직은 핸들러에 유지하세요.
+For handler-specific logic, keep it in the handler.
 
 
-### 기본 인터셉터
+### Default Interceptors
 
-프레임워크에는 핵심 기능을 위한 기본 인터셉터가 포함되어 있습니다:
+The framework includes default interceptors for core functionality:
 
-- **DefaultSetupInterceptor**: 전역 속도 제한
-- **DefaultParsingInterceptor**: 명령어 파싱
-- **DefaultMatchInterceptor**: 핸들러 매칭 (명령어, 입력, 공통 매처)
-- **DefaultValidationInterceptor**: 가드 검사 및 핸들러별 속도 제한
-- **DefaultInvokeInterceptor**: 핸들러 실행 및 오류 처리
+- **DefaultSetupInterceptor**: Global rate limiting
+- **DefaultParsingInterceptor**: Command parsing
+- **DefaultMatchInterceptor**: Handler matching (commands, inputs, common matchers)
+- **DefaultValidationInterceptor**: Guard checks and per-handler rate limiting
+- **DefaultInvokeInterceptor**: Handler execution and error handling
 
-사용자 정의 인터셉터는 이 기본값들과 함께 실행됩니다. 기본 인터셉터 전후에 로직을 추가할 수 있지만, 기본 인터셉터를 제거할 수는 없습니다.
+Your custom interceptors run alongside these defaults. You can add logic before or after the defaults, but you cannot remove the default interceptors.
 
 ---
 
-### 고급: 조건부 인터셉터
+### Advanced: Conditional Interceptors
 
-인터셉터를 조건부로 만들 수 있습니다:
+You can make interceptors conditional:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
-
-    // 특정 핸들러에만 적용
+    
+    // Only apply to specific handlers
     if (activity::class.simpleName?.contains("Admin") == true) {
-        // 관리자 전용 로직
+        // Admin-specific logic
         checkAdminPermissions(context)
     }
 }
 ```
 
 
-### 요약
+### Summary
 
-인터셉터는 봇에 횡단 관심사 로직을 추가하는 깔끔한 방법을 제공합니다:
+Interceptors provide a clean way to add cross-cutting logic to your bot:
 
-- ✅ **7개의 단계**로 처리의 다른 시점에 사용
-- ✅ **간단한 API**: `PipelineInterceptor` 구현만 하면 됨
-- ✅ **유연성**: 단계당 여러 인터셉터 등록 가능
-- ✅ **강력함**: 전체 처리 컨텍스트에 접근 가능
-- ✅ **안전성**: `context.finish()`로 처리를 조기 중단할 수 있음
+- ✅ **Seven phases** for different stages of processing
+- ✅ **Simple API**: Just implement `PipelineInterceptor`
+- ✅ **Flexible**: Register multiple interceptors per phase
+- ✅ **Powerful**: Access to full processing context
+- ✅ **Safe**: Can stop processing early with `context.finish()`
 
-인터셉터를 사용해 핸들러는 비즈니스 로직에 집중하고, 인증, 로깅, 메트릭 같은 공유 관심사는 중앙에서 처리하세요.
+Use interceptors to keep your handlers focused on business logic while handling shared concerns like authentication, logging, and metrics in a centralized way.
 
 ---
 
-### 관련 문서
+### See also
 
-* [기능적 처리 DSL](Functional-handling-DSL.md) - 함수형 업데이트 처리
-* [가드](Guards.md) - 핸들러 수준 권한 확인
+* [Handlers (incl. Functional DSL)](Handlers.md) - Annotation- and DSL-based handler definition
+* [Sessions](Sessions.md) - Per-chat / per-user state &amp; message tracking
+* [Guards](Guards.md) - Handler-level permission checks
 ---

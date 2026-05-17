@@ -1,13 +1,13 @@
 ---
 ---
-title: Cấu hình Bot
+title: Bot Configuration
 ---
 
-Thư viện cung cấp rất nhiều tùy chọn cấu hình, bạn có thể xem tham chiếu API trong mô tả lớp [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html).
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
-Có hai cách tiếp cận để cấu hình bot:
+There are also two approaches to configuring the bot:
 
-### Lambda Configurator
+### Configurator lambda
 
 ```kotlin
 // ...
@@ -21,101 +21,121 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-### Interface ConfigLoader
+### ConfigLoader interface
 
-Cũng có khả năng cấu hình thông qua một interface [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) đặc biệt,<br/> mà bạn có thể sử dụng để tải cài đặt từ các nguồn bên ngoài (`properties`, `command line args`, v.v.).
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
-Việc triển khai interface này có thể được truyền qua constructor thứ cấp và instance sẽ được cấu hình tương ứng.
+The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 
 ```kotlin
 val bot = TelegramBot(ConfigLoaderImpl)
 ```
 
-Hiện tại có một số module được cung cấp triển khai interface này như `ktgram-config-env`, `ktgram-config-toml`.
+Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
-### Tổng quan về BotConfiguration
+### BotConfiguration Overview
 
 #### BotConfiguration
 
-Lớp `BotConfiguration` là trung tâm để cấu hình một bot. Nó bao gồm các properties để nhận dạng bot, thiết lập host API, xác định xem bot có hoạt động trong môi trường test hay không, xử lý input, quản lý classes, và kiểm soát tự động xóa input. Ngoài ra, nó cung cấp các properties nội bộ cho giới hạn tỷ lệ, cấu hình HTTP client, logging, listener cập nhật, và parsing command.
+The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
 ##### Properties
 
-- `identifier`: Nhận dạng các instance bot khác nhau trong quá trình xử lý multi-bot.
-- `apiHost`: Host của Telegram API.
-- `isTestEnv`: Cờ chỉ ra bot có hoạt động trong môi trường test hay không.
-- `inputListener`: Instance của class xử lý input.
-- `classManager`: Manager được sử dụng để lấy classes.
-- `inputAutoRemoval`: Cờ điều chỉnh việc tự động xóa điểm input trong quá trình xử lý.
-- `exceptionHandlingStrategy`: Định nghĩa chiến lược xử lý ngoại lệ.
-    * `CollectToChannel` - Thu thập vào `TgUpdateHandler.caughtExceptions`.
-    * `Throw` - Throw lại được bọc với `TgException`.
-    * `DoNothing` - Không làm gì :)
-    * `Handle` - Thiết lập custom handler.
-- `throwExOnActionsFailure`: Throw exception khi bất kỳ request bot nào thất bại.
+- `identifier`: Identifies different bot instances during multi-bot processing.
+- `apiHost`: Host of the Telegram API.
+- `isTestEnv`: Flag indicating whether the bot operates in a test environment.
+- `inputListener`: Instance of the input handling class.
+- `classManager`: Manager used to get classes.
+- `inputAutoRemoval`: Flag regulating the auto-deletion of the input point during processing.
+- `exceptionHandlingStrategy`: Defines the strategy for handling exceptions.
+    * `CollectToChannel` - Collect to `TgUpdateHandler.caughtExceptions`.
+    * `Throw` - Throw again wrapped with `TgException`.
+    * `DoNothing` - Do nothing :)
+    * `Handle` - Set custom handler.
+- `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
 ##### Configuration Blocks
 
-`BotConfiguration` cũng cung cấp các hàm để cấu hình các thành phần nội bộ của nó:
+`BotConfiguration` also offers functions to configure its internal components:
 
-- `httpClient(block: HttpConfiguration.() -> Unit)`: Cấu hình HTTP client.
-- `logging(block: LoggingConfiguration.() -> Unit)`: Cấu hình logging.
-- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Cấu hình giới hạn request.
-- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Cấu hình listener cập nhật.
-- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Xác định pattern parsing command.
+- `httpClient(block: HttpConfiguration.() -> Unit)`: Configures the HTTP client.
+- `logging(block: LoggingConfiguration.() -> Unit)`: Configures logging.
+- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
+- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
+- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
-### Các Classes Cấu hình Liên quan
+### Associated Configuration Classes
 
 #### RateLimiterConfiguration
 
-Cấu hình giới hạn tỷ lệ toàn cục.
+Configures global rate limiting.
 
-- `limits`: Giới hạn tỷ lệ toàn cục.
-- `mechanism`: Cơ chế được sử dụng cho giới hạn tỷ lệ, mặc định là thuật toán TokenBucket.
-- `exceededAction`: Action được áp dụng khi vượt quá giới hạn.
+- `limits`: Global rate limits.
+- `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
+- `exceededAction`: Action applied when the limit is exceeded.
 
 #### HttpConfiguration
 
-Chứa cấu hình cho HTTP client của bot.
+Contains configuration for the bot's HTTP client.
 
-- `requestTimeoutMillis`: Request timeout tính bằng milliseconds.
-- `connectTimeoutMillis`: Connection timeout tính bằng milliseconds.
-- `socketTimeoutMillis`: Socket timeout tính bằng milliseconds.
-- `maxRequestRetry`: Maximum retry cho HTTP requests.
-- `retryStrategy`: Strategy cho retries, có thể tùy chỉnh.
-- `retryDelay`: Multiplier cho timeout tại mỗi retry.
-- `proxy`: Proxy settings cho HTTP calls.
-- `additionalHeaders`: Headers được áp dụng cho mọi request.
+- `requestTimeoutMillis`: Request timeout in milliseconds.
+- `connectTimeoutMillis`: Connection timeout in milliseconds.
+- `socketTimeoutMillis`: Socket timeout in milliseconds.
+- `maxRequestRetry`: Maximum retry for HTTP requests.
+- `retryStrategy`: Strategy for retries, customizable.
+- `retryDelay`: Multiplier for timeout at each retry.
+- `proxy`: Proxy settings for HTTP calls.
+- `additionalHeaders`: Headers applied to every request.
 
 #### LoggingConfiguration
 
-Quản lý các mức logging cho bot actions và HTTP requests.
+Manages logging levels for bot actions and HTTP requests.
 
-- `botLogLevel`: Mức logging cho bot actions.
-- `httpLogLevel`: Mức logging cho HTTP requests.
+- `botLogLevel`: Level of logs for bot actions.
+- `httpLogLevel`: Level of logs for HTTP requests.
 
 #### UpdatesListenerConfiguration
 
-Cấu hình các tham số liên quan đến pulling updates.
+Configures parameters related to pulling updates.
 
-- `dispatcher`: Dispatcher để thu thập incoming updates.
-- `processingDispatcher`: Dispatcher để xử lý updates.
-- `pullingDelay`: Delay sau mỗi pulling request.
-- `updatesPollingTimeout`: Timeout option cho cơ chế long-polling.
+- `dispatcher`: Dispatcher for collecting incoming updates.
+- `processingDispatcher`: Dispatcher for processing updates.
+- `pullingDelay`: Delay after each pulling request.
+- `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
 #### CommandParsingConfiguration
 
-Xác định các tham số cho command parsing.
+Specifies parameters for command parsing.
 
-- `commandDelimiter`: Separator giữa command và parameters.
-- `parametersDelimiter`: Separator giữa parameters.
-- `parameterValueDelimiter`: Separator giữa key và value của parameter.
-- `restrictSpacesInCommands`: Cờ chỉ ra nếu spaces trong commands có nên được xem là kết thúc command.
-- `useIdentifierInGroupCommands`: Sử dụng identifier của bot để match commands chứa @.
+- `commandDelimiter`: Separator between command and parameters.
+- `parametersDelimiter`: Separator between parameters.
+- `parameterValueDelimiter`: Separator between key and value of parameter.
+- `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
+- `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-### Ví dụ Cấu hình
+#### SessionConfiguration *(added in 9.5)*
 
-Đây là ví dụ về cách cấu hình một bot sử dụng các classes này:
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
+
+### Example Configuration
+
+Here's an example of how to configure a bot using these classes:
 
 ```kotlin
 val bot = TelegramBot("TOKEN") {
@@ -147,7 +167,7 @@ val bot = TelegramBot("TOKEN") {
 }
 ```
 
-Cấu hình này thiết lập một bot với các identifiers cụ thể, bật chế độ test environment, cấu hình rate limiting, HTTP client settings, logging levels, update listener parameters, và command parsing rules.
+This configuration sets up a bot with specific identifiers, enables test environment mode, configures rate limiting, HTTP client settings, logging levels, update listener parameters, and command parsing rules.
 
-Bằng cách tận dụng các tùy chọn cấu hình này, các nhà phát triển có thể tinh chỉnh bots của họ để đáp ứng các yêu cầu cụ thể và tối ưu hiệu năng trên nhiều tình huống hoạt động khác nhau.
+By leveraging these configuration options, developers can fine-tune their bots to meet specific requirements and optimize performance across various operational scenarios.
 ---

@@ -1,13 +1,13 @@
 ---
 ---
-title: Configuração do Bot
+title: Bot Configuration
 ---
 
-A biblioteca oferece diversas opções de configuração, você pode ver a referência da API na classe [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html).
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
-Há também duas abordagens para configurar o bot:
+There are also two approaches to configuring the bot:
 
-### Lambda Configurator
+### Configurator lambda
 
 ```kotlin
 // ...
@@ -21,101 +21,121 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-### Interface ConfigLoader
+### ConfigLoader interface
 
-Há também a possibilidade de configurar através de uma interface especial [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html),<br/> que você pode usar para carregar configurações de fontes externas (`properties`, `command line args`, etc.).
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
-A implementação desta interface pode ser passada através de um construtor secundário e a instância será configurada de acordo.
+The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 
 ```kotlin
 val bot = TelegramBot(ConfigLoaderImpl)
 ```
 
-Atualmente existem vários módulos fornecidos que implementam esta interface como `ktgram-config-env`, `ktgram-config-toml`.
+Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
-### Visão Geral da BotConfiguration
+### BotConfiguration Overview
 
 #### BotConfiguration
 
-A classe `BotConfiguration` é o hub central para configurar um bot. Inclui propriedades para identificar o bot, configurar o host da API, determinar se o bot opera em um ambiente de teste, lidar com entradas, gerenciar classes e controlar a remoção automática de entradas. Além disso, oferece propriedades internas para rate limiting, configuração do cliente HTTP, logging, escuta de updates e parsing de comandos.
+The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
-##### Propriedades
+##### Properties
 
-- `identifier`: Identifica diferentes instâncias de bot durante processamento multi-bot.
-- `apiHost`: Host da API Telegram.
-- `isTestEnv`: Flag indicando se o bot opera em ambiente de teste.
-- `inputListener`: Instância da classe de tratamento de entrada.
-- `classManager`: Gerenciador usado para obter classes.
-- `inputAutoRemoval`: Flag regulando a exclusão automática do ponto de entrada durante processamento.
-- `exceptionHandlingStrategy`: Define a estratégia para tratamento de exceções.
-    * `CollectToChannel` - Coleta para `TgUpdateHandler.caughtExceptions`.
-    * `Throw` - Lança novamente envolto com `TgException`.
-    * `DoNothing` - Não faz nada :)
-    * `Handle` - Define manipulador personalizado.
-- `throwExOnActionsFailure`: Lança exceção quando qualquer requisição do bot falha.
+- `identifier`: Identifies different bot instances during multi-bot processing.
+- `apiHost`: Host of the Telegram API.
+- `isTestEnv`: Flag indicating whether the bot operates in a test environment.
+- `inputListener`: Instance of the input handling class.
+- `classManager`: Manager used to get classes.
+- `inputAutoRemoval`: Flag regulating the auto-deletion of the input point during processing.
+- `exceptionHandlingStrategy`: Defines the strategy for handling exceptions.
+    * `CollectToChannel` - Collect to `TgUpdateHandler.caughtExceptions`.
+    * `Throw` - Throw again wrapped with `TgException`.
+    * `DoNothing` - Do nothing :)
+    * `Handle` - Set custom handler.
+- `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
-##### Blocos de Configuração
+##### Configuration Blocks
 
-`BotConfiguration` também oferece funções para configurar seus componentes internos:
+`BotConfiguration` also offers functions to configure its internal components:
 
-- `httpClient(block: HttpConfiguration.() -> Unit)`: Configura o cliente HTTP.
-- `logging(block: LoggingConfiguration.() -> Unit)`: Configura logging.
-- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configura limitação de requisições.
-- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configura o escutador de updates.
-- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Especifica padrão de parsing de comandos.
+- `httpClient(block: HttpConfiguration.() -> Unit)`: Configures the HTTP client.
+- `logging(block: LoggingConfiguration.() -> Unit)`: Configures logging.
+- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
+- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
+- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
-### Classes de Configuração Associadas
+### Associated Configuration Classes
 
 #### RateLimiterConfiguration
 
-Configura limitação global de taxa.
+Configures global rate limiting.
 
-- `limits`: Limites globais de taxa.
-- `mechanism`: Mecanismo usado para limitação de taxa, padrão é algoritmo TokenBucket.
-- `exceededAction`: Ação aplicada quando o limite é excedido.
+- `limits`: Global rate limits.
+- `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
+- `exceededAction`: Action applied when the limit is exceeded.
 
 #### HttpConfiguration
 
-Contém configuração para o cliente HTTP do bot.
+Contains configuration for the bot's HTTP client.
 
-- `requestTimeoutMillis`: Timeout de requisição em milissegundos.
-- `connectTimeoutMillis`: Timeout de conexão em milissegundos.
-- `socketTimeoutMillis`: Timeout de socket em milissegundos.
-- `maxRequestRetry`: Máximo de tentativas para requisições HTTP.
-- `retryStrategy`: Estratégia para retentativas, personalizável.
-- `retryDelay`: Multiplicador para timeout em cada retentativa.
-- `proxy`: Configurações de proxy para chamadas HTTP.
-- `additionalHeaders`: Headers aplicados a cada requisição.
+- `requestTimeoutMillis`: Request timeout in milliseconds.
+- `connectTimeoutMillis`: Connection timeout in milliseconds.
+- `socketTimeoutMillis`: Socket timeout in milliseconds.
+- `maxRequestRetry`: Maximum retry for HTTP requests.
+- `retryStrategy`: Strategy for retries, customizable.
+- `retryDelay`: Multiplier for timeout at each retry.
+- `proxy`: Proxy settings for HTTP calls.
+- `additionalHeaders`: Headers applied to every request.
 
 #### LoggingConfiguration
 
-Gerencia níveis de logging para ações do bot e requisições HTTP.
+Manages logging levels for bot actions and HTTP requests.
 
-- `botLogLevel`: Nível de logs para ações do bot.
-- `httpLogLevel`: Nível de logs para requisições HTTP.
+- `botLogLevel`: Level of logs for bot actions.
+- `httpLogLevel`: Level of logs for HTTP requests.
 
 #### UpdatesListenerConfiguration
 
-Configura parâmetros relacionados à obtenção de updates.
+Configures parameters related to pulling updates.
 
-- `dispatcher`: Dispatcher para coletar updates recebidos.
-- `processingDispatcher`: Dispatcher para processar updates.
-- `pullingDelay`: Delay após cada requisição de pulling.
-- `updatesPollingTimeout`: Opção de timeout para mecanismo de long-polling.
+- `dispatcher`: Dispatcher for collecting incoming updates.
+- `processingDispatcher`: Dispatcher for processing updates.
+- `pullingDelay`: Delay after each pulling request.
+- `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
 #### CommandParsingConfiguration
 
-Especifica parâmetros para parsing de comandos.
+Specifies parameters for command parsing.
 
-- `commandDelimiter`: Separador entre comando e parâmetros.
-- `parametersDelimiter`: Separador entre parâmetros.
-- `parameterValueDelimiter`: Separador entre chave e valor do parâmetro.
-- `restrictSpacesInCommands`: Flag indicando se espaços em comandos devem ser tratados como fim do comando.
-- `useIdentifierInGroupCommands`: Usa identificador do bot para casar comandos contendo @.
+- `commandDelimiter`: Separator between command and parameters.
+- `parametersDelimiter`: Separator between parameters.
+- `parameterValueDelimiter`: Separator between key and value of parameter.
+- `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
+- `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-### Exemplo de Configuração
+#### SessionConfiguration *(added in 9.5)*
 
-Aqui está um exemplo de como configurar um bot usando estas classes:
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
+
+### Example Configuration
+
+Here's an example of how to configure a bot using these classes:
 
 ```kotlin
 val bot = TelegramBot("TOKEN") {
@@ -147,7 +167,7 @@ val bot = TelegramBot("TOKEN") {
 }
 ```
 
-Esta configuração configura um bot com identificadores específicos, habilita modo de ambiente de teste, configura rate limiting, configurações do cliente HTTP, níveis de logging, parâmetros do escutador de updates e regras de parsing de comandos.
+This configuration sets up a bot with specific identifiers, enables test environment mode, configures rate limiting, HTTP client settings, logging levels, update listener parameters, and command parsing rules.
 
-Aproveitando estas opções de configuração, desenvolvedores podem ajustar seus bots para atender requisitos específicos e otimizar performance em diversos cenários operacionais.
+By leveraging these configuration options, developers can fine-tune their bots to meet specific requirements and optimize performance across various operational scenarios.
 ---

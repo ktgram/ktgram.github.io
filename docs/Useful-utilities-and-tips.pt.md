@@ -1,14 +1,14 @@
 ---
 ---
-title: Utilitários e Dicas Úteis
+title: Useful Utilities And Tips
 ---
 
 
-### Trabalhando com ProcessedUpdate
+### Operando com ProcessedUpdate
 
-A [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) é uma classe genérica para atualizações que, dependendo dos dados originais, podem ser fornecidas em diferentes tipos ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html), etc.)
+O [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) é uma classe genérica para updates que, dependendo dos dados originais, pode ser fornecida em diferentes tipos ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html), etc.)
 
-Assim você pode verificar o tipo de dados de entrada e manipular posteriormente certos dados com smartcasts, por exemplo:
+Então você pode verificar o tipo dos dados recebidos e manipular determinados dados com smartcasts, por exemplo:
 
 ```kotlin
 // ...
@@ -16,26 +16,26 @@ if (update !is MessageUpdate) {
     message { "Only messages are allowed" }.send(user, bot)
     return
 }
-// Posteriormente, ProcessedUpdate será percebido como MessageUpdate.
+// Further on, ProcessedUpdate will be perceived as MessageUpdate.
 ```
 
-Também existe uma interface [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) dentro que permite determinar se há uma referência de usuário dentro, exemplo de uso:
+Também existe uma interface [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) que permite determinar se há uma referência de usuário dentro, caso de uso exemplo:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
 
 ```
 
-Se necessário, dentro há sempre o original [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) no parâmetro update.
+Se necessário, dentro dela sempre há o [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) original no parâmetro de update.
 
 
 ### Injeção de dependência
 
-A biblioteca usa um mecanismo simples para inicializar classes onde seus métodos de processamento de atualização são anotados com as anotações fornecidas.
+A biblioteca usa um mecanismo simples para inicializar classes onde seus métodos de processamento de update são anotados com as anotações fornecidas.
 
 [`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) é usado por padrão para invocar métodos anotados.
 
-Mas se você quiser usar outras bibliotecas para isso pode redefinir a interface [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html), <br/>usando seu mecanismo preferido e passá-la ao inicializar o bot.
+Mas se você quiser usar outras bibliotecas para isso, pode redefinir a interface [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html), <br/>usando o mecanismo de sua preferência e passá‑lo ao inicializar o bot.
 
 ```kotlin
 fun main() = runBlocking {
@@ -47,36 +47,36 @@ fun main() = runBlocking {
 }
 ```
 
-### Filtrando atualizações
+### Filtrando updates
 
-Se não houver condições complexas você pode simplesmente filtrar algumas atualizações para serem processadas:
+Se não houver condições complexas, você pode simplesmente filtrar alguns updates para não serem processados:
 
 ```kotlin
-// função onde a condição de filtragem de atualizações é definida
+// function where updates filtering condition defined
 fun filteringFun(update: Update): Boolean = update.message?.text.isNullOrBlank()
 
 fun main() = runBlocking {
   val bot = TelegramBot("BOT_TOKEN")
 
-  // definindo um fluxo de processamento mais específico para atualizações
+  // setting more specific processing flow for updates
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // assim, se o listener sair do escopo antes de alcançar a função handler, isso é filtragem.
-    // na verdade você pode até escrever diretamente a condição if lá com return@setListener ou estender a filtragem para classe separada.
+    // so simply, if the listener left the scope before reaching the handler function, that it is filtering.
+    // actually you can even write directly if-condition there with return@setListener or extend filtering to separate class.
 
-    handle(it) // ou forma manual de tratamento com block
+    handle(it) // or manual handling way with block
   }
 }
 ```
 
-para incluir filtragem em seu processo de correspondência ou exclusão de comandos, dê uma olhada em guards ou `@CommonHandler`.
+para incluir filtragem na correspondência de comandos ou excluir processo, dê uma olhada em guards ou `@CommonHandler`.
 
 ### Generalizar opções para diferentes métodos
 
-Se você tiver que aplicar os mesmos parâmetros opcionais com frequência, pode escrever uma função similar que atenda a você e reduza o código boilerplate :)
+Se você precisa aplicar os mesmos parâmetros opcionais com frequência, pode escrever uma função semelhante que atenda às suas necessidades e reduzir o código boilerplate :)
 
-Algumas propriedades comuns são separadas para [diferentes interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
+Algumas propriedades comuns são separadas em [diferentes interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")
@@ -91,8 +91,11 @@ inline fun <T, R, O> T.markdownMode(crossinline block: O.() -> Unit = {}): T
     }
 
 
-// ... e no seu código
+// ... and in your code
 
 message { "test" }.markdownMode().send(to, via)
 
 ```
+
+
+---

@@ -62,6 +62,7 @@ The `BotConfiguration` class is the central hub for configuring a bot. It includ
 - `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
 - `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
 - `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
 ### Associated Configuration Classes
 
@@ -111,6 +112,25 @@ Specifies parameters for command parsing.
 - `parameterValueDelimiter`: Separator between key and value of parameter.
 - `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
 - `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
+
+#### SessionConfiguration *(added in 9.5)*
+
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
 
 ### Example Configuration
 

@@ -3,21 +3,22 @@
 title: Activity Invocation
 ---
 
-During activity invocation, it is possible to pass the bot context, as it is declared as a parameter in target functions.
+Trong quá trình gọi activity, có thể truyền ngữ cảnh bot, vì nó được khai báo dưới dạng tham số trong các hàm mục tiêu.
 
-The parameters that can be passed are:
+Các tham số có thể được truyền là:
 
-* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (and all its subclasses) - current processing update.
-* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - low level context of handling activity.
-* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - if present.
-* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - if present.
-* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - current bot instance.
+* [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) (và tất cả các lớp con của nó, ví dụ `MessageUpdate`, `CallbackQueryUpdate`, …) - bản cập nhật đang được xử lý.
+* [`ProcessingContext`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processing-context/index.html) - ngữ cảnh cấp thấp của việc xử lý activity.
+* [`User`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-user/index.html) - nếu có.
+* [`Chat`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.chat/-chat/index.html) - nếu có.
+* [`TelegramBot`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot/-telegram-bot/index.html) - thể hiện hiện tại của bot.
+* [`Session`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.session/-session/index.html) *(được thêm trong 9.5)* - phiên cho chat/người dùng hiện tại. Ghi chú tham số với [`@SessionQualifier("name")`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-session-qualifier/index.html) để tiêm một phiên đặt tên độc lập. Xem bài viết [Sessions article](Sessions.md).
 
-It is also possible to add a custom type for passing.
+Cũng có thể thêm một kiểu tùy chỉnh để truyền.
 
-To do this, add a class that implements [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) and mark it with the [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html) annotation.
+Để làm điều này, thêm một lớp triển khai [`Autowiring<T>`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.marker/-autowiring/index.html) và đánh dấu nó bằng annotation [`@Injectable`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-injectable/index.html).
 
-After implementing the `Autowiring` interface - `T` will be available for passing in target functions and will be obtained through the method described in the interface.
+Sau khi triển khai giao diện `Autowiring` - `T` sẽ khả dụng để truyền trong các hàm mục tiêu và sẽ được lấy thông qua phương pháp mô tả trong giao diện.
 
 ```kotlin
 @Injectable
@@ -28,10 +29,9 @@ object UserResolver : Autowiring<UserRecord> {
 }
 ```
 
+Các tham số khác được khai báo trong hàm sẽ **được tìm kiếm** trong các tham số đã phân tích.
 
-Other parameters declared in functions will be **searched** in parsed parameters.
-
-Additionally, parsed parameters during passing can be cast to certain types, here is their list:
+Thêm vào đó, các tham số đã phân tích khi truyền có thể được ép kiểu sang một số loại cụ thể, danh sách như sau:
 
 - `String`
 - `Integer`
@@ -40,9 +40,22 @@ Additionally, parsed parameters during passing can be cast to certain types, her
 - `Float`
 - `Double`
 
-Moreover, note that if parameters are declared and missing (or in parsed parameters or for example `User` is missing in `Update`) or the declared type does not fit the received parameter in the function, **`null`** will be passed so be careful.
+Hơn nữa, lưu ý rằng nếu các tham số được khai báo nhưng thiếu (hoặc trong các tham số đã phân tích hoặc ví dụ `User` thiếu trong `Update`) hoặc kiểu khai báo không phù hợp với tham số nhận được trong hàm, **`null`** sẽ được truyền vào, vì vậy hãy cẩn thận.
 
-Summarizing everything, below here is an example of how function parameters are usually formed:
+Tóm lại, dưới đây là một ví dụ về cách các tham số hàm thường được hình thành:
+
+```mermaid
+flowchart LR
+    U["ProcessedUpdate<br/>(and typed subclasses)"] --> R[Parameter resolver]
+    PC[ProcessingContext] --> R
+    User[User from update] --> R
+    Chat[Chat from update] --> R
+    Bot[TelegramBot] --> R
+    Sess["Session<br/>(opt. @SessionQualifier)"] --> R
+    Inj["@Injectable Autowiring&lt;T&gt;"] --> R
+    Parsed["Parsed text params<br/>(String / Int / Long / Short / Float / Double)"] --> R
+    R --> Fn[Handler function call]
+```
 
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/3c1d7830-8e5d-45fb-82bb-ac63f08c3782" alt="Invokation process diagram" />

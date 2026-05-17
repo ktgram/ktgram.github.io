@@ -5,9 +5,12 @@ title: Home
 ### Intro
 Let's get an idea of how the library handles updates in general:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/442cc5f1-0256-425a-9f25-185fdd49fe0a" alt="Handling process diagram" />
-</p>
+```mermaid
+flowchart LR
+    U["Telegram Update"] --> P["Processing<br/>repackage to ProcessedUpdate"]
+    P --> H["Handling<br/>match against activities"]
+    H --> I["Invocation<br/>call handler with injected params"]
+```
 
 After receiving an update, the library performs three main steps, as we can see.
 
@@ -35,9 +38,17 @@ More detailed you can see in [update parsing article](Update-parsing.md).
 
 Next, according to the processing priority:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/6178c410-9b9e-4045-9f03-4791b3f49894" alt="Handling priority diagram" />
-</p>
+```mermaid
+flowchart TD
+    Start(["Parsed update"]) --> Cmd{"matches a @CommandHandler?"}
+    Cmd -- yes --> CmdDone["Invoke command"]
+    Cmd -- no --> Inp{"user has pending input?"}
+    Inp -- yes --> InpDone["Invoke @InputHandler"]
+    Inp -- no --> Com{"matches any @CommonHandler?"}
+    Com -- yes --> ComDone["Invoke common handler"]
+    Com -- no --> Unp["Invoke @UnprocessedHandler"]
+    Start -. parallel .-> UH["@UpdateHandler — always runs"]
+```
 
 We are looking for a correspondence between the parsed data and the activities we are operating on.
 As we can see on the priority diagram, `Commands` always come first.
@@ -60,6 +71,13 @@ Accordingly, each command can have different handlers for a different list of sc
 
 Below you can see how mapping by text payload and scope is done:
 
+```mermaid
+flowchart LR
+    Text["text payload<br/>(e.g. /start)"] --> Match["CommandHandler lookup"]
+    UpdType["update type<br/>(MESSAGE, CALLBACK_QUERY, ...)"] --> Match
+    Match --> Handler["Best-matching<br/>@CommandHandler function"]
+```
+
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="Command scope diagram" />
 </p>
@@ -72,9 +90,13 @@ The concept is very similar to input waiting in commandline applications, you pu
 
 Below you can see an example of processing an update when there is no match on `Commands`.
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/925d3e05-0985-43d5-8d6f-b3f2786ff212" alt="Priority example diagram" />
-</p>
+```mermaid
+flowchart LR
+    Upd["Update arrives"] --> Cmd{"matches a command?"}
+    Cmd -- no --> InpPoint{"user has<br/>an input-waiting point?"}
+    InpPoint -- yes --> Hit["Invoke matching @InputHandler<br/>(input is consumed)"]
+    InpPoint -- no --> Fallback["Fall through to Common / Unprocessed"]
+```
 
 #### Commons
 
@@ -107,5 +129,6 @@ More details can be found in the [invocation article](Activity-invocation.md).
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)
 * [Handlers](Handlers.md)
+* [Sessions](Sessions.md)
 * [Bot configuration](Bot-configuration.md)
 * [Web starters (Spring, Ktor)](Web-starters-(Spring-and-Ktor.md))

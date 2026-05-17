@@ -28,6 +28,17 @@ See configuration [`commandParsing`](https://vendelieu.github.io/telegram-bot/te
 
 You can see in the diagram below which components are mapped to which parts of the target function.
 
+```mermaid
+flowchart LR
+    Raw["Raw text<br/>e.g. /greet?name=Adam&age=30"] --> Split[Apply commandParsing delimiters]
+    Split --> Cmd["command<br/>/greet"]
+    Split --> P1["param: name=Adam"]
+    Split --> P2["param: age=30"]
+    Cmd --> Lookup[Handler match]
+    P1 --> Inj[Parameter injection]
+    P2 --> Inj
+```
+
 <p align="center">
   <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/7489099a-cca8-4049-a374-efaf6ce52128" alt="Text parsing diagram" />
 </p>

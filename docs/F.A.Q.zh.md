@@ -3,23 +3,24 @@
 title: F.A.Q
 ---
 
-### `AbstractMethodError` 异常
+### `AbstractMethodError` exception
 
-如果您在应用程序启动时遇到这样的异常：
+If you getting such exception on the startup of your application:
 
 ```kotlin
 Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 'kotlinx.serialization.KSerializer[] kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()'
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-这是因为您的构建系统解析了旧的序列化库，其内部机制不同。要解决这个问题，您应该让它使用更新的版本，例如通过在您的构建脚本中添加以下内容：
+It happening because your build system resolving old serialization library which internal mechanics differs.
+To solve it you should make it use more newer version, for example by adding this to your buildscript:
 
 ```kotlin
 configurations.all {
     resolutionStrategy.eachDependency {
-        val serdeVer = "x.x.x" // 应 >= 1.8.0
+        val serdeVer = "x.x.x" // should be >= 1.8.0
         when(requested.module.toString()) {
-            // json 序列化
+            // json serialiazaton
             "org.jetbrains.kotlinx:kotlinx-serialization-json" -> useVersion(serdeVer)
             "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm" -> useVersion(serdeVer)
             "org.jetbrains.kotlinx:kotlinx-serialization-core" -> useVersion(serdeVer)
@@ -30,39 +31,39 @@ configurations.all {
 }
 ```
 
-(如果这在变更日志中有详细说明，我永远不会升级它，因为我收到了太多关于这个问题的报告)
+(If it was well described in changelog I would never upgraded it bc I getting so much reports on this issue)
 
-### 如何获取方法的响应？
+### How do I get the method's response?
 
-要获取响应并能够操作，您需要在方法的末尾使用 `sendReturning` 而不是 `send`。
+To get a response and be able to operate over, you need to use `sendReturning` at the end of the method instead of `send`.
 
-在这种情况下会返回 `Response` 类，其中包含响应，成功或失败，接下来您需要处理失败或直接调用 `getOrNull()`。
+In this case the `Response` class is returned, which contains the response, success or failure, further you need to either handle the failure or just call `getOrNull()`.
 
-这里有关于：[处理响应](https://github.com/vendelieu/telegram-bot#processing-responses) 的章节。
+There's section about: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-### 使用 `spring-boot-devtools` 时出现错误
+### I'm getting error while using `spring-boot-devtools`
 
-这是因为 `spring-boot-devtools` 有自己的 `classloader`，它找不到方法。
+This happens because `spring-boot-devtools` has its own `classloader` and it does not find methods.
 
-您需要在 `resources/META-INF/spring-devtools.properties` 中添加：
+You need to add to `resources/META-INF/spring-devtools.properties`:
 
 ```properties
 restart.include.generated=/eu.vendeli
 ```
 
-### 如何更改 ktor 引擎
+### How to change ktor engine
 
-如果您想更改客户端使用的引擎，您可以简单地更改 [参数](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) 在 [插件设置](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html) 中。
+If you want to change the engine used by the client you can simply change the [parameter](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) in the [plugin settings](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-### 如何使用我喜欢的日志提供商
+### How to use my favorite logging provider
 
-库使用 `slf4j-api`，要使用提供商，您只需将其添加到依赖项中。
+The library uses `slf4j-api` and to use the provider you just need to add it to the dependencies.
 
-库插件会自动检测提供商的使用，如果缺少提供商，默认会使用 `logback`。
+The library plugin automatically detects the use of the provider, if provider is missing, `logback` will be used by default.
 
-### 在长轮询处理程序中捕获网络异常
+### Catch network exceptions within long-polling handler
 
-例如，如果您有不稳定的连接并需要因为这个原因捕获错误，也许这种方法会对您有所帮助：
+For example if you have an unstable connection and need to catch an error because of this, perhaps this approach will help you:
 
 ```kotlin
 fun main() {
@@ -71,7 +72,7 @@ fun main() {
     try {
         bot.handleUpdates()
     } catch (e: Exception) {
-        // 如果需要处理
+        // handle if needed
         
         bot.update.stopListener()
         bot.handleUpdates()
@@ -79,4 +80,6 @@ fun main() {
 }
 ```
 
-您还可以查看 [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53) 中是如何实现的。
+Also you can take a look how it's done in [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
+
+---

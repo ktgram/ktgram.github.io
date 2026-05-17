@@ -1,11 +1,11 @@
 ---
 ---
-title: Обновление парсинга
+title: Update Parsing
 ---
 
-### Текстовая полезная нагрузка
+### Text payload
 
-Некоторые обновления могут иметь текстовую полезную нагрузку, которую можно распарсить для дальнейшей обработки. Рассмотрим их:
+Certain updates may have text payload that can be parsed for further processing. Let's take a look at them:
 
 * `MessageUpdate` -> `message.text`
 * `EditedMessageUpdate` -> `editedMessage.text`
@@ -19,29 +19,40 @@ title: Обновление парсинга
 * `PollUpdate` -> `poll.question`
 * `PurchasedPaidMediaUpdate` -> `purchasedPaidMedia.paidMediaPayload`
 
-Из перечисленных обновлений выбирается определенный параметр и принимается как [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html) для дальнейшего парсинга.
+From the listed updates, a certain parameter is selected and taken as [`TextReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-text-reference/index.html), for further parsing.
 
-### Парсинг
+### Parsing
 
-Выбранные параметры парсятся с помощью соответствующих настроенных разделителей в команду и параметры к ней.
+The selected parameters are parsed with the appropriate configured delimiters into the command and parameters to it.
 
-См. конфигурацию блока [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/command-parsing.html).
+See configuration [`commandParsing`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/command-parsing.html) block.
 
-Вы можете увидеть на диаграмме ниже, какие компоненты сопоставлены с какими частями целевой функции.
+You can see in the diagram below which components are mapped to which parts of the target function.
+
+```mermaid
+flowchart LR
+    Raw["Raw text<br/>e.g. /greet?name=Adam&age=30"] --> Split[Apply commandParsing delimiters]
+    Split --> Cmd["command<br/>/greet"]
+    Split --> P1["param: name=Adam"]
+    Split --> P2["param: age=30"]
+    Cmd --> Lookup[Handler match]
+    P1 --> Inj[Parameter injection]
+    P2 --> Inj
+```
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/7489099a-cca8-4049-a374-efaf6ce52128" alt="Диаграмма парсинга текста" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/7489099a-cca8-4049-a374-efaf6ce52128" alt="Text parsing diagram" />
 </p>
 
 ### @ParamMapping
 
-Также существует аннотация [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) для удобства или для любого особого случая.
+There is also an annotation called [`@ParamMapping`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-param-mapping/index.html) for convenience or for any special case. 
 
-Она позволяет сопоставить имя параметра из входящего текста с любым параметром.
+It allows you to map the name of the parameter from the incoming text to any parameter. 
 
-Это также удобно, когда ваши входящие данные ограничены, например, `CallbackData` (64 символа).
+This is also convenient when your incoming data is limited, for example, `CallbackData` (64 characters).
 
-Пример использования:
+See example of usage:
 `greeting?name=Adam`
 
 ```kotlin
@@ -51,24 +62,24 @@ suspend fun greeting(@ParamMapping("name") anyParameterName: String, user: User,
 }
 ```
 
-А также может использоваться для перехвата безымянных параметров в случаях, когда парсер настроен таким образом, что имена параметров пропускаются или даже отсутствуют, что проходит по шаблону 'param_n', где `n` - его порядковый номер.
+And also it can be used for catching unnamed parameters, in cases where the parser is set up such that parameter names are skipped or even they absent, which passes by 'param_n' pattern, where `n` is its ordinal.
 
-Например, такой текст - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`, будет распарсен как:
-* команда - `myCommand`
-* параметры
+For example such text - `myCommand?p1=v1&v2&p3=&p4=v4&p5=`, will be parsed to:
+* command - `myCommand`
+* parameters
   * `p1` = `v1`
   * `param_2` = `v2`
   * `p3` = ``
   * `p4` = `v4`
   * `p5` = ``
 
-Как видите, так как второй параметр не имеет объявленного имени, он представлен как `param_2`.
+As you can see since second parameter don't have declared name it represented as `param_2`.
 
-Таким образом вы можете сокращать имена переменных в обратном вызове и использовать понятные читаемые имена в коде.
+So you can abbreviate the variable names in the callback itself and use clear readable names in the code.
 
 ### Deeplink
 
-Учитывая информацию выше, если вы ожидаете deeplink в вашей стартовой команде, вы можете его перехватить с помощью:
+Considering the information from above if you expect deeplink in your start command you can catch it with:
 
 ```kotlin
 @CommandHandler(["/start"])
@@ -77,12 +88,14 @@ suspend fun start(@ParamMapping("param_1") deeplink: String?, user: User, bot: T
 }
 ```
 
-### Групповые команды
+### Group commands
 
-В конфигурации `commandParsing` у нас есть параметр [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html). Когда он включен, мы можем использовать `TelegramBot.identifier` (не забудьте изменить его, если вы используете описанный параметр) в процессе сопоставления команд. Это помогает разделять похожие команды между несколькими ботами. В противном случае часть `@MyBot` просто будет пропущена.
+In `commandParsing` configuration we have parameter [`useIdentifierInGroupCommands`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-command-parsing-configuration/use-identifier-in-group-commands.html) when it turned on, we can use `TelegramBot.identifier` (don't forget to change it if you are using described parameter) in the command matching process, it helps to separate similar commands between several bots, otherwise the `@MyBot` part will just be skipped. 
 
-### См. также
+### See also
 
-* [Вызов активности](Activity-invocation.md)
-* [Активности и процессоры](Activites-and-Processors.md)
-* [Действия](Actions.md)
+* [Activity invocation](Activity-invocation.md)
+* [Activities & Processors](Activites-and-Processors.md)
+* [Actions](Actions.md)
+
+---

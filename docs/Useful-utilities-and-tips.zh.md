@@ -1,14 +1,14 @@
 ---
 ---
-title: 实用工具和技巧
+title: Useful Utilities And Tips
 ---
 
 
-### 处理 ProcessedUpdate
+### Operating with ProcessedUpdate
 
-[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) 是一个通用类，用于更新，根据原始数据，可以以不同类型提供（[`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html)、[`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) 等）
+The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html), etc.)
 
-因此，你可以检查传入数据的类型，并通过智能转换进一步操作特定数据，例如：
+So you can check the type of incoming data and further manipulate certain data with smartcasts, for example:
 
 ```kotlin
 // ...
@@ -16,26 +16,26 @@ if (update !is MessageUpdate) {
     message { "Only messages are allowed" }.send(user, bot)
     return
 }
-// 进一步，ProcessedUpdate 将被视为 MessageUpdate。
+// Further on, ProcessedUpdate will be perceived as MessageUpdate.
 ```
 
-还有一个 [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) 接口，允许你确定其中是否包含用户引用，使用示例：
+There's also an [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) interface inside that lets you determine if there's a user reference inside, example use case:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
 
 ```
 
-如果需要，更新参数中始终有原始的 [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html)。
+If needed inside there is always the original [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) in the update parameter.
 
 
-### 依赖注入
+### Dependency injection
 
-库使用简单的机制来初始化类，其中你的更新处理方法使用提供的注解进行标注。
+The library uses simple mechanism to initialize classes where your update processing methods are annotated with the provided annotations.
 
-[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) 默认用于调用注解方法。
+[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) is used by default to invoke annotated methods.
 
-但如果你想使用其他库来实现，你可以重新定义 [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) 接口，<br/>使用你偏好的机制，并在初始化机器人时传入。
+But if you want to use some other libraries for that you can redefine the [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) interface, <br/>using your preferred mechanism and pass it on when initializing the bot.
 
 ```kotlin
 fun main() = runBlocking {
@@ -47,36 +47,36 @@ fun main() = runBlocking {
 }
 ```
 
-### 过滤更新
+### Filtering updates
 
-如果没有复杂的条件，你可以简单地过滤某些更新以进行处理：
+If there's no complex conditions you can simply filter some updates for being processed:
 
 ```kotlin
-// 定义更新过滤条件的函数
+// function where updates filtering condition defined
 fun filteringFun(update: Update): Boolean = update.message?.text.isNullOrBlank()
 
 fun main() = runBlocking {
   val bot = TelegramBot("BOT_TOKEN")
 
-  // 为更新设置更具体的处理流程
+  // setting more specific processing flow for updates
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // 所以，如果监听器在到达处理程序函数之前离开作用域，那就是过滤。
-    // 实际上你甚至可以直接在那里写 if 条件，使用 return@setListener，或者将过滤扩展到单独的类。
+    // so simply, if the listener left the scope before reaching the handler function, that it is filtering.
+    // actually you can even write directly if-condition there with return@setListener or extend filtering to separate class.
 
-    handle(it) // 或使用块进行手动处理
+    handle(it) // or manual handling way with block
   }
 }
 ```
 
-要在命令匹配或排除过程中包含过滤，请查看 guards 或 `@CommonHandler`。
+to include filtering in your command matching or excluding process take a look at guards or `@CommonHandler`.
 
-### 为不同方法通用化选项
+### Generalize options for different methods
 
-如果你经常需要应用相同的可选参数，你可以编写类似的函数来满足你的需求，并简化样板代码 :)
+If you have to apply the same optional parameters often, you can write a similar function that suits you and lighten the boilerplate code :)
 
-一些通用属性被分离到[不同的接口](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html)中。
+Some common properties are separated to [different interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")
@@ -91,8 +91,11 @@ inline fun <T, R, O> T.markdownMode(crossinline block: O.() -> Unit = {}): T
     }
 
 
-// ... 在你的代码中
+// ... and in your code
 
 message { "test" }.markdownMode().send(to, via)
 
 ```
+
+
+---

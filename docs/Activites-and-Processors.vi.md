@@ -3,17 +3,17 @@
 title: Activites And Processors
 ---
 
-### Giới thiệu
+### Introduction
 
-`Activity` trong thuật ngữ của thư viện này là thực thể trừu tượng là tổng quát hóa của các thực thể như `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, và `@CommonHandler`.
+`Activity` trong thuật ngữ của thư viện này là thực thể trừu tượng là sự tổng quát hóa của các thực thể như `@CommandHandler`, `@InputHandler`, `@UnprocessedHandler`, `@CommonHandler`, `@UpdateHandler`, và `@WizardHandler`.
 
-Bạn cũng có thể xem [bài viết về handlers](Handlers.md).
+Cũng hãy xem bài viết về [handlers](Handlers.md).
 
-### Thu thập activities
+### Collecting activities
 
-Activities được thu thập và chuẩn bị tất cả ngữ cảnh trong thời gian biên dịch (trừ những cái được định nghĩa thông qua functional dsl).
+Activities được phát hiện và nối lại vào **thời gian biên dịch** bởi bộ xử lý **ktnip** KSP. Ngoại lệ duy nhất là [Functional DSL](Handlers#functional-dsl.md) — các handler được định nghĩa thông qua `bot.setFunctionality { ... }` được đăng ký tại thời gian chạy.
 
-Nếu bạn muốn giới hạn vùng mà package sẽ được tìm kiếm, bạn có thể truyền tham số vào plugin:
+Nếu bạn muốn giới hạn khu vực mà gói sẽ được tìm kiếm, bạn có thể truyền một tham số cho plugin:
 
 ```gradle
 ktGram {
@@ -29,14 +29,14 @@ ksp {
 }
 ```
 
-lưu ý trong trường hợp như vậy, để các actions được thu thập được xử lý chính xác, bạn cũng phải chỉ định package trong bản thân instance.
+lưu ý trong trường hợp như vậy, để các hành động đã thu thập được xử lý đúng, bạn cũng phải chỉ định gói trong chính instance.
 
 ```kotlin
 fun main() = runBlocking {
     val bot = TelegramBot("BOT_TOKEN", "com.example.mybot")
 
     bot.handleUpdates()
-    // bắt đầu long-polling listener
+    // start long-polling listener
 }
 ```
 
@@ -48,7 +48,8 @@ ktGram {
 }
 ```
 
-hoặc nếu bạn không dùng plugin để chỉ định các package khác nhau, bạn cần chỉ định chúng với `;` làm separator:
+
+hoặc nếu bạn không sử dụng plugin để chỉ định các gói khác nhau, bạn cần chỉ định chúng bằng dấu phân cách `;`:
 
 ```gradle
 ksp {
@@ -56,18 +57,18 @@ ksp {
 }
 ```
 
-### Xử lý
+### Processing
 
 #### Webhooks
 
-Trong controller của bạn (hoặc một nơi khác nơi `webhook` được xử lý), bạn gọi: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
+Trong controller của bạn (hoặc nơi khác nơi `webhook` được xử lý), bạn gọi: [`bot.update.parseAndHandle(webhookString)`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.core/-tg-update-handler/index.html#706360827%2FFunctions%2F-880831646)
 
 #### Long polling
 
 Gọi: `bot.handleUpdates()` hoặc thông qua `bot.update.setListener { handle(it) }`
 
 
-### Xem thêm
+### See also
 
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)

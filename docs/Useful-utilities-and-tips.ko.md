@@ -1,14 +1,14 @@
 ---
 ---
-title: 유용한 유틸리티와 팁
+title: Useful Utilities And Tips
 ---
 
 
-### ProcessedUpdate 사용
+### Operating with ProcessedUpdate
 
-[`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html)는 업데이트를 위한 제네릭 클래스로, 원본 데이터에 따라 다른 타입([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html) 등)으로 제공될 수 있습니다.
+The [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) is a generic class for updates which, depending on the original data, can be provided in different types ([`MessageUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-message-update/index.html), [`CallbackQueryUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-callback-query-update/index.html), etc.)
 
-따라서 들어오는 데이터의 타입을 확인하고 스마트 캐스트를 통해 특정 데이터를 조작할 수 있습니다. 예를 들어:
+So you can check the type of incoming data and further manipulate certain data with smartcasts, for example:
 
 ```kotlin
 // ...
@@ -16,26 +16,26 @@ if (update !is MessageUpdate) {
     message { "Only messages are allowed" }.send(user, bot)
     return
 }
-// 이후에는 ProcessedUpdate가 MessageUpdate로 인식됩니다.
+// Further on, ProcessedUpdate will be perceived as MessageUpdate.
 ```
 
-[`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) 인터페이스도 내부에 있어 사용자 참조가 있는지 확인할 수 있으며, 사용 예시는 다음과 같습니다:
+There's also an [`UserReference`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-user-reference/index.html) interface inside that lets you determine if there's a user reference inside, example use case:
 
 ```kotlin
 val user = if(update is UserReference) update.user else null
 
 ```
 
-필요하다면 항상 원본 [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html)가 update 매개변수에 있습니다.
+If needed inside there is always the original [`update`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types/-update/index.html) in the update parameter.
 
 
-### 의존성 주입
+### Dependency injection
 
-이 라이브러리는 업데이트 처리 메서드가 제공된 어노테이션으로 표시된 클래스를 초기화하는 간단한 메커니즘을 사용합니다.
+The library uses simple mechanism to initialize classes where your update processing methods are annotated with the provided annotations.
 
-[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt)가 기본적으로 어노테이션된 메서드를 호출하는 데 사용됩니다.
+[`ClassManagerImpl`](https://github.com/vendelieu/telegram-bot/blob/master/telegram-bot/src/commonMain/kotlin/eu/vendeli/tgbot/implementations/ClassManagerImpl.kt) is used by default to invoke annotated methods.
 
-하지만 다른 라이브러리를 사용하려면 [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) 인터페이스를 재정의하고 선호하는 메커니즘을 사용한 후 봇 초기화 시 전달할 수 있습니다.
+But if you want to use some other libraries for that you can redefine the [`ClassManager`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.ctx/-class-manager/index.html) interface, <br/>using your preferred mechanism and pass it on when initializing the bot.
 
 ```kotlin
 fun main() = runBlocking {
@@ -47,36 +47,36 @@ fun main() = runBlocking {
 }
 ```
 
-### 업데이트 필터링
+### Filtering updates
 
-복잡한 조건이 없다면 단순히 일부 업데이트를 처리하기 위해 필터링할 수 있습니다:
+If there's no complex conditions you can simply filter some updates for being processed:
 
 ```kotlin
-// 업데이트 필터링 조건을 정의한 함수
+// function where updates filtering condition defined
 fun filteringFun(update: Update): Boolean = update.message?.text.isNullOrBlank()
 
 fun main() = runBlocking {
   val bot = TelegramBot("BOT_TOKEN")
 
-  // 업데이트를 위한 더 구체적인 처리 흐름 설정
+  // setting more specific processing flow for updates
   bot.update.setListener {
     if(filteringFun(it)) return@setListener
 
-    // 리스너가 핸들러 함수에 도달하기 전 범위를 벗어나면 필터링됩니다.
-    // 실제로는 직접 if-조건문을 작성하고 return@setListener을 사용하거나 필터링을 별도 클래스로 확장할 수 있습니다.
+    // so simply, if the listener left the scope before reaching the handler function, that it is filtering.
+    // actually you can even write directly if-condition there with return@setListener or extend filtering to separate class.
 
-    handle(it) // 또는 블록을 사용한 수동 처리 방법
+    handle(it) // or manual handling way with block
   }
 }
 ```
 
-명령어 매칭이나 제외 프로세스에 필터링을 포함하려면 guard 또는 `@CommonHandler`를 확인하세요.
+to include filtering in your command matching or excluding process take a look at guards or `@CommonHandler`.
 
-### 다양한 메서드에 대한 옵션 일반화
+### Generalize options for different methods
 
-동일한 선택적 매개변수를 자주 적용해야 한다면 적합한 유사한 함수를 작성하여 보일러플레이트 코드를 줄일 수 있습니다 :)
+If you have to apply the same optional parameters often, you can write a similar function that suits you and lighten the boilerplate code :)
 
-일부 공통 속성은 [다른 인터페이스](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html)로 분리되어 있습니다.
+Some common properties are separated to [different interfaces](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.options/-options/index.html).
 
 ```kotlin
 @Suppress("NOTHING_TO_INLINE")
@@ -91,8 +91,11 @@ inline fun <T, R, O> T.markdownMode(crossinline block: O.() -> Unit = {}): T
     }
 
 
-// ... 그리고 코드에서
+// ... and in your code
 
 message { "test" }.markdownMode().send(to, via)
 
 ```
+
+
+---

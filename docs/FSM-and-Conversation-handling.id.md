@@ -1,57 +1,70 @@
 ---
 ---
-title: Fsm Dan Penanganan Percakapan
+title: Fsm And Conversation Handling
 ---
 
-Perpustakaan ini juga mendukung mekanisme FSM, yang merupakan mekanisme untuk pemrosesan progresif input pengguna dengan penanganan input yang salah.
+The library also supports the FSM mechanism, which is a mechanism for progressive processing of user input with incorrect input handling.
 
 > [!NOTE]
-> TL;DR: Lihat contoh [di sana](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
+> TL;DR: See example [there](https://github.com/vendelieu/telegram-bot_template/tree/conversation).
 
-### Dalam teori
+### In theory
 
-Mari kita bayangkan situasi di mana Anda perlu mengumpulkan survei pengguna, Anda dapat meminta semua data seseorang dalam satu langkah, tetapi dengan input yang salah dari salah satu parameter, akan sulit baik bagi pengguna maupun bagi kita, dan setiap langkah mungkin memiliki perbedaan tergantung pada data input tertentu.
+Let's imagine a situation where you need to collect a user survey, you can ask for all the data of a person at one step, but with incorrect input of one of the parameters, it will be difficult both for the user and for us, and each step may have a difference depending on certain input data.
 
-Sekarang mari kita bayangkan input data secara bertahap, di mana bot memasuki mode dialog dengan pengguna.
+Now let's imagine step-by-step input of data, where the bot enters dialogue mode with the user.
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Diagram Proses Penanganan" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2e84fa00-e59c-4352-8665-83be3b971e7b" alt="Handling process diagram" />
 </p>
 
-Panah hijau menunjukkan proses transisi melalui langkah tanpa kesalahan, panah biru berarti menyimpan status saat ini dan menunggu input ulang (misalnya jika pengguna menunjukkan bahwa dia berusia -100 tahun, harus meminta usia lagi), dan panah merah menunjukkan keluar dari seluruh proses karena perintah apa pun atau pembatalan makna lainnya.
+```mermaid
+stateDiagram-v2
+    [*] --> Step
+    Step: onEntry → wait input → validate
+    Step --> Step: Transition.Retry (invalid)
+    Step --> NextStep: Transition.Next
+    Step --> JumpTarget: Transition.JumpTo(step)
+    Step --> [*]: Transition.Finish
+    NextStep --> [*]: ...continues
+    JumpTarget --> [*]: ...continues
+    Step --> [*]: external cancel / new command
+```
 
-### Dalam praktik
+Forward arrows (`Transition.Next`, `Transition.JumpTo`) advance the wizard, `Transition.Retry` keeps the user on the same step until input is valid (for example, when the user types `-100` for their age), and `Transition.Finish` (or an external command) ends the flow entirely.
 
-Sistem Wizard memungkinkan interaksi multi-langkah pengguna dalam bot Telegram. Sistem ini memandu pengguna melalui urutan langkah, memvalidasi input, menyimpan status, dan bertransisi antar langkah.
+### In practice
 
-**Manfaat Utama:**
-- **Type-safe**: Pemeriksaan tipe kompilasi-waktu untuk akses status
-- **Deklaratif**: Definisikan langkah sebagai kelas/objek bersarang
-- **Fleksibel**: Dukungan untuk transisi kondisional, lompatan, dan retry
-- **Stateful**: Persistensi status otomatis dengan penyimpanan backend yang dapat ditancapkan
-- **Terintegrasi**: Bekerja dengan sistem Activity yang ada
+The Wizard system enables multi-step user interactions in Telegram bots. It guides users through a sequence of steps, validates input, stores state, and transitions between steps.
 
-### Konsep Inti
+**Key Benefits:**
+- **Type-safe**: Compile-time type checking for state access
+- **Declarative**: Define steps as nested classes/objects
+- **Flexible**: Support for conditional transitions, jumps, and retries
+- **Stateful**: Automatic state persistence with pluggable storage backends
+- **Integrated**: Works with the existing Activity system
+
+### Core Concepts
 
 #### WizardStep
 
-`WizardStep` mewakili satu langkah dalam alur wizard. Setiap langkah harus mengimplementasikan:
+A `WizardStep` represents a single step in the wizard flow. Each step must implement:
 
-- **`onEntry(ctx: WizardContext)`**: Dipanggil saat pengguna memasuki langkah ini. Gunakan ini untuk meminta pengguna.
-- **`onRetry(ctx: WizardContext)`**: Dipanggil saat validasi gagal dan langkah harus retry. Gunakan ini untuk menampilkan pesan error.
-- **`validate(ctx: WizardContext): Transition`**: Memvalidasi input saat ini dan mengembalikan `Transition` yang menunjukkan apa yang terjadi selanjutnya.
-- **`store(ctx: WizardContext): Any?`** (opsional): Mengembalikan nilai yang akan disimpan untuk langkah ini. Kembalikan `null` jika langkah tidak menyimpan status.
+- **`onEntry(ctx: WizardContext)`**: Called when the user enters this step. Use this to prompt the user.
+- **`onRetry(ctx: WizardContext)`**: Called when validation fails and the step should retry. Use this to show error messages.
+- **`validate(ctx: WizardContext): Transition`**: Validates the current input and returns a `Transition` indicating what happens next.
+- **`store(ctx: WizardContext): Any?`** (optional): Returns the value to persist for this step. Return `null` if the step doesn't store state.
 
 ```kotlin
 object NameStep : WizardStep(isInitial = true) {
     override suspend fun onEntry(ctx: WizardContext) {
         message { "What is your name?" }.send(ctx.user, ctx.bot)
     }
-
+    
     override suspend fun onRetry(ctx: WizardContext) {
         message { "Name cannot be empty. Please try again." }.send(ctx.user, ctx.bot)
     }
-
+    
     override suspend fun validate(ctx: WizardContext): Transition {
         return if (ctx.update.text.isNullOrBlank()) {
             Transition.Retry
@@ -59,7 +72,7 @@ object NameStep : WizardStep(isInitial = true) {
             Transition.Next
         }
     }
-
+    
     override suspend fun store(ctx: WizardContext): String {
         return ctx.update.text!!
     }
@@ -67,19 +80,19 @@ object NameStep : WizardStep(isInitial = true) {
 ```
 
 > [!NOTE]
-> Jika beberapa langkah tidak ditandai sebagai initial -> langkah pertama yang dinyatakan dianggap sebagai.
+> If some step is not marked as initial -> first declared step is considered as.
 
 #### Transition
 
-`Transition` menentukan apa yang terjadi setelah validasi:
+A `Transition` determines what happens after validation:
 
-- **`Transition.Next`**: Pindah ke langkah berikutnya dalam urutan
-- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Lompat ke langkah tertentu
-- **`Transition.Retry`**: Retry langkah saat ini (validasi gagal)
-- **`Transition.Finish`**: Selesaikan wizard
+- **`Transition.Next`**: Move to the next step in sequence
+- **`Transition.JumpTo(step: KClass<out WizardStep>)`**: Jump to a specific step
+- **`Transition.Retry`**: Retry the current step (validation failed)
+- **`Transition.Finish`**: Finish the wizard
 
 ```kotlin
-// Lompatan kondisional berdasarkan input
+// Conditional jump based on input
 override suspend fun validate(ctx: WizardContext): Transition {
     val age = ctx.update.text?.toIntOrNull()
     return when {
@@ -92,53 +105,53 @@ override suspend fun validate(ctx: WizardContext): Transition {
 
 #### WizardContext
 
-`WizardContext` menyediakan akses ke:
-- **`user: User`**: Pengguna saat ini
-- **`update: ProcessedUpdate`**: Update saat ini
-- **`bot: TelegramBot`**: Instance bot
-- **`userReference: UserChatReference`**: Referensi ID pengguna dan chat untuk penyimpanan status
+`WizardContext` provides access to:
+- **`user: User`**: The current user
+- **`update: ProcessedUpdate`**: The current update
+- **`bot: TelegramBot`**: The bot instance
+- **`userReference: UserChatReference`**: User and chat ID reference for state storage
 
-Plus metode akses status type-safe (dihasilkan oleh KSP).
+Plus type-safe state access methods (generated by KSP).
 
 ---
 
-### Mendefinisikan Wizard
+### Defining a Wizard
 
-#### Struktur Dasar
+#### Basic Structure
 
-Wizard didefinisikan sebagai kelas atau objek yang diannotasi dengan `@WizardHandler`:
+A wizard is defined as a class or object annotated with `@WizardHandler`:
 
 ```kotlin
 @WizardHandler(trigger = ["/survey"])
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // ... implementasi langkah
+        // ... step implementation
     }
-
+    
     object AgeStep : WizardStep {
-        // ... implementasi langkah
+        // ... step implementation
     }
-
+    
     object FinishStep : WizardStep {
-        // ... implementasi langkah
+        // ... step implementation
     }
 }
 ```
 
-#### Parameter Anotasi
+#### Annotation Parameters
 
-**`@WizardHandler`** menerima:
-- **`trigger: Array<String>`**: Perintah yang memulai wizard (misalnya, `["/start", "/survey"]`)
-- **`scope: Array<UpdateType>`**: Tipe update yang didengarkan (default: `[UpdateType.MESSAGE]`)
-- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: Kelas state manager untuk menyimpan data langkah
+**`@WizardHandler`** accepts:
+- **`trigger: Array<String>`**: Commands that start the wizard (e.g., `["/start", "/survey"]`)
+- **`scope: Array<UpdateType>`**: Update types to listen for (default: `[UpdateType.MESSAGE]`)
+- **`stateManagers: Array<KClass<out WizardStateManager<*>>>`**: State manager classes for storing step data
 
 ---
 
-### Manajemen Status
+### State Management
 
 #### WizardStateManager
 
-Status disimpan menggunakan implementasi `WizardStateManager<T>`. Setiap manager menangani tipe tertentu:
+State is stored using `WizardStateManager<T>` implementations. Each manager handles a specific type:
 
 ```kotlin
 interface WizardStateManager<T : Any> {
@@ -148,11 +161,11 @@ interface WizardStateManager<T : Any> {
 }
 ```
 
-Lihat juga: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
+See also: [MapStateManager<T>](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-state-manager/index.html), [MapStringStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-string-state-manager/index.html), [MapIntStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-int-state-manager/index.html), [MapLongStateManager](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.implementations/-map-long-state-manager/index.html).
 
-#### Pencocokan Otomatis
+#### Automatic Matching
 
-KSP mencocokkan langkah ke state manager berdasarkan tipe kembalian `store()`:
+KSP matches steps to state managers based on the `store()` return type:
 
 ```kotlin
 @WizardHandler(
@@ -162,21 +175,21 @@ KSP mencocokkan langkah ke state manager berdasarkan tipe kembalian `store()`:
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
         override suspend fun store(ctx: WizardContext): String {
-            return ctx.update.text!! // Cocok dengan StringStateManager
+            return ctx.update.text!! // Matches StringStateManager
         }
     }
-
+    
     object AgeStep : WizardStep {
         override suspend fun store(ctx: WizardContext): Int {
-            return ctx.update.text!!.toInt() // Cocok dengan IntStateManager
+            return ctx.update.text!!.toInt() // Matches IntStateManager
         }
     }
 }
 ```
 
-#### Override Per-Langkah
+#### Per-Step Override
 
-Override state manager untuk langkah tertentu menggunakan `@WizardHandler.StateManager`:
+Override the state manager for a specific step using `@WizardHandler.StateManager`:
 
 ```kotlin
 @WizardHandler(
@@ -185,78 +198,78 @@ Override state manager untuk langkah tertentu menggunakan `@WizardHandler.StateM
 )
 object SurveyWizard {
     object NameStep : WizardStep(isInitial = true) {
-        // Menggunakan DefaultStateManager
+        // Uses DefaultStateManager
     }
-
+    
     @WizardHandler.StateManager(CustomStateManager::class)
     object AgeStep : WizardStep {
-        // Menggunakan CustomStateManager sebagai gantinya
+        // Uses CustomStateManager instead
     }
 }
 ```
 
 ---
 
-### Akses Status Type-Safe
+### Type-Safe State Access
 
-KSP menghasilkan fungsi ekstensi type-safe pada `WizardContext` untuk setiap langkah yang menyimpan status.
+KSP generates type-safe extension functions on `WizardContext` for each step that stores state.
 
-#### Fungsi yang Dihasilkan
+#### Generated Functions
 
-Untuk langkah yang menyimpan `String`:
+For a step that stores a `String`:
 
 ```kotlin
-// Dihasilkan secara otomatis oleh KSP
+// Generated automatically by KSP
 suspend inline fun <reified S : WizardStep> WizardContext.getState(): String?
 suspend inline fun <reified S : WizardStep> WizardContext.setState(value: String)
 suspend inline fun <reified S : WizardStep> WizardContext.delState()
 ```
 
-#### Penggunaan
+#### Usage
 
 ```kotlin
 object FinishStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Akses type-safe - mengembalikan String? (nullable)
+        // Type-safe access - returns String? (nullable)
         val name: String? = ctx.getState<NameStep>()
-
-        // Akses type-safe - mengembalikan Int? (nullable)
+        
+        // Type-safe access - returns Int? (nullable)
         val age: Int? = ctx.getState<AgeStep>()
-
+        
         val summary = buildString {
             appendLine("Name: $name")
             appendLine("Age: $age")
         }
-
+        
         message { summary }.send(ctx.user, ctx.bot)
     }
-
+    
     override suspend fun onRetry(ctx: WizardContext) = Unit
-
+    
     override suspend fun validate(ctx: WizardContext): Transition {
         return Transition.Finish
     }
 }
 ```
 
-#### Metode Fallback
+#### Fallback Methods
 
-Jika metode type-safe tidak tersedia, gunakan metode fallback:
+If type-safe methods aren't available, use the fallback methods:
 
 ```kotlin
-// Fallback - mengembalikan Any?
+// Fallback - returns Any?
 val name = ctx.getState(NameStep::class)
 
-// Fallback - menerima Any?
+// Fallback - accepts Any?
 ctx.setState(NameStep::class, "John")
 ctx.delState(NameStep::class)
 ```
 
 ---
 
-### Contoh Lengkap
+### Complete Example
 
-#### Wizard Pendaftaran Pengguna
+#### User Registration Wizard
 
 ```kotlin
 @WizardHandler(
@@ -268,11 +281,11 @@ object RegistrationWizard {
         override suspend fun onEntry(ctx: WizardContext) {
             message { "What is your name?" }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun onRetry(ctx: WizardContext) {
             message { "Please enter a valid name." }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun validate(ctx: WizardContext): Transition {
             val name = ctx.update.text?.trim()
             return if (name.isNullOrBlank() || name.length < 2) {
@@ -281,21 +294,21 @@ object RegistrationWizard {
                 Transition.Next
             }
         }
-
+        
         override suspend fun store(ctx: WizardContext): String {
             return ctx.update.text!!.trim()
         }
     }
-
+    
     object AgeStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
             message { "How old are you?" }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun onRetry(ctx: WizardContext) {
             message { "Please enter a valid age (must be a number)." }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun validate(ctx: WizardContext): Transition {
             val age = ctx.update.text?.toIntOrNull()
             return when {
@@ -305,32 +318,32 @@ object RegistrationWizard {
                 else -> Transition.Next
             }
         }
-
+        
         override suspend fun store(ctx: WizardContext): Int {
             return ctx.update.text!!.toInt()
         }
     }
-
+    
     object UnderageStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            message {
-                "Sorry, you must be 18 or older to register."
+            message { 
+                "Sorry, you must be 18 or older to register." 
             }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun onRetry(ctx: WizardContext) = Unit
-
+        
         override suspend fun validate(ctx: WizardContext): Transition {
             return Transition.Finish
         }
     }
-
+    
     object ConfirmationStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
-            // Akses status type-safe
+            // Type-safe state access
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
-
+            
             val confirmation = buildString {
                 appendLine("Please confirm your information:")
                 appendLine("Name: $name")
@@ -338,37 +351,37 @@ object RegistrationWizard {
                 appendLine()
                 appendLine("Reply 'yes' to confirm or 'no' to start over.")
             }
-
+            
             message { confirmation }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun onRetry(ctx: WizardContext) {
             message { "Please reply 'yes' or 'no'." }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun validate(ctx: WizardContext): Transition {
             val response = ctx.update.text?.lowercase()?.trim()
             return when (response) {
                 "yes" -> Transition.Finish
-                "no" -> Transition.JumpTo(NameStep::class) // Mulai ulang
+                "no" -> Transition.JumpTo(NameStep::class) // Start over
                 else -> Transition.Retry
             }
         }
     }
-
+    
     object FinishStep : WizardStep {
         override suspend fun onEntry(ctx: WizardContext) {
             val name: String? = ctx.getState<NameStep>()
             val age: Int? = ctx.getState<AgeStep>()
-
-            // Simpan ke database, kirim konfirmasi, dll.
-            message {
-                "Registration complete! Welcome, $name (age $age)."
+            
+            // Save to database, send confirmation, etc.
+            message { 
+                "Registration complete! Welcome, $name (age $age)." 
             }.send(ctx.user, ctx.bot)
         }
-
+        
         override suspend fun onRetry(ctx: WizardContext) = Unit
-
+        
         override suspend fun validate(ctx: WizardContext): Transition {
             return Transition.Finish
         }
@@ -378,11 +391,11 @@ object RegistrationWizard {
 
 ---
 
-### Fitur Lanjutan
+### Advanced Features
 
-#### Transisi Kondisional
+#### Conditional Transitions
 
-Gunakan `Transition.JumpTo` untuk alur kondisional:
+Use `Transition.JumpTo` for conditional flows:
 
 ```kotlin
 override suspend fun validate(ctx: WizardContext): Transition {
@@ -395,20 +408,20 @@ override suspend fun validate(ctx: WizardContext): Transition {
 }
 ```
 
-#### Langkah Stateless
+#### Stateless Steps
 
-Langkah tidak perlu menyimpan status. Cukup kembalikan `null` dari `store()` (atau biarkan apa adanya):
+Steps don't need to store state. Simply return `null` from `store()` (or keep as is):
 
 ```kotlin
 object ConfirmationStep : WizardStep {
     override suspend fun store(ctx: WizardContext): Any? = null
-    // ... sisa implementasi
+    // ... rest of implementation
 }
 ```
 
-#### State Manager Kustom
+#### Custom State Managers
 
-Implementasikan `WizardStateManager<T>` untuk penyimpanan kustom (database, Redis, dll.):
+Implement `WizardStateManager<T>` for custom storage (database, Redis, etc.):
 
 ```kotlin
 class DatabaseStateManager : WizardStateManager<String> {
@@ -416,24 +429,24 @@ class DatabaseStateManager : WizardStateManager<String> {
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ): String? {
-        // Muat dari database
+        // Load from database
         return database.getWizardState(reference.userId, key.qualifiedName)
     }
-
+    
     override suspend fun set(
         key: KClass<out WizardStep>,
         reference: UserChatReference,
         value: String
     ) {
-        // Simpan ke database
+        // Save to database
         database.saveWizardState(reference.userId, key.qualifiedName, value)
     }
-
+    
     override suspend fun del(
         key: KClass<out WizardStep>,
         reference: UserChatReference
     ) {
-        // Hapus dari database
+        // Delete from database
         database.deleteWizardState(reference.userId, key.qualifiedName)
     }
 }
@@ -441,108 +454,108 @@ class DatabaseStateManager : WizardStateManager<String> {
 
 ---
 
-### Cara Kerja Internal
+### How It Works Internally
 
-#### Generasi Kode
+#### Code Generation
 
-KSP menghasilkan:
+KSP generates:
 
-1. **WizardActivity**: Implementasi konkret yang memperluas `WizardActivity` dengan langkah hardcoded
-2. **Start Activity**: Menangani trigger perintah dan memulai wizard
-3. **Input Activity**: Menangani input pengguna selama alur wizard
-4. **State Accessors**: Fungsi ekstensi type-safe untuk akses status
+1. **WizardActivity**: A concrete implementation extending `WizardActivity` with hardcoded steps
+2. **Start Activity**: Handles the command trigger and starts the wizard
+3. **Input Activity**: Handles user input during the wizard flow
+4. **State Accessors**: Type-safe extension functions for state access
 
-#### Alur
+#### Flow
 
-1. Pengguna mengirim `/register` → Start Activity dipanggil
-2. Start Activity membuat `WizardContext` dan memanggil `wizardActivity.start(ctx)`
-3. `start()` memasuki langkah initial dan mengatur `inputListener` untuk melacak langkah saat ini
-4. Pengguna mengirim pesan → Input Activity dipanggil
-5. Input Activity memanggil `wizardActivity.handleInput(ctx)`
-6. `handleInput()` memvalidasi input, menyimpan status, dan bertransisi ke langkah berikutnya
-7. Proses berulang hingga `Transition.Finish` dikembalikan
+1. User sends `/register` → Start Activity is invoked
+2. Start Activity creates `WizardContext` and calls `wizardActivity.start(ctx)`
+3. `start()` enters the initial step and sets `inputListener` to track the current step
+4. User sends a message → Input Activity is invoked
+5. Input Activity calls `wizardActivity.handleInput(ctx)`
+6. `handleInput()` validates input, persists state, and transitions to the next step
+7. Process repeats until `Transition.Finish` is returned
 
-#### Persistensi Status
+#### State Persistence
 
-- Status disimpan setelah validasi berhasil (sebelum transisi)
-- Nilai kembalian `store()` setiap langkah disimpan menggunakan `WizardStateManager` yang cocok
-- Status di-scope per pengguna dan chat (`UserChatReference`)
+- State is persisted after successful validation (before transition)
+- Each step's `store()` return value is saved using the matching `WizardStateManager`
+- State is scoped per user and chat (`UserChatReference`)
 
 ---
 
-### Praktik Terbaik
+### Best Practices
 
-#### 1. Selalu Berikan Prompt yang Jelas
+#### 1. Always Provide Clear Prompts
 
 ```kotlin
 override suspend fun onEntry(ctx: WizardContext) {
-    message {
+    message { 
         "Please enter your email address:\n" +
-        "(Format: user@example.com)"
+        "(Format: user@example.com)" 
     }.send(ctx.user, ctx.bot)
 }
 ```
 
-#### 2. Tangani Error Validasi dengan Graceful
+#### 2. Handle Validation Errors Gracefully
 
 ```kotlin
 override suspend fun onRetry(ctx: WizardContext) {
-    message {
+    message { 
         "Invalid email format. Please try again.\n" +
-        "Example: user@example.com"
+        "Example: user@example.com" 
     }.send(ctx.user, ctx.bot)
 }
 ```
 
-#### 3. Gunakan Akses Status Type-Safe
+#### 3. Use Type-Safe State Access
 
-Lebih suka metode type-safe yang dihasilkan:
+Prefer generated type-safe methods:
 
 ```kotlin
-// ✅ Baik - type-safe
+// ✅ Good - type-safe
 val name: String? = ctx.getState<NameStep>()
 
-// ❌ Hindari - kehilangan type safety
+// ❌ Avoid - loses type safety
 val name = ctx.getState(NameStep::class) as? String
 ```
 
-#### 4. Jaga Langkah Tetap Fokus
+#### 4. Keep Steps Focused
 
-Setiap langkah harus memiliki tanggung jawab tunggal:
+Each step should have a single responsibility:
 
 ```kotlin
-// ✅ Baik - langkah fokus
+// ✅ Good - focused step
 object EmailStep : WizardStep {
-    // Hanya menangani pengumpulan email
+    // Only handles email collection
 }
 
-// ❌ Hindari - terlalu banyak logika
+// ❌ Avoid - too much logic
 object PersonalInfoStep : WizardStep {
-    // Menangani nama, email, telepon, alamat...
+    // Handles name, email, phone, address...
 }
 ```
 
-#### 5. Gunakan Nama Langkah yang Bermakna
+#### 5. Use Meaningful Step Names
 
 ```kotlin
-// ✅ Baik
+// ✅ Good
 object EmailVerificationStep : WizardStep
 
-// ❌ Hindari
+// ❌ Avoid
 object Step2 : WizardStep
 ```
 
-#### 6. Bersihkan Status Saat Dibutuhkan
+#### 6. Clean Up State When Needed
 
-Jika Anda perlu menghapus status secara manual:
+If you need to clear state manually:
 
 ```kotlin
 object CancelStep : WizardStep {
     override suspend fun onEntry(ctx: WizardContext) {
-        // Hapus semua status wizard
+        // Clear all wizard state
         ctx.delState<NameStep>()
         ctx.delState<AgeStep>()
-
+        
         message { "Registration cancelled." }.send(ctx.user, ctx.bot)
     }
 }
@@ -550,14 +563,16 @@ object CancelStep : WizardStep {
 
 ---
 
-### Ringkasan
+### Summary
 
-Sistem Wizard menyediakan:
-- ✅ **Type-safe** manajemen status dengan pengecekan kompilasi-waktu
-- ✅ **Deklaratif** definisi langkah sebagai kelas bersarang
-- ✅ **Fleksibel** transisi dengan logika kondisional
-- ✅ **Otomatis** generasi kode via KSP
-- ✅ **Terintegrasi** dengan sistem Activity yang ada
-- ✅ **Pluggable** backend penyimpanan status
+The Wizard system provides:
+- ✅ **Type-safe** state management with compile-time checking
+- ✅ **Declarative** step definitions as nested classes
+- ✅ **Flexible** transitions with conditional logic
+- ✅ **Automatic** code generation via KSP
+- ✅ **Integrated** with the existing Activity system
+- ✅ **Pluggable** state storage backends
 
-Mulailah membangun wizard dengan menganotasi kelas dengan `@WizardHandler` dan definisikan langkah Anda sebagai objek `WizardStep` bersarang!
+Start building wizards by annotating a class with `@WizardHandler` and defining your steps as nested `WizardStep` objects!
+if you have any questions contact us in chat, we will be glad to help :)
+---

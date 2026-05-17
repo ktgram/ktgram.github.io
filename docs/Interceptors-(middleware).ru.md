@@ -1,55 +1,55 @@
 ---
 ---
-title: Перехватчики (Middleware)
+title: Interceptors (Middleware)
 ---
 
-### Перехватчики: сквозная логика для вашего бота
+### Interceptors: Cross-Cutting Logic for Your Bot
 
-При создании Telegram-бота вы часто повторяете настройку, проверки или очистку между обработчиками. Перехватчики позволяют подключить общую логику вокруг обработчиков, сохраняя их сфокусированными и поддерживаемыми.
+When building a Telegram bot, you often repeat setup, checks, or cleanup across handlers. Interceptors let you plug in shared logic around handlers, keeping handlers focused and maintainable.
 
-Вот как работают перехватчики в *telegram-bot* и как их использовать.
+Here’s how interceptors work in *telegram-bot* and how to use them.
 
-### Что такое перехватчики? (Простое объяснение)
+### What Are Interceptors? (Simple Explanation)
 
-Перехватчики — это функции, которые запускаются в определенные моменты конвейера обработки обновлений. Они позволяют вам:
-- Инспектировать и модифицировать контекст обработки
-- Добавлять сквозную логику (логирование, аутентификация, метрики)
-- Останавливать обработку при необходимости
-- Очищать ресурсы после обработки
+Interceptors are functions that run at specific points in the update processing pipeline. They let you:
+- Inspect and modify the processing context
+- Add cross-cutting logic (logging, auth, metrics)
+- Stop processing early if needed
+- Clean up resources after processing
 
-Представьте перехватчики как контрольные точки, через которые проходит каждое обновление до, во время и после выполнения обработчика.
+Think of interceptors as checkpoints that every update passes through before, during, and after handler execution.
 
 
-### Конвейер обработки
+### The Processing Pipeline
 
-Бот обрабатывает обновления через конвейер с семью фазами:
+The bot processes updates through a pipeline with seven phases:
 
-| Фаза | Когда запускается | Для чего можно использовать |
+| Phase | When It Runs | What You Can Use It For |
 |-------|--------------|-------------------------|
-| **Setup** | Сразу после получения обновления, до начала обработки | ✔ Глобальное ограничение частоты<br>✔ Фильтрация спама или некорректных обновлений<br>✔ Начальное логирование<br>✔ Настройка общего контекста |
-| **Parsing** | После Setup, извлекает команду и параметры | ✔ Пользовательский парсинг команд<br>✔ Обогащение контекста распарсенными данными<br>✔ Валидация структуры обновления |
-| **Match** | Находит подходящий обработчик (Command/Input/Common) | ✔ Переопределение выбора обработчика<br>✔ Пользовательская логика обработки ввода<br>✔ Логирование найденных обработчиков |
-| **Validation** | После нахождения обработчика, перед вызовом | ✔ Права конкретного обработчика<br>✔ Ограничение частоты на уровне обработчика<br>✔ Проверки guard<br>✔ Отмена обработки если условия не соблюдены |
-| **PreInvoke** | Немедленно перед запуском обработчика | ✔ Последние проверки<br>✔ Запуск таймеров/метрик<br>✔ Обогащение контекста для обработчика<br>✔ Модификация поведения обработчика |
-| **Invoke** | Здесь выполняется обработчик | ✔ Обертка выполнения обработчика<br>✔ Обработка ошибок<br>✔ Логирование результатов обработчика |
-| **PostInvoke** | После завершения обработчика (успех или ошибка) | ✔ Очистка ресурсов<br>✔ Логирование результатов<br>✔ Отправка сообщений-заглушек при ошибках<br>✔ Модификация результатов перед возвратом |
+| **Setup** | As soon as the update arrives, before any processing | ✔ Global rate limiting<br>✔ Filter out spam or malformed updates<br>✔ Initial logging<br>✔ Setup shared context |
+| **Parsing** | After setup, extracts command and parameters | ✔ Custom command parsing<br>✔ Enrich context with parsed data<br>✔ Validate update structure |
+| **Match** | Finds the appropriate handler (Command/Input/Common) | ✔ Override handler selection<br>✔ Custom input handling logic<br>✔ Log matched handlers |
+| **Validation** | After handler is found, before invocation | ✔ Handler-specific permissions<br>✔ Rate limiting per handler<br>✔ Guard checks<br>✔ Cancel processing if conditions aren't met |
+| **PreInvoke** | Immediately before the handler runs | ✔ Last-minute checks<br>✔ Start timers/metrics<br>✔ Enrich context for handler<br>✔ Modify handler behavior |
+| **Invoke** | The handler is executed here | ✔ Wrap handler execution<br>✔ Error handling<br>✔ Logging handler results |
+| **PostInvoke** | After handler completes (success or failure) | ✔ Cleanup resources<br>✔ Log results<br>✔ Send fallback messages on errors<br>✔ Modify results before returning |
 
 
-### Создание перехватчика
+### Creating an Interceptor
 
-Перехватчик — это простая функция, которая получает `ProcessingContext`:
+An interceptor is a simple function that receives a `ProcessingContext`:
 
 ```kotlin
 import eu.vendeli.tgbot.core.PipelineInterceptor
 import eu.vendeli.tgbot.types.component.ProcessingContext
 
 val myInterceptor: PipelineInterceptor = { context ->
-    // Ваша логика здесь
+    // Your logic here
     println("Processing update: ${context.update.updateId}")
 }
 ```
 
-Или с использованием лямбды:
+Or using a lambda:
 
 ```kotlin
 val loggingInterceptor = PipelineInterceptor { context ->
@@ -59,84 +59,84 @@ val loggingInterceptor = PipelineInterceptor { context ->
 ```
 
 
-### Регистрация перехватчиков
+### Registering Interceptors
 
-Регистрируйте перехватчики в конвейере обработки:
+Register interceptors on the processing pipeline:
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // Регистрация перехватчика для фазы Setup
+    
+    // Register an interceptor for the Setup phase
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-        // Проверка забаненного пользователя
+        // Check if user is banned
         val user = context.update.userOrNull
         if (user != null && isBanned(user.id)) {
-            context.finish() // Остановка обработки
+            context.finish() // Stop processing
             return@intercept
         }
     }
-
-    // Регистрация перехватчика для фазы PreInvoke
+    
+    // Register an interceptor for the PreInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
-        // сохранение времени начала
+        // store start time
     }
-
-    // Регистрация перехватчика для фазы PostInvoke
+    
+    // Register an interceptor for the PostInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
-        val startTime = // получение времени начала
+        val startTime = // get start time
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             println("Handler took ${duration}ms")
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
 
-### Реальный пример: Аутентификация и метрики
+### Real-World Example: Authentication & Metrics
 
-Пример: бот, который требует аутентификацию для определенных команд, измеряет время выполнения обработчиков и логирует все команды.
+Example: a bot that requires authentication for certain commands, measures handler execution time, and logs all commands.
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // Фаза Setup: Проверка аутентификации пользователя
+    
+    // Setup phase: Check if user is authenticated
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
         val user = context.update.userOrNull ?: return@intercept
-
+        
         if (!isAuthenticated(user.id)) {
             message { "Please authenticate first using /login" }
                 .send(user, context.bot)
             context.finish()
         }
     }
-
-    // Фаза PreInvoke: Запуск таймера и проверка прав
+    
+    // PreInvoke phase: Start timer and check permissions
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
-
-        // Проверка прав пользователя для этого конкретного обработчика
+        
+        // Check if user has permission for this specific handler
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
             context.finish()
             return@intercept
         }
-
-        // Запуск таймера
-        // сохранение времени начала
+        
+        // Start timer
+        // store start time
     }
-
-    // Фаза PostInvoke: Логирование и очистка
+    
+    // PostInvoke phase: Log and cleanup
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
-        val startTime = // получение времени начала
-
+        val startTime = // get start time
+        
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             val logger = context.bot.config.loggerFactory.get("Metrics")
@@ -146,7 +146,7 @@ suspend fun main() {
             )
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
@@ -154,46 +154,46 @@ suspend fun main() {
 
 ### ProcessingContext
 
-`ProcessingContext` предоставляет доступ к:
+The `ProcessingContext` provides access to:
 
-- **`update: ProcessedUpdate`** - Текущее обновление в процессе обработки
-- **`bot: TelegramBot`** - Экземпляр бота
-- **`registry: ActivityRegistry`** - Реестр активностей
-- **`parsedInput: String`** - Распарсенный текст команды/ввода
-- **`parameters: Map<String, String>`** - Параметры команды
-- **`activity: Activity?`** - Найденный обработчик (null до фазы Match)
-- **`shouldProceed: Boolean`** - Следует ли продолжать обработку
-- **`additionalContext: AdditionalContext`** - Дополнительные данные контекста
-- **`finish()`** - Остановка обработки раньше времени
+- **`update: ProcessedUpdate`** - The current update being processed
+- **`bot: TelegramBot`** - The bot instance
+- **`registry: ActivityRegistry`** - The activity registry
+- **`parsedInput: String`** - The parsed command/input text
+- **`parameters: Map<String, String>`** - Parsed command parameters
+- **`activity: Activity?`** - The resolved handler (null until Match phase)
+- **`shouldProceed: Boolean`** - Whether processing should continue
+- **`additionalContext: AdditionalContext`** - Additional context data
+- **`finish()`** - Stop processing early
 
-#### Остановка обработки раньше времени
+#### Stopping Processing Early
 
-Вызовите `context.finish()` для остановки обработки:
+Call `context.finish()` to stop processing:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
     if (someCondition) {
-        context.finish() // Дальнейшие фазы выполняться не будут
+        context.finish() // No further phases will execute
     }
 }
 ```
 
-#### Хранение пользовательских данных
+#### Storing Custom Data
 
-Используйте `additionalContext` для передачи данных между перехватчиками:
+Use `additionalContext` to pass data between interceptors:
 
 ```kotlin
-// В PreInvoke
+// In PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// В PostInvoke
+// In PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
 
-### Несколько перехватчиков
+### Multiple Interceptors
 
-Вы можете зарегистрировать несколько перехватчиков для одной фазы. Они выполняются в порядке регистрации:
+You can register multiple interceptors for the same phase. They execute in registration order:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
@@ -204,67 +204,67 @@ bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     println("Second interceptor")
 }
 
-// При обработке обновления:
-// Вывод: "First interceptor"
-// Вывод: "Second interceptor"
+// When an update is processed:
+// Output: "First interceptor"
+// Output: "Second interceptor"
 ```
 
-Если перехватчик вызывает `context.finish()`, последующие перехватчики в этой фазе пропускаются, и последующие фазы не выполняются.
+If an interceptor calls `context.finish()`, subsequent interceptors in that phase are skipped, and later phases won't execute.
 
 
-### Лучшие практики
+### Best Practices
 
-#### 1. Используйте правильную фазу
+#### 1. Use the Right Phase
 
-- Setup: Глобальные проверки, фильтрация, начальная настройка
-- Parsing: Пользовательская логика парсинга
-- Match: Логика выбора обработчика
-- Validation: Права доступа, ограничение частоты, guard-проверки
-- PreInvoke: Подготовка конкретного обработчика
-- Invoke: Обычно обрабатывается перехватчиком по умолчанию
-- PostInvoke: Очистка, логирование, обработка ошибок
+- Setup: Global checks, filtering, initial setup
+- Parsing: Custom parsing logic
+- Match: Handler selection logic
+- Validation: Permissions, rate limits, guards
+- PreInvoke: Handler-specific preparation
+- Invoke: Usually handled by the default interceptor
+- PostInvoke: Cleanup, logging, error handling
 
-#### 2. Делайте перехватчики сфокусированными
+#### 2. Keep Interceptors Focused
 
-Каждый перехватчик должен делать одно действие:
+Each interceptor should do one thing:
 
 ```kotlin
-// ✅ Хорошо - сфокусированный перехватчик
+// ✅ Good - focused interceptor
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     if (isBanned(context.update.userOrNull?.id)) {
         context.finish()
     }
 }
 
-// ❌ Избегайте - слишком много действий
+// ❌ Avoid - doing too much
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-    // Аутентификация
-    // Логирование
-    // Метрики
-    // Ограничение частоты
-    // ... слишком много!
+    // Authentication
+    // Logging
+    // Metrics
+    // Rate limiting
+    // ... too much!
 }
 ```
 
-#### 3. Грамотно обрабатывайте ошибки
+#### 3. Handle Errors Gracefully
 
-Перехватчики не должны крашить бота:
+Interceptors should not crash the bot:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     try {
-        // Ваша логика
+        // Your logic
     } catch (e: Exception) {
         val logger = context.bot.config.loggerFactory.get("Interceptor")
         logger.error("Interceptor error", e)
-        // Не вызывайте context.finish() если не хотите останавливать обработку
+        // Don't call context.finish() unless you want to stop processing
     }
 }
 ```
 
-#### 4. Очищайте ресурсы
+#### 4. Clean Up Resources
 
-Если вы открываете ресурсы в `PreInvoke`, очищайте их в `PostInvoke`:
+If you open resources in `PreInvoke`, clean them up in `PostInvoke`:
 
 ```kotlin
 var timer: Timer? = null
@@ -280,82 +280,83 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 }
 ```
 
-#### 5. Порядок имеет значение
+#### 5. Order Matters
 
-Регистрируйте перехватчики в том порядке, в котором хотите их запускать:
+Register interceptors in the order you want them to run:
 
 ```kotlin
-// Более общие проверки сначала
+// More general checks first
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { 
-    // Глобальная проверка бана
+    // Global ban check
 }
 
-// Более специфичные проверки позже
+// More specific checks later
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { 
-    // Проверка прав конкретного обработчика
+    // Handler-specific permission check
 }
 ```
 
-#### 6. Используйте перехватчики для сквозных задач
+#### 6. Use Interceptors for Cross-Cutting Concerns
 
-Перехватчики идеальны для:
-- ✅ Аутентификация/авторизация
-- ✅ Логирование
-- ✅ Мониторинг производительности
-- ✅ Ограничение частоты
-- ✅ Обработка ошибок
-- ✅ Трансформация запросов/ответов
+Interceptors are ideal for:
+- ✅ Authentication/authorization
+- ✅ Logging
+- ✅ Metrics/performance monitoring
+- ✅ Rate limiting
+- ✅ Error handling
+- ✅ Request/response transformation
 
-Для логики конкретного обработчика оставляйте в самом обработчике.
+For handler-specific logic, keep it in the handler.
 
 
-### Перехватчики по умолчанию
+### Default Interceptors
 
-Фреймворк включает перехватчики по умолчанию для основной функциональности:
+The framework includes default interceptors for core functionality:
 
-- **DefaultSetupInterceptor**: Глобальное ограничение частоты
-- **DefaultParsingInterceptor**: Парсинг команд
-- **DefaultMatchInterceptor**: Сопоставление обработчиков (команды, ввод, общие матчеры)
-- **DefaultValidationInterceptor**: Guard-проверки и ограничение частоты на уровне обработчика
-- **DefaultInvokeInterceptor**: Выполнение обработчика и обработка ошибок
+- **DefaultSetupInterceptor**: Global rate limiting
+- **DefaultParsingInterceptor**: Command parsing
+- **DefaultMatchInterceptor**: Handler matching (commands, inputs, common matchers)
+- **DefaultValidationInterceptor**: Guard checks and per-handler rate limiting
+- **DefaultInvokeInterceptor**: Handler execution and error handling
 
-Ваши пользовательские перехватчики работают вместе с этими перехватчиками по умолчанию. Вы можете добавить логику до или после перехватчиков по умолчанию, но вы не можете удалить перехватчики по умолчанию.
+Your custom interceptors run alongside these defaults. You can add logic before or after the defaults, but you cannot remove the default interceptors.
 
 ---
 
-### Продвинутый: условные перехватчики
+### Advanced: Conditional Interceptors
 
-Вы можете делать перехватчики условными:
+You can make interceptors conditional:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
-
-    // Применять только к конкретным обработчикам
+    
+    // Only apply to specific handlers
     if (activity::class.simpleName?.contains("Admin") == true) {
-        // Логика для админ-обработчиков
+        // Admin-specific logic
         checkAdminPermissions(context)
     }
 }
 ```
 
 
-### Итог
+### Summary
 
-Перехватчики предоставляют чистый способ добавить сквозную логику в ваш бот:
+Interceptors provide a clean way to add cross-cutting logic to your bot:
 
-- ✅ **Семь фаз** для разных этапов обработки
-- ✅ **Простой API**: Просто реализуйте `PipelineInterceptor`
-- ✅ **Гибкие**: Регистрируйте несколько перехватчиков на фазу
-- ✅ **Мощные**: Доступ ко всему контексту обработки
-- ✅ **Безопасные**: Можно останавливать обработку раньше времени с `context.finish()`
+- ✅ **Seven phases** for different stages of processing
+- ✅ **Simple API**: Just implement `PipelineInterceptor`
+- ✅ **Flexible**: Register multiple interceptors per phase
+- ✅ **Powerful**: Access to full processing context
+- ✅ **Safe**: Can stop processing early with `context.finish()`
 
-Используйте перехватчики чтобы сохранять обработчики сфокусированными на бизнес-логике, пока сквозные задачи, такие как аутентификация, логирование и метрики, обрабатываются централизованно.
+Use interceptors to keep your handlers focused on business logic while handling shared concerns like authentication, logging, and metrics in a centralized way.
 
 ---
 
-### См. также
+### See also
 
-* [Функциональный DSL обработки](Functional-handling-DSL.md) - Функциональная обработка обновлений
-* [Guards](Guards.md) - Проверки прав доступа на уровне обработчика
+* [Handlers (incl. Functional DSL)](Handlers.md) - Annotation- and DSL-based handler definition
+* [Sessions](Sessions.md) - Per-chat / per-user state &amp; message tracking
+* [Guards](Guards.md) - Handler-level permission checks
 ---

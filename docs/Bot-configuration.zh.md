@@ -3,9 +3,9 @@
 title: Bot Configuration
 ---
 
-库提供了大量的配置选项，你可以在 [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) 类描述中查看 API 参考。
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
-配置机器人也有两种方法：
+There are also two approaches to configuring the bot:
 
 ### Configurator lambda
 
@@ -21,101 +21,121 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-### ConfigLoader 接口
+### ConfigLoader interface
 
-还有一种方法是通过特殊的 [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) 接口进行配置，<br/> 你可以用来从外部源（`properties`、`命令行参数`等）加载设置。
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
-这个接口的实现可以通过次级构造函数传递，实例将相应地进行配置。
+The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 
 ```kotlin
 val bot = TelegramBot(ConfigLoaderImpl)
 ```
 
-目前提供了几个实现该接口的模块，如 `ktgram-config-env`、`ktgram-config-toml`。
+Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
-### BotConfiguration 概述
+### BotConfiguration Overview
 
 #### BotConfiguration
 
-`BotConfiguration` 类是配置机器人的中心枢纽。它包含用于标识机器人、设置 API 主机、确定机器人是否在测试环境中运行、处理输入、管理类以及控制输入自动删除的属性。此外，它还提供用于速率限制、HTTP 客户端配置、日志记录、更新监听和命令解析的内部属性。
+The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
-##### 属性
+##### Properties
 
-- `identifier`: 在多机器人处理过程中标识不同的机器人实例。
-- `apiHost`: Telegram API 主机。
-- `isTestEnv`: 指示机器人是否在测试环境中运行的标志。
-- `inputListener`: 输入处理类的实例。
-- `classManager`: 用于获取类的管理器。
-- `inputAutoRemoval`: 在处理过程中调节输入点自动删除的标志。
-- `exceptionHandlingStrategy`: 定义异常处理策略。
-    * `CollectToChannel` - 收集到 `TgUpdateHandler.caughtExceptions`。
-    * `Throw` - 再次抛出并包装为 `TgException`。
-    * `DoNothing` - 什么都不做 :)
-    * `Handle` - 设置自定义处理器。
-- `throwExOnActionsFailure`: 当任何机器人请求失败时抛出异常。
+- `identifier`: Identifies different bot instances during multi-bot processing.
+- `apiHost`: Host of the Telegram API.
+- `isTestEnv`: Flag indicating whether the bot operates in a test environment.
+- `inputListener`: Instance of the input handling class.
+- `classManager`: Manager used to get classes.
+- `inputAutoRemoval`: Flag regulating the auto-deletion of the input point during processing.
+- `exceptionHandlingStrategy`: Defines the strategy for handling exceptions.
+    * `CollectToChannel` - Collect to `TgUpdateHandler.caughtExceptions`.
+    * `Throw` - Throw again wrapped with `TgException`.
+    * `DoNothing` - Do nothing :)
+    * `Handle` - Set custom handler.
+- `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
-##### 配置块
+##### Configuration Blocks
 
-`BotConfiguration` 还提供函数来配置其内部组件：
+`BotConfiguration` also offers functions to configure its internal components:
 
-- `httpClient(block: HttpConfiguration.() -> Unit)`: 配置 HTTP 客户端。
-- `logging(block: LoggingConfiguration.() -> Unit)`: 配置日志记录。
-- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: 配置请求限制。
-- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: 配置更新监听器。
-- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: 指定命令解析模式。
+- `httpClient(block: HttpConfiguration.() -> Unit)`: Configures the HTTP client.
+- `logging(block: LoggingConfiguration.() -> Unit)`: Configures logging.
+- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
+- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
+- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
-### 相关配置类
+### Associated Configuration Classes
 
 #### RateLimiterConfiguration
 
-配置全局速率限制。
+Configures global rate limiting.
 
-- `limits`: 全局速率限制。
-- `mechanism`: 用于速率限制的机制，默认为 TokenBucket 算法。
-- `exceededAction`: 超过限制时应用的动作。
+- `limits`: Global rate limits.
+- `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
+- `exceededAction`: Action applied when the limit is exceeded.
 
 #### HttpConfiguration
 
-包含机器人 HTTP 客户端的配置。
+Contains configuration for the bot's HTTP client.
 
-- `requestTimeoutMillis`: 请求超时（毫秒）。
-- `connectTimeoutMillis`: 连接超时（毫秒）。
-- `socketTimeoutMillis`: 套接字超时（毫秒）。
-- `maxRequestRetry`: HTTP 请求的最大重试次数。
-- `retryStrategy`: 重试策略，可自定义。
-- `retryDelay`: 每次重试的超时倍数。
-- `proxy`: HTTP 调用的代理设置。
-- `additionalHeaders`: 应用于每个请求的所有头信息。
+- `requestTimeoutMillis`: Request timeout in milliseconds.
+- `connectTimeoutMillis`: Connection timeout in milliseconds.
+- `socketTimeoutMillis`: Socket timeout in milliseconds.
+- `maxRequestRetry`: Maximum retry for HTTP requests.
+- `retryStrategy`: Strategy for retries, customizable.
+- `retryDelay`: Multiplier for timeout at each retry.
+- `proxy`: Proxy settings for HTTP calls.
+- `additionalHeaders`: Headers applied to every request.
 
 #### LoggingConfiguration
 
-管理机器人操作和 HTTP 请求的日志级别。
+Manages logging levels for bot actions and HTTP requests.
 
-- `botLogLevel`: 机器人操作的日志级别。
-- `httpLogLevel`: HTTP 请求的日志级别。
+- `botLogLevel`: Level of logs for bot actions.
+- `httpLogLevel`: Level of logs for HTTP requests.
 
 #### UpdatesListenerConfiguration
 
-配置与拉取更新相关的参数。
+Configures parameters related to pulling updates.
 
-- `dispatcher`: 收集传入更新的调度器。
-- `processingDispatcher`: 处理更新的调度器。
-- `pullingDelay`: 每次拉取请求后的延迟。
-- `updatesPollingTimeout`: 长轮询机制的超时选项。
+- `dispatcher`: Dispatcher for collecting incoming updates.
+- `processingDispatcher`: Dispatcher for processing updates.
+- `pullingDelay`: Delay after each pulling request.
+- `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
 #### CommandParsingConfiguration
 
-指定命令解析的参数。
+Specifies parameters for command parsing.
 
-- `commandDelimiter`: 命令和参数之间的分隔符。
-- `parametersDelimiter`: 参数之间的分隔符。
-- `parameterValueDelimiter`: 参数键和值之间的分隔符。
-- `restrictSpacesInCommands`: 指示命令中的空格是否应被视为命令结束的标志。
-- `useIdentifierInGroupCommands`: 使用机器人的标识符来匹配包含 @ 的命令。
+- `commandDelimiter`: Separator between command and parameters.
+- `parametersDelimiter`: Separator between parameters.
+- `parameterValueDelimiter`: Separator between key and value of parameter.
+- `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
+- `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-### 示例配置
+#### SessionConfiguration *(added in 9.5)*
 
-这是如何使用这些类配置机器人的示例：
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
+
+### Example Configuration
+
+Here's an example of how to configure a bot using these classes:
 
 ```kotlin
 val bot = TelegramBot("TOKEN") {
@@ -147,6 +167,7 @@ val bot = TelegramBot("TOKEN") {
 }
 ```
 
-此配置设置了一个具有特定标识符的机器人，启用测试环境模式，配置速率限制、HTTP 客户端设置、日志级别、更新监听器参数和命令解析规则。
+This configuration sets up a bot with specific identifiers, enables test environment mode, configures rate limiting, HTTP client settings, logging levels, update listener parameters, and command parsing rules.
 
-通过利用这些配置选项，开发人员可以微调他们的机器人以满足特定需求，并在各种操作场景中优化性能。
+By leveraging these configuration options, developers can fine-tune their bots to meet specific requirements and optimize performance across various operational scenarios.
+---

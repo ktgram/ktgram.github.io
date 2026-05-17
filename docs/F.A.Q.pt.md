@@ -3,24 +3,24 @@
 title: F.A.Q
 ---
 
-### Exceção `AbstractMethodError`
+### `AbstractMethodError` exception
 
-Se você está obtendo essa exceção ao iniciar seu aplicativo:
+Se você está recebendo essa exceção na inicialização da sua aplicação:
 
 ```kotlin
 Exception in thread "DefaultDispatcher-worker-1" java.lang.AbstractMethodError: 'kotlinx.serialization.KSerializer[] kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()'
 	at eu.vendeli.tgbot.types.options.GetUpdatesOptions$$serializer.typeParametersSerializers(GetUpdatesOptions.kt:6)
 ```
 
-Isso acontece porque seu sistema de build está resolvendo uma biblioteca de serialização antiga cuja mecânica interna difere.
-Para resolver isso você deve fazer com que use uma versão mais recente, por exemplo adicionando isso ao seu buildscript:
+Isso acontece porque o seu sistema de build está resolvendo uma biblioteca de serialização antiga, cuja mecânica interna difere.  
+Para resolver, faça com que ele use uma versão mais nova, por exemplo adicionando isto ao seu buildscript:
 
 ```kotlin
 configurations.all {
     resolutionStrategy.eachDependency {
-        val serdeVer = "x.x.x" // deve ser >= 1.8.0
+        val serdeVer = "x.x.x" // should be >= 1.8.0
         when(requested.module.toString()) {
-            // serialização json
+            // json serialiazaton
             "org.jetbrains.kotlinx:kotlinx-serialization-json" -> useVersion(serdeVer)
             "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm" -> useVersion(serdeVer)
             "org.jetbrains.kotlinx:kotlinx-serialization-core" -> useVersion(serdeVer)
@@ -31,39 +31,39 @@ configurations.all {
 }
 ```
 
-(Se isso estivesse bem descrito no changelog eu nunca teria atualizado, pois estou recebendo tantos relatórios sobre esse problema)
+(Se estivesse bem descrito no changelog, eu nunca teria atualizado porque recebo muitos relatórios sobre esse problema)
 
-### Como obter a resposta do método?
+### How do I get the method's response?
 
-Para obter uma resposta e poder operar sobre ela, você precisa usar `sendReturning` no final do método em vez de `send`.
+Para obter uma resposta e poder operá‑la, você precisa usar `sendReturning` ao final do método ao invés de `send`.
 
-Nesse caso a classe `Response` é retornada, que contém a resposta, sucesso ou falha, e você precisa ou lidar com a falha ou simplesmente chamar `getOrNull()`.
+Nesse caso a classe `Response` é retornada, contendo a resposta, sucesso ou falha; então você deve tratar a falha ou simplesmente chamar `getOrNull()`.
 
-Há uma seção sobre: [Processando respostas](https://github.com/vendelieu/telegram-bot#processing-responses).
+Há uma seção sobre: [Processing responses](https://github.com/vendelieu/telegram-bot#processing-responses).
 
-### Estou recebendo erro ao usar `spring-boot-devtools`
+### I'm getting error while using `spring-boot-devtools`
 
-Isso acontece porque `spring-boot-devtools` tem seu próprio `classloader` e ele não encontra os métodos.
+Isso ocorre porque o `spring-boot-devtools` tem seu próprio `classloader` e não encontra os métodos.
 
-Você precisa adicionar ao `resources/META-INF/spring-devtools.properties`:
+Você precisa adicionar em `resources/META-INF/spring-devtools.properties`:
 
 ```properties
 restart.include.generated=/eu.vendeli
 ```
 
-### Como alterar o engine do ktor
+### How to change ktor engine
 
-Se você quiser alterar o engine usado pelo cliente você pode simplesmente alterar o [parâmetro](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) nas [configurações do plugin](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
+Se você quiser mudar o engine usado pelo cliente, basta alterar o [parâmetro](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/ktor-jvm-engine.html) nas [configurações do plugin](https://vendelieu.github.io/telegram-bot/ktgram-gradle-plugin/eu.vendeli.ktgram.gradle/-kt-gram-ext/index.html).
 
-### Como usar meu provedor de logging favorito
+### How to use my favorite logging provider
 
-A biblioteca usa `slf4j-api` e para usar o provedor você só precisa adicioná-lo às dependências.
+A biblioteca usa `slf4j-api` e, para usar o provedor, basta adicioná‑lo nas dependências.
 
-O plugin da biblioteca detecta automaticamente o uso do provedor, se o provedor estiver ausente, `logback` será usado por padrão.
+O plugin da biblioteca detecta automaticamente o uso do provedor; se o provedor estiver ausente, `logback` será usado por padrão.
 
-### Capturar exceções de rede dentro do manipulador de long-polling
+### Catch network exceptions within long-polling handler
 
-Por exemplo, se você tem uma conexão instável e precisa capturar um erro por causa disso, talvez essa abordagem ajude você:
+Por exemplo, se você tem uma conexão instável e precisa capturar um erro por causa disso, talvez esta abordagem ajude:
 
 ```kotlin
 fun main() {
@@ -72,7 +72,7 @@ fun main() {
     try {
         bot.handleUpdates()
     } catch (e: Exception) {
-        // lidar se necessário
+        // handle if needed
         
         bot.update.stopListener()
         bot.handleUpdates()
@@ -80,4 +80,6 @@ fun main() {
 }
 ```
 
-Você também pode dar uma olhada em como isso é feito no [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
+Também pode ver como isso é feito no [spring-starter](https://github.com/vendelieu/telegram-bot/blob/1584d40f9a94a8c31bba9e7614c0070155630a52/spring-ktgram-starter/src/jvmMain/kotlin/eu/vendeli/spring/starter/TelegramAutoConfiguration.kt#L53).
+
+---

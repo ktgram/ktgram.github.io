@@ -1,51 +1,49 @@
 ---
 ---
-title: इंटरसेप्टर (मिडलवेयर)
+title: Interceptors (Middleware)
 ---
 
-### इंटरसेप्टर: आपके बॉट के लिए क्रॉस-कटिंग लॉजिक
+### Interceptors: Cross-Cutting Logic for Your Bot
 
-टेलीग्राम बॉट बनाते समय, आप अक्सर हैंडलर्स के बीच सेटअप, चेक या क्लीनअप को दोहराते हैं। इंटरसेप्टर आपको हैंडलर्स के चारों ओर साझा लॉजिक प्लग करने देते हैं, जिससे हैंडलर्स केंद्रित और बनाए रखने योग्य बने रहते हैं।
+जब आप एक Telegram बॉट बनाते हैं, तो अक्सर हैंडलर्स के बीच सेटअप, चेक्स या क्लीनअप दोहराते हैं। Interceptors आपको हैंडलर्स के आसपास साझा लॉजिक प्लग इन करने देते हैं, जिससे हैंडलर्स केंद्रित और मेंटेनेबल रहते हैं।
 
-*telegram-bot* में इंटरसेप्टर कैसे काम करते हैं और उनका उपयोग कैसे करें, यहां देखें।
+यहाँ *telegram-bot* में interceptors कैसे काम करते हैं और उन्हें कैसे उपयोग किया जाता है।
 
-### इंटरसेप्टर क्या हैं? (सरल व्याख्या)
+### What Are Interceptors? (Simple Explanation)
 
-इंटरसेप्टर वे फ़ंक्शन हैं जो अपडेट प्रोसेसिंग पाइपलाइन में विशिष्ट बिंदुओं पर चलते हैं। वे आपको अनुमति देते हैं:
-- प्रोसेसिंग संदर्भ को निरीक्षण और संशोधित करना
-- क्रॉस-कटिंग लॉजिक जोड़ना (लॉगिंग, ऑथेंटिकेशन, मेट्रिक्स)
-- यदि आवश्यक हो तो प्रोसेसिंग को जल्दी रोकना
-- प्रोसेसिंग के बाद संसाधनों की सफाई करना
+Interceptors फ़ंक्शन होते हैं जो अपडेट प्रोसेसिंग पाइपलाइन के विशिष्ट बिंदुओं पर चलते हैं। वे आपको:
+- प्रोसेसिंग कॉन्टेक्स्ट की जाँच और संशोधन करने देते हैं
+- क्रॉस-कटिंग लॉजिक (लॉगिंग, ऑथ, मेट्रिक्स) जोड़ते हैं
+- आवश्यक होने पर प्रोसेसिंग को जल्दी रोक सकते हैं
+- प्रोसेसिंग के बाद संसाधनों की सफ़ाई करते हैं
 
-इंटरसेप्टर को चेकपॉइंट के रूप में सोचें जिससे हर अपडेट हैंडलर निष्पादन से पहले, दौरान और बाद में गुजरता है।
+इन्हें ऐसे चेकपॉइंट समझें जिनसे हर अपडेट हैंडलर निष्पादन से पहले, दौरान और बाद पास करता है।
 
+### The Processing Pipeline
 
-### प्रोसेसिंग पाइपलाइन
+बॉट अपडेट्स को सात चरणों वाली पाइपलाइन के माध्यम से प्रोसेस करता है:
 
-बॉट अपडेट को सात चरणों वाली पाइपलाइन के माध्यम से प्रोसेस करता है:
-
-| चरण | कब चलता है | आप इसका उपयोग किस लिए कर सकते हैं |
+| Phase | When It Runs | What You Can Use It For |
 |-------|--------------|-------------------------|
-| **सेटअप** | अपडेट आते ही, प्रोसेसिंग से पहले | ✔ वैश्विक दर सीमित करना<br>✔ स्पैम या विकृत अपडेट को फ़िल्टर करना<br>✔ प्रारंभिक लॉगिंग<br>✔ साझा संदर्भ सेटअप करना |
-| **पार्सिंग** | सेटअप के बाद, कमांड और पैरामीटर निकालता है | ✔ कस्टम कमांड पार्सिंग<br>✔ पार्स किए गए डेटा के साथ संदर्भ को समृद्ध करना<br>✔ अपडेट संरचना को मान्य करना |
-| **मैच** | उपयुक्त हैंडलर (कमांड/इनपुट/कॉमन) ढूंढता है | ✔ हैंडलर चयन को ओवरराइड करना<br>✔ कस्टम इनपुट हैंडलिंग लॉजिक<br>✔ मैच किए गए हैंडलर्स को लॉग करना |
-| **मान्यकरण** | हैंडलर मिलने के बाद, निष्पादन से पहले | ✔ हैंडलर-विशिष्ट अनुमतियाँ<br>✔ हैंडलर प्रति दर सीमित करना<br>✔ गार्ड चेक<br>✔ यदि शर्तें पूरी न हों तो प्रोसेसिंग रद्द करना |
-| **प्रीइन्वोक** | हैंडलर चलने से तुरंत पहले | ✔ अंतिम मिनट की जाँच<br>✔ टाइमर/मेट्रिक्स शुरू करना<br>✔ हैंडलर के लिए संदर्भ को समृद्ध करना<br>✔ हैंडलर व्यवहार को संशोधित करना |
-| **इन्वोक** | यहाँ हैंडलर निष्पादित होता है | ✔ हैंडलर निष्पादन को लपेटना<br>✔ त्रुटि हैंडलिंग<br>✔ हैंडलर परिणामों को लॉग करना |
-| **पोस्टइन्वोक** | हैंडलर पूरा होने के बाद (सफल या विफल) | ✔ संसाधनों की सफाई करना<br>✔ परिणामों को लॉग करना<br>✔ त्रुटियों पर फॉलबैक संदेश भेजना<br>✔ लौटने से पहले परिणामों को संशोधित करना |
+| **Setup** | अपडेट के आने पर, किसी भी प्रोसेसिंग से पहले | ✔ ग्लोबल रेट लिमिटिंग<br>✔ स्पैम या मालफ़ॉर्म्ड अपडेट को फ़िल्टर करें<br>✔ शुरुआती लॉगिंग<br>✔ साझा कॉन्टेक्स्ट सेटअप |
+| **Parsing** | सेटअप के बाद, कमांड और पैरामीटर निकालता है | ✔ कस्टम कमांड पार्सिंग<br>✔ पार्स्ड डेटा के साथ कॉन्टेक्स्ट को समृद्ध करें<br>✔ अपडेट संरचना को वैलिडेट करें |
+| **Match** | उपयुक्त हैंडलर (Command/Input/Common) ढूँढता है | ✔ हैंडलर चयन को ओवरराइड करें<br>✔ कस्टम इनपुट हैंडलिंग लॉजिक<br>✔ मैच्ड हैंडलर्स को लॉग करें |
+| **Validation** | हैंडलर मिलने के बाद, इन्कोरेशन से पहले | ✔ हैंडलर-विशिष्ट परमिशन्स<br>✔ प्रति हैंडलर रेट लिमिटिंग<br>✔ गार्ड चेक्स<br>✔ यदि शर्तें पूरी नहीं हों तो प्रोसेसिंग कैंसल करें |
+| **PreInvoke** | हैंडलर चलने से ठीक पहले | ✔ अंतिम मिनट की चेक्स<br>✔ टाइमर/मेट्रिक्स शुरू करें<br>✔ हैंडलर के लिए कॉन्टेक्स्ट समृद्ध करें<br>✔ हैंडलर व्यवहार को बदलें |
+| **Invoke** | यहाँ हैंडलर चलाया जाता है | ✔ हैंडलर निष्पादन को रैप करें<br>✔ एरर हैंडलिंग<br>✔ हैंडलर परिणामों को लॉग करें |
+| **PostInvoke** | हैंडलर समाप्त होने के बाद (सफल या विफल) | ✔ रिसोर्सेज़ क्लीनअप<br>✔ परिणाम लॉग करें<br>✔ एरर पर फ़ॉलबैक संदेश भेजें<br>✔ रिटर्न से पहले परिणाम बदलें |
 
+### Creating an Interceptor
 
-### इंटरसेप्टर बनाना
-
-एक इंटरसेप्टर एक साधारण फ़ंक्शन है जो `ProcessingContext` प्राप्त करता है:
+एक interceptor एक साधारण फ़ंक्शन है जो `ProcessingContext` प्राप्त करता है:
 
 ```kotlin
 import eu.vendeli.tgbot.core.PipelineInterceptor
 import eu.vendeli.tgbot.types.component.ProcessingContext
 
 val myInterceptor: PipelineInterceptor = { context ->
-    // आपकी लॉजिक यहाँ
-    println("प्रोसेसिंग अपडेट: ${context.update.updateId}")
+    // Your logic here
+    println("Processing update: ${context.update.updateId}")
 }
 ```
 
@@ -54,89 +52,88 @@ val myInterceptor: PipelineInterceptor = { context ->
 ```kotlin
 val loggingInterceptor = PipelineInterceptor { context ->
     val logger = context.bot.config.loggerFactory.get("MyInterceptor")
-    logger.info("प्रोसेसिंग अपडेट #${context.update.updateId}")
+    logger.info("Processing update #${context.update.updateId}")
 }
 ```
 
+### Registering Interceptors
 
-### इंटरसेप्टर पंजीकृत करना
-
-प्रोसेसिंग पाइपलाइन पर इंटरसेप्टर पंजीकृत करें:
+इंटरसेप्टर्स को प्रोसेसिंग पाइपलाइन पर रजिस्टर करें:
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // सेटअप चरण के लिए इंटरसेप्टर पंजीकृत करें
+    
+    // Register an interceptor for the Setup phase
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-        // जांचें कि उपयोगकर्ता प्रतिबंधित है या नहीं
+        // Check if user is banned
         val user = context.update.userOrNull
         if (user != null && isBanned(user.id)) {
-            context.finish() // प्रोसेसिंग रोकें
+            context.finish() // Stop processing
             return@intercept
         }
     }
-
-    // प्रीइन्वोक चरण के लिए इंटरसेप्टर पंजीकृत करें
+    
+    // Register an interceptor for the PreInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val startTime = System.currentTimeMillis()
-        // स्टार्ट समय स्टोर करें
+        // store start time
     }
-
-    // पोस्टइन्वोक चरण के लिए इंटरसेप्टर पंजीकृत करें
+    
+    // Register an interceptor for the PostInvoke phase
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
-        val startTime = // स्टार्ट समय प्राप्त करें
+        val startTime = // get start time
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             println("Handler took ${duration}ms")
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
 
-### वास्तविक उदाहरण: ऑथेंटिकेशन और मेट्रिक्स
+### Real-World Example: Authentication & Metrics
 
-उदाहरण: एक बॉट जिसके लिए कुछ कमांड के लिए ऑथेंटिकेशन आवश्यक है, हैंडलर निष्पादन समय मापता है, और सभी कमांड को लॉग करता है।
+उदाहरण: एक बॉट जो कुछ कमांड्स के लिए ऑथेंटिकेशन की आवश्यकता रखता है, हैंडलर एक्ज़ीक्यूशन टाइम मापता है, और सभी कमांड्स को लॉग करता है।
 
 ```kotlin
 suspend fun main() {
     val bot = TelegramBot("BOT_TOKEN")
-
-    // सेटअप चरण: जांचें कि उपयोगकर्ता प्रमाणित है या नहीं
+    
+    // Setup phase: Check if user is authenticated
     bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
         val user = context.update.userOrNull ?: return@intercept
-
+        
         if (!isAuthenticated(user.id)) {
             message { "Please authenticate first using /login" }
                 .send(user, context.bot)
             context.finish()
         }
     }
-
-    // प्रीइन्वोक चरण: टाइमर शुरू करें और अनुमतियाँ जाँचें
+    
+    // PreInvoke phase: Start timer and check permissions
     bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
         val activity = context.activity ?: return@intercept
         val user = context.update.userOrNull ?: return@intercept
-
-        // जाँचें कि उपयोगकर्ता के पास यह विशिष्ट हैंडलर के लिए अनुमति है या नहीं
+        
+        // Check if user has permission for this specific handler
         if (!hasPermission(user.id, activity)) {
             message { "You don't have permission to use this command." }
                 .send(user, context.bot)
             context.finish()
             return@intercept
         }
-
-        // टाइमर शुरू करें
-        // स्टार्ट समय स्टोर करें
+        
+        // Start timer
+        // store start time
     }
-
-    // पोस्टइन्वोक चरण: लॉग और सफाई
+    
+    // PostInvoke phase: Log and cleanup
     bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
         val activity = context.activity ?: return@intercept
-        val startTime = // स्टार्ट समय प्राप्त करें
-
+        val startTime = // get start time
+        
         if (startTime != null) {
             val duration = System.currentTimeMillis() - startTime
             val logger = context.bot.config.loggerFactory.get("Metrics")
@@ -146,7 +143,7 @@ suspend fun main() {
             )
         }
     }
-
+    
     bot.handleUpdates()
 }
 ```
@@ -154,117 +151,116 @@ suspend fun main() {
 
 ### ProcessingContext
 
-`ProcessingContext` निम्नलिखित तक पहुंच प्रदान करता है:
+`ProcessingContext` निम्नलिखित प्रदान करता है:
 
-- **`update: ProcessedUpdate`** - प्रोसेस किया जा रहा वर्तमान अपडेट
-- **`bot: TelegramBot`** - बॉट उदाहरण
-- **`registry: ActivityRegistry`** - एक्टिविटी रजिस्ट्री
+- **`update: ProcessedUpdate`** - वर्तमान अपडेट जो प्रोसेस हो रहा है
+- **`bot: TelegramBot`** - बॉट इंस्टेंस
+- **`registry: ActivityRegistry`** - एक्टिविटी रेगिस्ट्री
 - **`parsedInput: String`** - पार्स किया गया कमांड/इनपुट टेक्स्ट
-- **`parameters: Map<String, String>`** - पार्स किए गए कमांड पैरामीटर
-- **`activity: Activity?`** - रिज़ॉल्व किया गया हैंडलर (मैच चरण तक null)
-- **`shouldProceed: Boolean`** - क्या प्रोसेसिंग जारी रखनी चाहिए
-- **`additionalContext: AdditionalContext`** - अतिरिक्त संदर्भ डेटा
-- **`finish()`** - प्रोसेसिंग को जल्दी रोकें
+- **`parameters: Map<String, String>`** - पार्स्ड कमांड पैरामीटर्स
+- **`activity: Activity?`** - रिज़ॉल्व्ड हैंडलर (Match फेज़ तक null)
+- **`shouldProceed: Boolean`** - क्या प्रोसेसिंग जारी रहनी चाहिए
+- **`additionalContext: AdditionalContext`** - अतिरिक्त कॉन्टेक्स्ट डेटा
+- **`finish()`** - जल्दी प्रोसेसिंग रोकें
 
-#### प्रोसेसिंग को जल्दी रोकना
+#### Stopping Processing Early
 
-प्रोसेसिंग रोकने के लिए `context.finish()` कॉल करें:
+`context.finish()` को कॉल करें ताकि प्रोसेसिंग रुक जाए:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { context ->
     if (someCondition) {
-        context.finish() // कोई भी बाद के चरण नहीं चलेंगे
+        context.finish() // No further phases will execute
     }
 }
 ```
 
-#### कस्टम डेटा स्टोर करना
+#### Storing Custom Data
 
 इंटरसेप्टर्स के बीच डेटा पास करने के लिए `additionalContext` का उपयोग करें:
 
 ```kotlin
-// प्रीइन्वोक में
+// In PreInvoke
 context.additionalContext["userId"] = context.update.userOrNull?.id
 
-// पोस्टइन्वोक में
+// In PostInvoke
 val userId = context.additionalContext["userId"] as? Long
 ```
 
 
-### एकाधिक इंटरसेप्टर
+### Multiple Interceptors
 
-आप एक ही चरण के लिए एकाधिक इंटरसेप्टर पंजीकृत कर सकते हैं। वे पंजीकरण क्रम में निष्पादित होते हैं:
+आप एक ही चरण के लिए कई इंटरसेप्टर्स रजिस्टर कर सकते हैं। वे रजिस्ट्रेशन क्रम में चलेंगे:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-    println("पहला इंटरसेप्टर")
+    println("First interceptor")
 }
 
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-    println("दूसरा इंटरसेप्टर")
+    println("Second interceptor")
 }
 
-// जब कोई अपडेट प्रोसेस होता है:
-// आउटपुट: "पहला इंटरसेप्टर"
-// आउटपुट: "दूसरा इंटरसेप्टर"
+// When an update is processed:
+// Output: "First interceptor"
+// Output: "Second interceptor"
 ```
 
-यदि कोई इंटरसेप्टर `context.finish()` कॉल करता है, तो उस चरण में बाद के इंटरसेप्टर छोड़ दिए जाते हैं, और बाद के चरण नहीं चलेंगे।
+यदि कोई इंटरसेप्टर `context.finish()` कॉल करता है, तो उसी चरण के बाद के इंटरसेप्टर्स स्किप हो जाएंगे, और बाद के चरण नहीं चलेंगे।
 
+### Best Practices
 
-### सर्वोत्तम प्रथाएँ
+#### 1. Use the Right Phase
 
-#### 1. सही चरण का उपयोग करें
+- Setup: ग्लोबल चेक्स, फ़िल्टरिंग, शुरुआती सेटअप
+- Parsing: कस्टम पार्सिंग लॉजिक
+- Match: हैंडलर चयन लॉजिक
+- Validation: परमिशन्स, रेट लिमिट्स, गार्ड्स
+- PreInvoke: हैंडलर-विशिष्ट तैयारी
+- Invoke: आमतौर पर डिफ़ॉल्ट इंटरसेप्टर द्वारा हैंडल किया जाता है
+- PostInvoke: क्लीनअप, लॉगिंग, एरर हैंडलिंग
 
-- सेटअप: वैश्विक जाँच, फ़िल्टरिंग, प्रारंभिक सेटअप
-- पार्सिंग: कस्टम पार्सिंग लॉजिक
-- मैच: हैंडलर चयन लॉजिक
-- मान्यकरण: अनुमतियाँ, दर सीमित करना, गार्ड
-- प्रीइन्वोक: हैंडलर-विशिष्ट तैयारी
-- इन्वोक: आमतौर पर डिफ़ॉल्ट इंटरसेप्टर द्वारा संभाला जाता है
-- पोस्टइन्वोक: सफाई, लॉगिंग, त्रुटि हैंडलिंग
+#### 2. Keep Interceptors Focused
 
-#### 2. इंटरसेप्टर्स केंद्रित रखें
-
-प्रत्येक इंटरसेप्टर को एक चीज़ करनी चाहिए:
+हर इंटरसेप्टर को एक काम करना चाहिए:
 
 ```kotlin
-// ✅ अच्छा - केंद्रित इंटरसेप्टर
+// ✅ Good - focused interceptor
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
     if (isBanned(context.update.userOrNull?.id)) {
         context.finish()
     }
 }
 
-// ❌ टालें - बहुत कुछ करना
+// ❌ Avoid - doing too much
 bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { context ->
-    // ऑथेंटिकेशन
-    // लॉगिंग
-    // मेट्रिक्स
-    // दर सीमित करना
-    // ... बहुत कुछ!
+    // Authentication
+    // Logging
+    // Metrics
+    // Rate limiting
+    // ... too much!
 }
 ```
 
-#### 3. त्रुटियों को विनम्रता से संभालें
+#### 3. Handle Errors Gracefully
 
-इंटरसेप्टर्स को बॉट को क्रैश नहीं करना चाहिए:
+इंटरसेप्टर बॉट को क्रैश नहीं करना चाहिए:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     try {
-        // आपकी लॉजिक
+        // Your logic
     } catch (e: Exception) {
         val logger = context.bot.config.loggerFactory.get("Interceptor")
         logger.error("Interceptor error", e)
-        // जब तक आप प्रोसेसिंग रोकना न चाहें, context.finish() न कॉल करें
+        // Don't call context.finish() unless you want to stop processing
     }
 }
 ```
 
-#### 4. संसाधनों की सफाई करें
+#### 4. Clean Up Resources
 
-यदि आप `प्रीइन्वोक` में संसाधन खोलते हैं, तो `पोस्टइन्वोक` में उनकी सफाई करें:
+यदि आप `PreInvoke` में संसाधन खोलते हैं, तो उन्हें `PostInvoke` में साफ़ करें:
 
 ```kotlin
 var timer: Timer? = null
@@ -280,82 +276,82 @@ bot.update.pipeline.intercept(ProcessingPipePhase.PostInvoke) { context ->
 }
 ```
 
-#### 5. क्रम मायने रखता है
+#### 5. Order Matters
 
-जिस क्रम में आप चाहते हैं उस क्रम में इंटरसेप्टर पंजीकृत करें:
+इंटरसेप्टर्स को उस क्रम में रजिस्टर करें जिसमें आप चाहते हैं कि वे चलें:
 
 ```kotlin
-// अधिक सामान्य जाँच पहले
-bot.update.pipeline.intercept(ProcessingPipePhase.Setup) {
-    // वैश्विक प्रतिबंध जाँच
+// More general checks first
+bot.update.pipeline.intercept(ProcessingPipePhase.Setup) { 
+    // Global ban check
 }
 
-// अधिक विशिष्ट जाँच बाद में
-bot.update.pipeline.intercept(ProcessingPipePhase.Validation) {
-    // हैंडलर-विशिष्ट अनुमति जाँच
+// More specific checks later
+bot.update.pipeline.intercept(ProcessingPipePhase.Validation) { 
+    // Handler-specific permission check
 }
 ```
 
-#### 6. क्रॉस-कटिंग चिंताओं के लिए इंटरसेप्टर का उपयोग करें
+#### 6. Use Interceptors for Cross-Cutting Concerns
 
-इंटरसेप्टर निम्नलिखित के लिए आदर्श हैं:
-- ✅ ऑथेंटिकेशन/अनुमति
+इंटरसेप्टर्स आदर्श हैं:
+- ✅ ऑथेंटिकेशन/ऑथराइजेशन
 - ✅ लॉगिंग
-- ✅ मेट्रिक्स/प्रदर्शन निगरानी
-- ✅ दर सीमित करना
-- ✅ त्रुटि हैंडलिंग
-- ✅ अनुरोध/प्रतिक्रिया रूपांतरण
+- ✅ मेट्रिक्स/परफ़ॉर्मेंस मॉनिटरिंग
+- ✅ रेट लिमिटिंग
+- ✅ एरर हैंडलिंग
+- ✅ रिक्वेस्ट/रेस्पॉन्स ट्रांसफ़ॉर्मेशन
 
-हैंडलर-विशिष्ट लॉजिक के लिए, उसे हैंडलर में ही रखें।
+हैंडलर-विशिष्ट लॉजिक को हैंडलर में रखें।
 
+### Default Interceptors
 
-### डिफ़ॉल्ट इंटरसेप्टर
+फ़्रेमवर्क में कोर फ़ंक्शनैलिटी के लिए डिफ़ॉल्ट इंटरसेप्टर्स शामिल हैं:
 
-फ्रेमवर्क में मूल कार्यक्षमता के लिए डिफ़ॉल्ट इंटरसेप्टर शामिल हैं:
-
-- **DefaultSetupInterceptor**: वैश्विक दर सीमित करना
+- **DefaultSetupInterceptor**: ग्लोबल रेट लिमिटिंग
 - **DefaultParsingInterceptor**: कमांड पार्सिंग
-- **DefaultMatchInterceptor**: हैंडलर मिलान (कमांड, इनपुट, कॉमन मैचर)
-- **DefaultValidationInterceptor**: गार्ड चेक और प्रति-हैंडलर दर सीमित करना
-- **DefaultInvokeInterceptor**: हैंडलर निष्पादन और त्रुटि हैंडलिंग
+- **DefaultMatchInterceptor**: हैंडलर मैचिंग (कमांड्स, इनपुट्स, कॉमन मैचर्स)
+- **DefaultValidationInterceptor**: गार्ड चेक्स और प्रति-हैंडलर रेट लिमिटिंग
+- **DefaultInvokeInterceptor**: हैंडलर निष्पादन और एरर हैंडलिंग
 
-आपके कस्टम इंटरसेप्टर इन डिफ़ॉल्टों के साथ-साथ चलते हैं। आप डिफ़ॉल्ट से पहले या बाद में लॉजिक जोड़ सकते हैं, लेकिन आप डिफ़ॉल्ट इंटरसेप्टर नहीं हटा सकते।
+आपके कस्टम इंटरसेप्टर्स इन डिफ़ॉल्ट्स के साथ चलेंगे। आप डिफ़ॉल्ट इंटरसेप्टर्स से पहले या बाद में लॉजिक जोड़ सकते हैं, लेकिन उन्हें हटाया नहीं जा सकता।
 
 ---
 
-### उन्नत: शर्तीय इंटरसेप्टर
+### Advanced: Conditional Interceptors
 
 आप इंटरसेप्टर को शर्तीय बना सकते हैं:
 
 ```kotlin
 bot.update.pipeline.intercept(ProcessingPipePhase.PreInvoke) { context ->
     val activity = context.activity ?: return@intercept
-
-    // केवल विशिष्ट हैंडलर्स पर लागू करें
+    
+    // Only apply to specific handlers
     if (activity::class.simpleName?.contains("Admin") == true) {
-        // एडमिन-विशिष्ट लॉजिक
+        // Admin-specific logic
         checkAdminPermissions(context)
     }
 }
 ```
 
 
-### सारांश
+### Summary
 
-इंटरसेप्टर आपके बॉट में क्रॉस-कटिंग लॉजिक जोड़ने का एक स्वच्छ तरीका प्रदान करते हैं:
+इंटरसेप्टर्स आपके बॉट में क्रॉस-कटिंग लॉजिक जोड़ने का एक साफ़ तरीका प्रदान करते हैं:
 
-- ✅ **सात चरण** प्रोसेसिंग के विभिन्न चरणों के लिए
-- ✅ **सरल API**: बस `PipelineInterceptor` को लागू करें
-- ✅ **लचीला**: प्रति चरण एकाधिक इंटरसेप्टर पंजीकृत करें
-- ✅ **शक्तिशाली**: पूर्ण प्रोसेसिंग संदर्भ तक पहुंच
-- ✅ **सुरक्षित**: `context.finish()` के साथ प्रोसेसिंग को जल्दी रोक सकते हैं
+- ✅ **सेवन चरण** विभिन्न प्रोसेसिंग स्टेज़ के लिए
+- ✅ **सरल API**: सिर्फ `PipelineInterceptor` इम्प्लीमेंट करें
+- ✅ **लचीला**: प्रति चरण कई इंटरसेप्टर रजिस्टर कर सकते हैं
+- ✅ **शक्तिशाली**: पूरा प्रोसेसिंग कॉन्टेक्स्ट एक्सेस करा
+- ✅ **सेफ़**: `context.finish()` से जल्दी प्रोसेसिंग रोक सकते हैं
 
-इंटरसेप्टर का उपयोग करके अपने हैंडलर्स को व्यावसायिक लॉजिक पर केंद्रित रखें जबकि ऑथेंटिकेशन, लॉगिंग और मेट्रिक्स जैसी साझा चिंताओं को केंद्रीकृत तरीके से संभालें।
+इंटरसेप्टर्स का उपयोग करके अपने हैंडलर्स को बिज़नेस लॉजिक पर केंद्रित रखें, जबकि ऑथेंटिकेशन, लॉगिंग और मेट्रिक्स जैसी साझा चिंताओं को केंद्रित तरीके से संभालें।
 
 ---
 
-### इसे भी देखें
+### See also
 
-* [फंक्शनल हैंडलिंग DSL](Functional-handling-DSL.md) - फंक्शनल अपडेट प्रोसेसिंग
-* [गार्ड](Guards.md) - हैंडलर-स्तरीय अनुमति जाँच
+* [Handlers (incl. Functional DSL)](Handlers.md) - Annotation- और DSL-आधारित हैंडलर परिभाषा
+* [Sessions](Sessions.md) - प्रति-चैट / प्रति-यूज़र स्थिति और मेसेज ट्रैकिंग
+* [Guards](Guards.md) - हैंडलर-लेवल परमिशन चेक्स
 ---

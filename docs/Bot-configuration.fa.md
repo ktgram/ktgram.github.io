@@ -1,13 +1,13 @@
 ---
 ---
-title: پیکربندی ربات
+title: Bot Configuration
 ---
 
-کتابخانه گزینه‌های زیادی برای پیکربندی ارائه می‌دهد، می‌توانید به مرجع API در کلاس [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) مراجعه کنید.
+Library provides plenty of configuration options, you can see api reference in the [`BotConfiguration`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.configuration/-bot-configuration/index.html) class description.
 
-دو رویکرد برای پیکربندی ربات وجود دارد:
+There are also two approaches to configuring the bot:
 
-### لانداوی Configurator
+### Configurator lambda
 
 ```kotlin
 // ...
@@ -21,101 +21,121 @@ val bot = TelegramBot("BOT_TOKEN") {
 // ...
 ```
 
-### رابط ConfigLoader
+### ConfigLoader interface
 
-همچنین امکان پیکربندی از طریق رابط خاص [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) وجود دارد،<br/> که می‌توانید برای بارگذاری تنظیمات از منابع خارجی (`properties`, `command line args`, و غیره) استفاده کنید.
+There is also the ability to configure through a special [`ConfigLoader`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.helper/-config-loader/index.html) interface,<br/> which you can use to load settings from external sources (`properties`, `command line args`, etc.).
 
-پیاده‌سازی این رابط می‌تواند از طریق سازنده ثانویه منتقل شود و نمونه مطابق با آن پیکربندی خواهد شد.
+The implementation of this interface can be passed through a secondary constructor and the instance will be configured accordingly.
 
 ```kotlin
 val bot = TelegramBot(ConfigLoaderImpl)
 ```
 
-در حال حاضر ماژول‌هایی مانند `ktgram-config-env` و `ktgram-config-toml` ارائه شده‌اند که این رابط را پیاده‌سازی می‌کنند.
+Currently there's several modules provided that implements this interface like `ktgram-config-env`, `ktgram-config-toml`.
 
 ### BotConfiguration Overview
 
 #### BotConfiguration
 
-کلاس `BotConfiguration` مرکز اصلی برای پیکربندی ربات است. شامل خصوصیاتی برای شناسایی ربات، تنظیم میزبان API، تعیین اینکه آیا ربات در محیط تستی عمل می‌کند، مدیریت ورودی‌ها، مدیریت کلاس‌ها و کنترل حذف خودکار ورودی است. علاوه بر این، خصوصیات داخلی برای محدودیت سرعت، پیکربندی کلاینت HTTP، لاگینگ، گوش‌دهی به آپدیت‌ها و تجزیه دستورات ارائه می‌کند.
+The `BotConfiguration` class is the central hub for configuring a bot. It includes properties for identifying the bot, setting up the API host, determining whether the bot operates in a test environment, handling inputs, managing classes, and controlling input auto-removal. Additionally, it provides internal properties for rate limiting, HTTP client configuration, logging, update listening, and command parsing.
 
 ##### Properties
 
-- `identifier`: شناسایی نمونه‌های مختلف ربات در پردازش چندرباتی.
-- `apiHost`: میزبان API تلگرام.
-- `isTestEnv`: پرچمی که نشان می‌دهد آیا ربات در محیط تستی عمل می‌کند.
-- `inputListener`: نمونه‌ای از کلاس مدیریت ورودی.
-- `classManager`: مدیری که برای دریافت کلاس‌ها استفاده می‌شود.
-- `inputAutoRemoval`: پرچمی که حذف خودکار نقطه ورود را در طول پردازش تنظیم می‌کند.
-- `exceptionHandlingStrategy`: استراتژی برای مدیریت استثناها را تعریف می‌کند.
-    * `CollectToChannel` - جمع‌آوری به `TgUpdateHandler.caughtExceptions`.
-    * `Throw` - دوباره پرتاب با لفاف `TgException`.
-    * `DoNothing` - هیچ کاری نکنید :)
-    * `Handle` - تنظیم کننده سفارشی.
-- `throwExOnActionsFailure`: استثنا پرتاب می‌شود وقتی هر درخواست رباتی شکست می‌خورد.
+- `identifier`: Identifies different bot instances during multi-bot processing.
+- `apiHost`: Host of the Telegram API.
+- `isTestEnv`: Flag indicating whether the bot operates in a test environment.
+- `inputListener`: Instance of the input handling class.
+- `classManager`: Manager used to get classes.
+- `inputAutoRemoval`: Flag regulating the auto-deletion of the input point during processing.
+- `exceptionHandlingStrategy`: Defines the strategy for handling exceptions.
+    * `CollectToChannel` - Collect to `TgUpdateHandler.caughtExceptions`.
+    * `Throw` - Throw again wrapped with `TgException`.
+    * `DoNothing` - Do nothing :)
+    * `Handle` - Set custom handler.
+- `throwExOnActionsFailure`: Throws an exception when any bot request fails.
 
 ##### Configuration Blocks
 
-`BotConfiguration` همچنین توابعی برای پیکربندی کامپوننت‌های داخلی خود ارائه می‌دهد:
+`BotConfiguration` also offers functions to configure its internal components:
 
-- `httpClient(block: HttpConfiguration.() -> Unit)`: کلاینت HTTP را پیکربندی می‌کند.
-- `logging(block: LoggingConfiguration.() -> Unit)`: لاگینگ را پیکربندی می‌کند.
-- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: محدود کردن درخواست‌ها را پیکربندی می‌کند.
-- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: گوش‌دهنده آپدیت‌ها را پیکربندی می‌کند.
-- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: الگوی تجزیه دستورات را مشخص می‌کند.
+- `httpClient(block: HttpConfiguration.() -> Unit)`: Configures the HTTP client.
+- `logging(block: LoggingConfiguration.() -> Unit)`: Configures logging.
+- `rateLimiter(block: RateLimiterConfiguration.() -> Unit)`: Configures request limiting.
+- `updatesListener(block: UpdatesListenerConfiguration.() -> Unit)`: Configures the updates listener.
+- `commandParsing(block: CommandParsingConfiguration.() -> Unit)`: Specifies command parsing pattern.
+- `sessions(block: SessionConfiguration.() -> Unit)` *(added in 9.5)*: Customizes the always-on session subsystem. See the [Sessions](Sessions.md) article for the full picture.
 
-### کلاس‌های پیکربندی مرتبط
+### Associated Configuration Classes
 
 #### RateLimiterConfiguration
 
-محدودیت سرعت جهانی را پیکربندی می‌کند.
+Configures global rate limiting.
 
-- `limits`: محدودیت‌های سرعت جهانی.
-- `mechanism`: مکانیزم مورد استفاده برای محدود کردن سرعت، به صورت پیش‌فرض الگوریتم TokenBucket است.
-- `exceededAction`: عملی که وقتی محدودیت تجاوز شود اعمال می‌شود.
+- `limits`: Global rate limits.
+- `mechanism`: Mechanism used for rate limiting, default is TokenBucket algorithm.
+- `exceededAction`: Action applied when the limit is exceeded.
 
 #### HttpConfiguration
 
-شامل پیکربندی برای کلاینت HTTP ربات است.
+Contains configuration for the bot's HTTP client.
 
-- `requestTimeoutMillis`: مهلت درخواست به میلی‌ثانیه.
-- `connectTimeoutMillis`: مهلت اتصال به میلی‌ثانیه.
-- `socketTimeoutMillis`: مهلت سوکت به میلی‌ثانیه.
-- `maxRequestRetry`: حداکثر تلاش مجدد برای درخواست‌های HTTP.
-- `retryStrategy`: استراتژی برای تلاش مجدد، قابل سفارشی‌سازی.
-- `retryDelay`: ضریب برای timeout در هر تلاش مجدد.
-- `proxy`: تنظیمات پروکسی برای تماس‌های HTTP.
-- `additionalHeaders`: هدرهایی که به هر درخواست اعمال می‌شود.
+- `requestTimeoutMillis`: Request timeout in milliseconds.
+- `connectTimeoutMillis`: Connection timeout in milliseconds.
+- `socketTimeoutMillis`: Socket timeout in milliseconds.
+- `maxRequestRetry`: Maximum retry for HTTP requests.
+- `retryStrategy`: Strategy for retries, customizable.
+- `retryDelay`: Multiplier for timeout at each retry.
+- `proxy`: Proxy settings for HTTP calls.
+- `additionalHeaders`: Headers applied to every request.
 
 #### LoggingConfiguration
 
-سطح‌های لاگینگ را برای اقدامات ربات و درخواست‌های HTTP مدیریت می‌کند.
+Manages logging levels for bot actions and HTTP requests.
 
-- `botLogLevel`: سطح لاگ‌ها برای اقدامات ربات.
-- `httpLogLevel`: سطح لاگ‌ها برای درخواست‌های HTTP.
+- `botLogLevel`: Level of logs for bot actions.
+- `httpLogLevel`: Level of logs for HTTP requests.
 
 #### UpdatesListenerConfiguration
 
-پارامترهای مربوط به کشیدن آپدیت‌ها را پیکربندی می‌کند.
+Configures parameters related to pulling updates.
 
-- `dispatcher`: dispatcher برای جمع‌آوری آپدیت‌های دریافتی.
-- `processingDispatcher`: dispatcher برای پردازش آپدیت‌ها.
-- `pullingDelay`: تاخیر پس از هر درخواست کشیدن.
-- `updatesPollingTimeout`: محدودیت زمانی برای مکانیزم long-polling.
+- `dispatcher`: Dispatcher for collecting incoming updates.
+- `processingDispatcher`: Dispatcher for processing updates.
+- `pullingDelay`: Delay after each pulling request.
+- `updatesPollingTimeout`: Timeout option for long-polling mechanism.
 
 #### CommandParsingConfiguration
 
-پارامترهایی برای تجزیه دستورات را مشخص می‌کند.
+Specifies parameters for command parsing.
 
-- `commandDelimiter`: جداکننده بین دستور و پارامترها.
-- `parametersDelimiter`: جداکننده بین پارامترها.
-- `parameterValueDelimiter`: جداکننده بین کلید و مقدار پارامتر.
-- `restrictSpacesInCommands`: پرچمی که نشان می‌دهد آیا فضاهای در دستورات باید به عنوان پایان دستور در نظر گرفته شود.
-- `useIdentifierInGroupCommands`: از شناسه ربات برای تطبیق دستورات حاوی @ استفاده می‌کند.
+- `commandDelimiter`: Separator between command and parameters.
+- `parametersDelimiter`: Separator between parameters.
+- `parameterValueDelimiter`: Separator between key and value of parameter.
+- `restrictSpacesInCommands`: Flag indicating if spaces in commands should be treated as the end of the command.
+- `useIdentifierInGroupCommands`: Uses bot's identifier to match commands containing @.
 
-### مثال پیکربندی
+#### SessionConfiguration *(added in 9.5)*
 
-در اینجا مثالی از نحوه پیکربندی ربات با استفاده از این کلاس‌ها آورده شده است:
+Customizes the always-on session subsystem. The block is optional — sessions work out of the box with in-memory storage and `SessionKeyStrategy.ChatUser`.
+
+- `keyStrategy`: How a `SessionKey` is derived from an update (`ChatUser`, `Chat`, `Auto`, or a custom `fun interface` implementation).
+- `storage`: Backend that stores tracked messages. Default is `InMemorySessionStorage`; plug in Redis / JDBC by implementing `SessionStorage`.
+- `managerFactory`: Builds the `SessionManager` for the bot. Override only when you need a custom manager.
+
+```kotlin
+val bot = TelegramBot("BOT_TOKEN") {
+    sessions {
+        keyStrategy = SessionKeyStrategy.Auto
+        storage = InMemorySessionStorage()
+    }
+}
+```
+
+See the [Sessions article](Sessions.md) for end-to-end usage.
+
+### Example Configuration
+
+Here's an example of how to configure a bot using these classes:
 
 ```kotlin
 val bot = TelegramBot("TOKEN") {
@@ -147,7 +167,7 @@ val bot = TelegramBot("TOKEN") {
 }
 ```
 
-این پیکربندی یک ربات با شناسه‌های خاص، حالت محیط تست را فعال می‌کند، محدودیت سرعت، تنظیمات کلاینت HTTP، سطوح لاگینگ، پارامترهای گوش‌دهنده آپدیت‌ها و قوانین تجزیه دستورات را پیکربندی می‌کند.
+This configuration sets up a bot with specific identifiers, enables test environment mode, configures rate limiting, HTTP client settings, logging levels, update listener parameters, and command parsing rules.
 
-با استفاده از این گزینه‌های پیکربندی، توسعه‌دهندگان می‌توانند ربات‌های خود را برای برآورده کردن نیازهای خاص و بهینه‌سازی عملکرد در سناریوهای مختلف عملیاتی تنظیم کنند.
+By leveraging these configuration options, developers can fine-tune their bots to meet specific requirements and optimize performance across various operational scenarios.
 ---

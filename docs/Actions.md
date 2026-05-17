@@ -5,9 +5,26 @@ title: Actions
 ### All requests is Actions
 All telegram api requests are various kinds of [`TgAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.action/-tg-action/index.html) interfaces that implementing different methods such as [`SendMessageAction`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/-send-message-action/index.html), <br/>which have wrapped in the form of [`message()`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.api.message/message.html) - type functions for the convenience of the library interface.
 
-<p align="center">
-    <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/2d097d60-1907-4ca1-8ad3-3ee8d223f8eb" alt="Actions diagram" />
-</p>
+```mermaid
+classDiagram
+    class TgAction~T~
+    class SimpleAction~T~
+    class Action~T~
+    class MediaAction~T~
+    TgAction <|-- SimpleAction
+    TgAction <|-- Action
+    Action <|-- MediaAction
+    class OptionsFeature
+    class MarkupFeature
+    class EntitiesFeature
+    class CaptionFeature
+    Action ..|> OptionsFeature
+    Action ..|> MarkupFeature
+    Action ..|> EntitiesFeature
+    MediaAction ..|> CaptionFeature
+```
+
+
 
 Each `Action` may be able of having its own possible methods, depending on the available [`Feature`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.interfaces.features/-feature/index.html).
 

@@ -4,110 +4,133 @@ title: Home
 ---
 
 ### Intro
-Давайте представим, как библиотека обрабатывает обновления в общем:
+Давайте получим представление о том, как библиотека в целом обрабатывает обновления:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/442cc5f1-0256-425a-9f25-185fdd49fe0a" alt="Схема процесса обработки" />
-</p>
+```mermaid
+flowchart LR
+    U["Telegram Update"] --> P["Processing<br/>repackage to ProcessedUpdate"]
+    P --> H["Handling<br/>match against activities"]
+    H --> I["Invocation<br/>call handler with injected params"]
+```
 
 После получения обновления библиотека выполняет три основных шага, как мы видим.
 
 ### Processing
 
-Обработка означает перепаковку полученного обновления в соответствующий подкласс [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) в зависимости от полезной нагрузки.
+Processing — это переупаковка полученного обновления в соответствующий подкласс [`ProcessedUpdate`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.types.component/-processed-update/index.html) в зависимости от передаваемой полезной нагрузки.
 
-Этот шаг необходим для облегчения работы с обновлением и расширения возможностей обработки.
+Этот шаг необходим, чтобы упростить работу с обновлением и расширить возможности обработки.
 
 ### Handling
 
-Далее следует основной шаг — собственно обработка.
+Далее следует основной шаг — непосредственно обработка.
 
 ### Global RateLimiter
 
-Если в обновлении есть пользователь, мы проверяем превышение глобального лимита.
+Если в обновлении присутствует пользователь, мы проверяем превышение глобального ограничителя скорости.
 
 ### Parse text
 
-Далее в зависимости от полезной нагрузки мы берем соответствующий компонент обновления, содержащий текст, и парсим его согласно конфигурации.
+Затем, в зависимости от полезной нагрузки, мы берём конкретный компонент обновления, содержащий текст, и разбираем его согласно конфигурации.
 
-Более подробно можно посмотреть в [статье о парсинге обновлений](Update-parsing.md).
+Более подробно см. в статье [update parsing article](Update-parsing.md).
 
 ### Find Activity
 
-Далее в соответствии с приоритетом обработки:
+Далее, согласно приоритету обработки:
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/6178c410-9b9e-4045-9f03-4791b3f49894" alt="Схема приоритета обработки" />
-</p>
+```mermaid
+flowchart TD
+    Start(["Parsed update"]) --> Cmd{"matches a @CommandHandler?"}
+    Cmd -- yes --> CmdDone["Invoke command"]
+    Cmd -- no --> Inp{"user has pending input?"}
+    Inp -- yes --> InpDone["Invoke @InputHandler"]
+    Inp -- no --> Com{"matches any @CommonHandler?"}
+    Com -- yes --> ComDone["Invoke common handler"]
+    Com -- no --> Unp["Invoke @UnprocessedHandler"]
+    Start -. parallel .-> UH["@UpdateHandler — always runs"]
+```
 
-Мы ищем соответствие между распарсенными данными и активностями, с которыми работаем.
-Как видно на схеме приоритета, `Команды` всегда идут первыми.
+Мы ищем соответствие между разобранными данными и действиями, которые обрабатываем.
+Как видно из диаграммы приоритетов, `Commands` всегда идут первыми.
 
-То есть если текстовая нагрузка в обновлении соответствует какой-либо команде, дальнейший поиск `Вводов`, `Общих` и конечно выполнение действия `Необработанных` не будут выполнены.
+То есть, если текстовая нагрузка в обновлении соответствует какой‑нибудь команде, дальнейший поиск `Inputs`, `Common` и, конечно, выполнение действия `Unprocessed` не будет выполнено.
 
-Единственное — если есть `UpdateHandlers`, он будет запущен параллельно независимо.
+Единственное, что `UpdateHandlers` будет запущен параллельно независимо от этого.
 
 #### Commands
 
-Давайте подробнее рассмотрим команды и их обработку.
+Давайте более детально рассмотрим команды и их обработку.
 
-Как вы могли заметить, хотя аннотация для обработки команд называется [`CommandHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-command-handler/index.html), она более универсальна, чем классическое понятие в Telegram Bots.
+Как вы могли заметить, хотя аннотация для обработки команд называется [`CommandHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-command-handler/index.html), она более универсальна, чем классическое понятие в Telegram‑ботах.
 
 ##### Scopes
 
-Это потому что у нее более широкий спектр возможностей обработки, то есть целевая функция может быть определена не только в зависимости от совпадения текста, но и от типа подходящего обновления — это концепция scopes.
+Это связано с более широким набором возможностей обработки, т.е. целевая функция может определяться не только по совпадению текста, но и по типу подходящего обновления — это и есть концепция областей (scopes).
 
-Соответственно, каждая команда может иметь разные обработчики для разных списков scopes, или наоборот — одна команда для нескольких.
+Соответственно, каждая команда может иметь разные обработчики для разных списков областей, или наоборот, одна команда может обслуживать несколько областей.
 
-Ниже можно увидеть, как выполняется маппинг по текстовой нагрузке и scope:
+Ниже показано, как происходит сопоставление по текстовой нагрузке и области:
+
+```mermaid
+flowchart LR
+    Text["text payload<br/>(e.g. /start)"] --> Match["CommandHandler lookup"]
+    UpdType["update type<br/>(MESSAGE, CALLBACK_QUERY, ...)"] --> Match
+    Match --> Handler["Best-matching<br/>@CommandHandler function"]
+```
 
 <p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="Схема scope команды" />
+  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/c870027e-750e-4bb8-a2ed-45ad93a55875" alt="Command scope diagram" />
 </p>
 
 #### Inputs
 
-Далее, если текстовая нагрузка не соответствует ни одной команде, ищутся точки ввода.
+Далее, если текстовая нагрузка не совпадает с любой командой, ищутся точки ввода.
 
-Концепция очень похожа на ожидание ввода в командных строковых приложениях — вы помещаете в контекст бота для конкретного пользователя точку, которая будет обрабатывать его следующий ввод, не важно что он содержит, главное чтобы следующее обновление имело `User` для возможности связать его с установленной точкой ожидания ввода.
+Концепция схожа с ожиданием ввода в командных приложениях: вы помещаете в контекст бота для конкретного пользователя точку, которая будет обрабатывать его следующий ввод, не важно, что он содержит, главное, чтобы следующее обновление имело `User`, позволяющий связать его с установленной точкой ожидания ввода.
 
-Ниже можно увидеть пример обработки обновления, когда нет совпадения по `Командам`.
+Ниже пример обработки обновления, когда нет совпадения по `Commands`.
 
-<p align="center">
-  <img src="https://github.com/vendelieu/telegram-bot/assets/3987067/925d3e05-0985-43d5-8d6f-b3f2786ff212" alt="Пример схемы приоритета" />
-</p>
+```mermaid
+flowchart LR
+    Upd["Update arrives"] --> Cmd{"matches a command?"}
+    Cmd -- no --> InpPoint{"user has<br/>an input-waiting point?"}
+    InpPoint -- yes --> Hit["Invoke matching @InputHandler<br/>(input is consumed)"]
+    InpPoint -- no --> Fallback["Fall through to Common / Unprocessed"]
+```
 
 #### Commons
 
-Если обработчик не находит `команд` или `вводов`, он проверяет текстовую нагрузку на `common` обработчики.
+Если обработчик не находит `commands` или `inputs`, он проверяет текстовую нагрузку против `common`‑обработчиков.
 
-Рекомендуем использовать это без злоупотреблений, так как проверка выполняется итерацией по всем записям.
+Мы советуем использовать это без злоупотреблений, поскольку происходит итерация по всем записям.
 
 #### Unprocessed
 
-И финальный шаг — если обработчик не находит никакой подходящей активности ([`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) работает полностью параллельно и не считается обычной активностью), тогда вступает в действие [`UnprocessedHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html), если он установлен, он обработает этот случай, это может быть полезно для предупреждения пользователя, что что-то пошло не так.
+И окончательный шаг: если обработчик не нашёл ни одного подходящего действия ([`UpdateHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-update-handler/index.html) работает полностью параллельно и не считается обычным действием), то вступает в действие [`UnprocessedHandler`](https://vendelieu.github.io/telegram-bot/telegram-bot/eu.vendeli.tgbot.annotations/-unprocessed-handler/index.html); если он установлен, он обработает этот случай, что может быть полезно для предупреждения пользователя о том, что что‑то пошло не так.
 
-Более подробно читайте в [статье об обработчиках](Handlers.md).
+Более подробно — в статье [Handlers article](Handlers.md).
 
 ### Activity RateLimiter
 
-После нахождения активности также проверяются лимиты пользователя на ней в соответствии с параметрами, указанными в параметрах активности.
+После нахождения действия также проверяются ограничения скорости пользователя для него, согласно параметрам, указанным в параметрах действия.
 
 ### Activity
 
-Activity относится к различным типам обработчиков, которые может обрабатывать библиотека Telegram Bot, включая Commands, Inputs, Regexes и обработчик Unprocessed.
+Activity относится к различным типам обработчиков, которые может обрабатывать библиотека telegram‑bot, включая Commands, Inputs, Regexes и Unprocessed‑handler.
 
 ### Invocation
 
-Финальный шаг обработки — вызов найденной активности.
+Последний шаг обработки — вызов найденного действия.
 
-Более подробности можно найти в [статье об invocation](Activity-invocation.md).
+Подробнее см. в статье [invocation article](Activity-invocation.md).
 
 ### See also
 
 * [Update parsing](Update-parsing.md)
 * [Activity invocation](Activity-invocation.md)
 * [Handlers](Handlers.md)
+* [Sessions](Sessions.md)
 * [Bot configuration](Bot-configuration.md)
-* [Web starters (Spring, Ktor)](Web-starters-(Spring-and-Ktor.md))
+* [Web starters (Spring, Ktor)](Web-starters-(Spring-and-Ktor.md)
 ---

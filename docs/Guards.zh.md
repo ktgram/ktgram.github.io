@@ -3,82 +3,82 @@
 title: Guards
 ---
 
-### 介绍
-Guards 是开发者创建机器人时的一项重要功能。这些 guards 作为执行前检查，用于确定特定命令是否应该被调用。通过实现这些检查，开发者可以增强机器人的功能性、安全性和用户体验。
+### Introduction
+Guards 是开发者创建机器人时的一个重要特性。这些 guard 充当执行前的检查，决定是否应调用特定命令。通过实现这些检查，开发者可以提升机器人功能、安全性和用户体验。
 
-### Activity Guards 的用途
-Activity Guards 的主要目的是确保只有授权用户或特定条件才能触发一个 activity。
+### Purpose of Activity Guards
+活动 guard 的主要目的是确保只有授权用户或满足特定条件时才会触发活动。
 
-这可以防止滥用，维护机器人的完整性，并简化交互。
+这可以防止滥用，维护机器人的完整性，并简化交互流程。
 
-### 常见使用场景
-1. 认证和授权：确保只有特定用户可以访问特定命令。
-2. 前置条件检查：在执行 activity 之前验证某些条件是否满足（例如，确保用户处于特定状态或上下文中）。
-3. 上下文 Guards：根据当前聊天或用户状态进行决策。
+### Common Use Cases
+1. 身份验证与授权：确保只有特定用户能够访问特定命令。  
+2. 前置条件检查：在执行活动之前验证某些条件是否满足（例如，确保用户处于特定状态或上下文）。  
+3. 上下文 guard：根据当前聊天或用户状态作出决策。
 
-### 实现策略
-实现 Telegram Command Guards 通常涉及编写封装每个 guard 逻辑的函数或方法。以下是常见策略：
+### Implementation Strategies
+实现 Telegram 命令 guard 通常涉及编写函数或方法来封装每个 guard 的逻辑。以下是常见策略：
 
-1. 用户角色检查：
-   - 确保用户具有执行命令所需角色（例如管理员、版主）之前执行命令。
+1. User Role Check:
+   - 在执行命令之前确保用户拥有所需角色（例如，admin、moderator）。
       ```kotlin
        override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 检查用户是否为给定聊天中的管理员
+        // Check if the user is an admin in the given chat
        }
       ```
-
-2. 状态验证：
-   - 在允许命令执行之前检查用户状态。
+   
+2. State Verification:
+   - 在允许命令执行之前检查用户的状态。
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
         return bot.userData[user.id, "data"] == requiredState
      }
      ```
-
-3. 自定义 Guards：
-   - 根据特定要求创建自定义逻辑。
+   
+3. Custom Guards:
+   - 根据具体需求创建自定义逻辑。
      ```kotlin
      override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 自定义逻辑来确定是否应该执行命令
+        // Custom logic to determine if the command should be executed
      }
      ```
+   
+### Integrating Guards with Activities
+要将这些 guard 与机器人命令集成，可以创建一个在命令处理器被调用前检查这些条件的 guard。
 
-### 将 Guards 与 Activities 集成
-要将这些 guards 与机器人命令集成，您可以创建一个 guard 来检查这些条件，然后再调用命令处理程序。
-
-### 实现示例
+### Implementing Example
 
 ```kotlin
-// 在某处定义实现 Guard 接口的 guard 类
+// define somewhere your guard class that implements Guard interface
 object YourGuard : Guard {
     override suspend fun condition(user: User?, update: ProcessedUpdate, bot: TelegramBot): Boolean {
-        // 在此处编写条件
+        // write your condition here
     }
 }
 
 // ...
 
 @CommandHandler(["yourCommand"])
-@Guard(YourGuard::class) // 也支持 InputHandler
+@Guard(YourGuard::class) // InputHandler also is supported
 fun command(bot: TelegramBot) {
-   // 命令主体
+   // command body
 }
 ```
 
-### 最佳实践
+### Best Practices
 
-- 模块化：保持 guard 逻辑模块化并与 activities 分离。
-- 可重用性：编写可重用的 guard 函数，可以轻松应用于不同的命令/输入。
-- 效率：优化 guard 检查以最小化性能开销。
-- 用户反馈：当 guard 阻止命令时向用户提供清晰的反馈。
+- Modularity: 将 guard 逻辑保持模块化并与活动分离。  
+- Reusability: 编写可在不同命令/输入之间轻松复用的 guard 函数。  
+- Efficiency: 优化 guard 检查以最小化性能开销。  
+- User Feedback: 当命令被 guard 阻止时，向用户提供明确的反馈。
 
-### 结论
+### Conclusion
 
-Activity Guards 是管理机器人命令/输入执行的一种强大工具。
+Activity Guards 是管理机器人命令/输入执行的强大工具。
 
-通过实现强大的 guard 机制，开发者可以确保他们的机器人安全高效地运行，提供更好的用户体验。
+通过实现健壮的 guard 机制，开发者可以确保机器人安全高效运行，提供更好的用户体验。
 
-### 另请参阅
+### See also
 
 * [Activities and Proccessors](Activites-and-Processors.md)
 * [Update parsing](Update-parsing.md)
