@@ -18,9 +18,9 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Model fallback chain (primary first, then fallbacks)
 MODELS = [
-    "arcee-ai/trinity-large-preview:free",
-    "deepseek/deepseek-r1-0528:free",
-    "stepfun/step-3.5-flash:free",
+    "deepseek/deepseek-v4-flash:free",
+    "qwen/qwen3-next-80b-a3b-instruct:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
 ]
 
 # Config
