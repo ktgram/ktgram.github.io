@@ -15,18 +15,31 @@ import yaml
 
 # OpenRouter API
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
 
-# Model fallback chain (primary first, then fallbacks)
-MODELS = [
+# Provider ranking — earlier providers are tried first when discovering free models.
+PROVIDER_PREFERENCE = [
+    "deepseek", "qwen", "google", "meta-llama", "openai",
+    "mistralai", "nvidia", "z-ai", "nousresearch", "minimax", "arcee-ai",
+]
+
+# Skip ID fragments unsuitable for prose translation (code-only, reasoning-trace, vision).
+SKIP_PATTERNS = ("coder", "thinking", "reasoning", "vision", "-vl")
+
+# Minimum context window to consider (smaller models truncate docs).
+MIN_CONTEXT = 8192
+
+# Minimum parameter count (in billions) for translation-quality output.
+MIN_PARAMS_B = 10.0
+
+# Regex pulling a parameter count out of model IDs like "llama-3.3-70b-instruct".
+PARAM_SIZE_RE = re.compile(r"-(\d+(?:\.\d+)?)b[-:]")
+
+# Static fallback used only when the catalog API is unreachable.
+FALLBACK_MODELS = [
     "deepseek/deepseek-v4-flash:free",
     "qwen/qwen3-next-80b-a3b-instruct:free",
     "meta-llama/llama-3.3-70b-instruct:free",
-    "google/gemma-4-31b-it:free",
-    "openai/gpt-oss-120b:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
-    "z-ai/glm-4.5-air:free",
-    "nousresearch/hermes-3-llama-3.1-405b:free",
-    "minimax/minimax-m2.5:free",
 ]
 
 # Config
@@ -114,6 +127,56 @@ def load_config() -> list[dict]:
     return data.get("languages", [])
 
 
+def discover_free_models() -> list[str]:
+    """Fetch OpenRouter catalog and return ranked free models suitable for translation."""
+    try:
+        resp = requests.get(OPENROUTER_MODELS_URL, timeout=30)
+        resp.raise_for_status()
+        models = resp.json()["data"]
+    except (requests.RequestException, KeyError, ValueError) as e:
+        print(f"Model discovery failed ({e}), using static fallback list.", flush=True)
+        return FALLBACK_MODELS
+
+    def is_eligible(m: dict) -> bool:
+        model_id = m.get("id", "")
+        if not model_id.endswith(":free"):
+            return False
+        pricing = m.get("pricing") or {}
+        if pricing.get("prompt") != "0" or pricing.get("completion") != "0":
+            return False
+        if (m.get("context_length") or 0) < MIN_CONTEXT:
+            return False
+        arch = m.get("architecture") or {}
+        input_mods = arch.get("input_modalities") or []
+        output_mods = arch.get("output_modalities") or []
+        if "text" not in input_mods or "text" not in output_mods:
+            return False
+        slug = model_id.lower()
+        if any(p in slug for p in SKIP_PATTERNS):
+            return False
+        size_match = PARAM_SIZE_RE.search(slug)
+        if size_match and float(size_match.group(1)) < MIN_PARAMS_B:
+            return False
+        return True
+
+    def rank(m: dict) -> tuple[int, int]:
+        provider = m["id"].split("/", 1)[0]
+        try:
+            pref = PROVIDER_PREFERENCE.index(provider)
+        except ValueError:
+            pref = len(PROVIDER_PREFERENCE)
+        # Tie-break by context length (larger first).
+        return (pref, -(m.get("context_length") or 0))
+
+    eligible = sorted((m for m in models if is_eligible(m)), key=rank)
+    ids = [m["id"] for m in eligible]
+    if not ids:
+        print("No eligible free models discovered, using static fallback list.", flush=True)
+        return FALLBACK_MODELS
+    print(f"Discovered {len(ids)} free models. Top 5: {', '.join(ids[:5])}", flush=True)
+    return ids
+
+
 def get_base_docs() -> list[Path]:
     """Find docs without language suffix (e.g. Actions.md, not Actions.zh.md)."""
     base_docs = []
@@ -127,6 +190,7 @@ def translate_content(
     content: str,
     language_name: str,
     token: str,
+    models: list[str],
 ) -> str:
     """Call OpenRouter API to translate content. Tries models in fallback order."""
     user_prompt = USER_PROMPT_TEMPLATE.format(
@@ -142,7 +206,7 @@ def translate_content(
         "Content-Type": "application/json",
     }
     last_error = None
-    for model in MODELS:
+    for model in models:
         payload = {
             "model": model,
             "messages": messages,
@@ -182,12 +246,13 @@ def _translate_one(
     content: str,
     lang: dict,
     token: str,
+    models: list[str],
 ) -> tuple[Path, str]:
     """Translate one (doc, language) pair. Returns (out_path, translated_content)."""
     locale = lang["locale"]
     name = lang["name"]
     out_path = DOCS_DIR / f"{stem}.{locale}.md"
-    translated = translate_content(content, name, token)
+    translated = translate_content(content, name, token, models)
     return (out_path, translated)
 
 
@@ -203,6 +268,8 @@ def main() -> None:
     if not base_docs:
         print("No base docs found.", flush=True)
         return
+
+    models = discover_free_models()
 
     # Build list of (doc_name, stem, content, lang) for parallel execution
     tasks = []
@@ -221,7 +288,7 @@ def main() -> None:
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = {
-            executor.submit(_translate_one, name, stem, content, lang, token): (name, lang)
+            executor.submit(_translate_one, name, stem, content, lang, token, models): (name, lang)
             for name, stem, content, lang in tasks
         }
         done = 0
